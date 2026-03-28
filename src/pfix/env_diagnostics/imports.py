@@ -200,7 +200,15 @@ class ImportDiagnostic(BaseDiagnostic):
     def _extract_module_name(self, msg: str) -> str:
         """Extract module name from error message."""
         # "No module named 'pandas'" -> "pandas"
-        match = __import__('re').search(r"[\"']?([a-zA-Z_][a-zA-Z0-9_.]*)[\"']?", msg)
+        # Try to find quoted module name first (most reliable)
+        match = __import__('re').search(r"['\"]([a-zA-Z_][a-zA-Z0-9_.]*)['\"]", msg)
         if match:
             return match.group(1).split(".")[0]
+        # Fallback: try to find first module-like name
+        match = __import__('re').search(r"\b([a-zA-Z_][a-zA-Z0-9_]*)\b", msg)
+        if match:
+            # Filter out common words that aren't modules
+            word = match.group(1)
+            if word.lower() not in ('no', 'named', 'module', 'the', 'a', 'an'):
+                return word
         return "unknown"

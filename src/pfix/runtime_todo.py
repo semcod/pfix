@@ -419,22 +419,30 @@ class RuntimeCollector:
 
     def _classify(self, exc: BaseException) -> str:
         """Classify error into category."""
+        # Order matters: check most specific exceptions first
         mapping = {
+            # Import errors (most specific first)
             ModuleNotFoundError: "import_error",
             ImportError: "import_error",
+            # Network errors (ConnectionError subclasses before OSError)
+            ConnectionRefusedError: "network_error",
+            ConnectionResetError: "network_error",
+            ConnectionError: "network_error",
+            TimeoutError: "network_error",
+            # Filesystem errors
             FileNotFoundError: "filesystem_error",
             PermissionError: "filesystem_error",
             IsADirectoryError: "filesystem_error",
             NotADirectoryError: "filesystem_error",
-            OSError: "os_error",
-            MemoryError: "memory_error",
-            RecursionError: "memory_error",
-            ConnectionError: "network_error",
-            ConnectionRefusedError: "network_error",
-            ConnectionResetError: "network_error",
-            TimeoutError: "network_error",
+            # Process errors
             ChildProcessError: "process_error",
             ProcessLookupError: "process_error",
+            # Memory errors
+            MemoryError: "memory_error",
+            RecursionError: "memory_error",
+            # General OS error (after specific subclasses)
+            OSError: "os_error",
+            # Other errors
             TypeError: "type_error",
             ValueError: "value_error",
             KeyError: "key_error",
@@ -442,9 +450,9 @@ class RuntimeCollector:
             AttributeError: "attribute_error",
             NameError: "name_error",
             SyntaxError: "syntax_error",
-            UnicodeError: "encoding_error",
             UnicodeDecodeError: "encoding_error",
             UnicodeEncodeError: "encoding_error",
+            UnicodeError: "encoding_error",
         }
         for exc_type, category in mapping.items():
             if isinstance(exc, exc_type):

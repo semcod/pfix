@@ -38,6 +38,7 @@ from .paths import PathDiagnostic
 from .process import ProcessDiagnostic
 from .python_version import PythonVersionDiagnostic
 from .serialization import SerializationDiagnostic
+from .third_party import ThirdPartyDiagnostic
 from .venv import VenvDiagnostic
 
 
@@ -60,6 +61,7 @@ class EnvDiagnostics:
             ConcurrencyDiagnostic(),
             SerializationDiagnostic(),
             HardwareDiagnostic(),
+            ThirdPartyDiagnostic(),
         ]
 
     def check_all(self, categories: list[str] | None = None) -> list["DiagnosticResult"]:
@@ -232,4 +234,5 @@ __all__ = [
     "ConcurrencyDiagnostic",
     "SerializationDiagnostic",
     "HardwareDiagnostic",
+    "ThirdPartyDiagnostic",
 ]

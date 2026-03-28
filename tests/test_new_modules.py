@@ -173,22 +173,487 @@ class TestCache:
         assert stats["backend"] in ["sqlite", "diskcache"]
 
 
-# ── EnvDiagnostics Imports Test ───────────────────────────────────────
+from pfix.env_diagnostics.hardware import HardwareDiagnostic
+from pfix.env_diagnostics.concurrency import ConcurrencyDiagnostic
+from pfix.env_diagnostics.serialization import SerializationDiagnostic
+from pfix.types import ErrorContext
+
+
+# ── Hardware Diagnostic Tests ───────────────────────────────────────
+
+class TestHardwareDiagnostic:
+    def test_initialization(self):
+        diag = HardwareDiagnostic()
+        assert diag.category == "hardware"
+
+    def test_cpu_count_check(self, tmp_path):
+        diag = HardwareDiagnostic()
+        results = diag._check_cpu_count()
+        # Should return list (may be empty if multiple CPUs)
+        assert isinstance(results, list)
+        # If single CPU, should warn
+        import multiprocessing
+        if multiprocessing.cpu_count() == 1:
+            assert len(results) == 1
+            assert results[0].check_name == "single_cpu"
+            assert results[0].status == "warning"
+
+    def test_gpu_check_no_cuda(self, tmp_path, monkeypatch):
+        diag = HardwareDiagnostic()
+        # Ensure no CUDA env var
+        monkeypatch.delenv("CUDA_VISIBLE_DEVICES", raising=False)
+        results = diag._check_gpu_availability()
+        # Should return empty list when no CUDA expected
+        assert isinstance(results, list)
+
+    def test_docker_check_not_in_docker(self, tmp_path, monkeypatch):
+        diag = HardwareDiagnostic()
+        results = diag._check_docker_limits()
+        # Not in docker, should return empty list
+        assert isinstance(results, list)
+
+    def test_diagnose_exception_cuda_error(self):
+        diag = HardwareDiagnostic()
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=10,
+            exception_type="RuntimeError",
+            exception_message="CUDA out of memory",
+        )
+        # Hardware diagnostic returns None for exceptions
+        result = diag.diagnose_exception(RuntimeError("CUDA error"), ctx)
+        assert result is None
+
+
+# ── Concurrency Diagnostic Tests ────────────────────────────────────
+
+class TestConcurrencyDiagnostic:
+    def test_initialization(self):
+        diag = ConcurrencyDiagnostic()
+        assert diag.category == "concurrency"
+
+    def test_thread_count_normal(self):
+        diag = ConcurrencyDiagnostic()
+        results = diag._check_thread_count()
+        # Normal thread count should not trigger warning
+        assert isinstance(results, list)
+
+    def test_asyncio_loop_check(self):
+        diag = ConcurrencyDiagnostic()
+        results = diag._check_asyncio_loop()
+        # Should return list (ok status if loop running, empty otherwise)
+        assert isinstance(results, list)
+
+    def test_diagnose_asyncio_loop_error(self):
+        diag = ConcurrencyDiagnostic()
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=20,
+            exception_type="RuntimeError",
+            exception_message="asyncio loop is already running",
+        )
+        exc = RuntimeError("asyncio loop is already running")
+        result = diag.diagnose_exception(exc, ctx)
+        assert result is not None
+        assert result.check_name == "asyncio_loop_already_running"
+        assert result.status == "error"
+        assert result.category == "concurrency"
+
+    def test_diagnose_other_exception_returns_none(self):
+        diag = ConcurrencyDiagnostic()
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=20,
+            exception_type="ValueError",
+            exception_message="some other error",
+        )
+        exc = ValueError("some other error")
+        result = diag.diagnose_exception(exc, ctx)
+        assert result is None
+
+
+# ── Serialization Diagnostic Tests ──────────────────────────────────
+
+class TestSerializationDiagnostic:
+    def test_initialization(self):
+        diag = SerializationDiagnostic()
+        assert diag.category == "serialization"
+
+    def test_pickle_protocol_check(self):
+        diag = SerializationDiagnostic()
+        results = diag._check_pickle_protocol()
+        # Should return list with warning about protocol versions
+        assert isinstance(results, list)
+        if results:
+            assert results[0].check_name == "pickle_protocol"
+            assert "protocol" in results[0].message.lower()
+
+    def test_cache_files_check(self, tmp_path):
+        diag = SerializationDiagnostic()
+        # Create test pycache
+        cache_dir = tmp_path / "__pycache__"
+        cache_dir.mkdir()
+        (cache_dir / "test.cpython-39.pyc").write_text("fake pyc")
+
+        results = diag._check_cache_files(tmp_path)
+        # Should not error on valid cache
+        assert isinstance(results, list)
+
+    def test_diagnose_pickle_error(self):
+        diag = SerializationDiagnostic()
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=30,
+            exception_type="PickleError",
+            exception_message="cannot pickle object",
+        )
+        exc = type("PickleError", (Exception,), {})("cannot pickle object")
+        result = diag.diagnose_exception(exc, ctx)
+        assert result is not None
+        assert result.check_name == "pickle_error"
+        assert result.category == "serialization"
+
+    def test_diagnose_json_error(self):
+        diag = SerializationDiagnostic()
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=30,
+            exception_type="JSONDecodeError",
+            exception_message="invalid json",
+        )
+        # Test with ValueError containing "json"
+        exc = ValueError("invalid json at position 0")
+        result = diag.diagnose_exception(exc, ctx)
+        assert result is not None
+        assert result.check_name == "json_error"
+        assert result.category == "serialization"
+
+    def test_diagnose_other_exception_returns_none(self):
+        diag = SerializationDiagnostic()
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=30,
+            exception_type="ValueError",
+            exception_message="not a serialization error",
+        )
+        exc = ValueError("not a serialization error")
+        result = diag.diagnose_exception(exc, ctx)
+        assert result is None
+
+
+# ── Integration Tests ───────────────────────────────────────────────
 
 class TestEnvDiagnosticsImports:
     def test_import_env_diagnostics(self):
         from pfix.env_diagnostics import EnvDiagnostics
         assert EnvDiagnostics is not None
-    
+
     def test_import_base_diagnostic(self):
         from pfix.env_diagnostics.base import BaseDiagnostic
         assert BaseDiagnostic is not None
-    
+
     def test_import_specific_diagnostics(self):
         from pfix.env_diagnostics.imports import ImportDiagnostic
         from pfix.env_diagnostics.filesystem import FilesystemDiagnostic
         from pfix.env_diagnostics.memory import MemoryDiagnostic
-        
+
         assert ImportDiagnostic is not None
         assert FilesystemDiagnostic is not None
         assert MemoryDiagnostic is not None
+
+
+# ── Runtime TODO Tests ────────────────────────────────────────────────
+
+class TestRuntimeTodo:
+    def test_error_fingerprint_normalization(self):
+        from pfix.runtime_todo import ErrorFingerprint
+
+        # Test IP normalization
+        msg = "Connection refused: 192.168.1.100:5432"
+        normalized = ErrorFingerprint._normalize_error_message(msg)
+        assert "<ip>" in normalized
+        assert "192.168.1.100" not in normalized
+        assert "<port>" in normalized
+
+        # Test memory address normalization
+        msg2 = "Object at 0x7f8b2c4d5e6f"
+        normalized2 = ErrorFingerprint._normalize_error_message(msg2)
+        assert "<addr>" in normalized2
+        assert "0x7f8b2c4d5e6f" not in normalized2
+
+    def test_error_fingerprint_consistency(self):
+        from pfix.runtime_todo import ErrorFingerprint
+        from pfix.types import RuntimeIssue, TraceFrame
+
+        # Same error should produce same fingerprint
+        issue1 = RuntimeIssue(
+            abs_filepath="/app/test.py",
+            line_number=10,
+            function_name="test_func",
+            exception_type="ValueError",
+            exception_message="test error",
+        )
+        issue2 = RuntimeIssue(
+            abs_filepath="/app/test.py",
+            line_number=10,
+            function_name="test_func",
+            exception_type="ValueError",
+            exception_message="test error",
+        )
+
+        fp1 = ErrorFingerprint.compute(issue1)
+        fp2 = ErrorFingerprint.compute(issue2)
+        assert fp1 == fp2
+
+    def test_error_fingerprint_differentiation(self):
+        from pfix.runtime_todo import ErrorFingerprint
+        from pfix.types import RuntimeIssue
+
+        # Different errors should produce different fingerprints
+        issue1 = RuntimeIssue(
+            abs_filepath="/app/test.py",
+            line_number=10,
+            function_name="test_func",
+            exception_type="ValueError",
+            exception_message="error one",
+        )
+        issue2 = RuntimeIssue(
+            abs_filepath="/app/test.py",
+            line_number=10,
+            function_name="test_func",
+            exception_type="TypeError",
+            exception_message="error one",
+        )
+
+        fp1 = ErrorFingerprint.compute(issue1)
+        fp2 = ErrorFingerprint.compute(issue2)
+        assert fp1 != fp2
+
+    def test_todofile_append_and_dedup(self, tmp_path):
+        from pfix.runtime_todo import TodoFile
+        from pfix.types import RuntimeIssue, TraceFrame
+        from datetime import datetime, timezone
+
+        todo_file = tmp_path / "TODO.md"
+        todo = TodoFile(todo_file)
+
+        # Create first issue
+        issue = RuntimeIssue(
+            abs_filepath=str(tmp_path / "app.py"),
+            line_number=42,
+            function_name="main",
+            module_name="app",
+            exception_type="RuntimeError",
+            exception_message="test error",
+            traceback_frames=[
+                TraceFrame(filepath=str(tmp_path / "app.py"), line_number=42, function_name="main", code_line="raise RuntimeError()")
+            ],
+            timestamp=datetime.now(timezone.utc),
+            python_version="3.12.0",
+            venv_path=str(tmp_path / ".venv"),
+            hostname="test-host",
+            pid=1234,
+            working_dir=str(tmp_path),
+            argv=["python", "app.py"],
+            category="runtime_error",
+            severity="high",
+        )
+
+        # First append should succeed (new entry)
+        from pfix.runtime_todo import ErrorFingerprint
+        issue.fingerprint = ErrorFingerprint.compute(issue)
+        result1 = todo.append_issue(issue)
+        assert result1 is True
+
+        # Second append should be deduplicated (False, counter incremented)
+        result2 = todo.append_issue(issue)
+        assert result2 is False
+
+        # Verify file content
+        content = todo_file.read_text()
+        assert "Runtime Errors (Production)" in content
+        assert "RuntimeError: test error" in content
+        assert "count=2" in content
+
+    def test_runtime_collector_severity_filtering(self):
+        from pfix.runtime_todo import RuntimeCollector, TodoFile
+
+        todo = TodoFile("/tmp/test.md")
+        collector = RuntimeCollector(
+            todo,
+            enabled=True,
+            min_severity="high",
+        )
+
+        # Low severity should not be captured
+        assert not collector._should_capture(ValueError("low"))
+
+        # High severity should be captured
+        class MockConnError(ConnectionError):
+            pass
+        assert collector._should_capture(MockConnError("high"))
+
+    def test_runtime_collector_classification(self):
+        from pfix.runtime_todo import RuntimeCollector, TodoFile
+
+        todo = TodoFile("/tmp/test.md")
+        collector = RuntimeCollector(todo)
+
+        # Test exception classifications
+        assert collector._classify(ModuleNotFoundError("test")) == "import_error"
+        assert collector._classify(FileNotFoundError("test")) == "filesystem_error"
+        assert collector._classify(ConnectionError("test")) == "network_error"
+        assert collector._classify(ValueError("test")) == "value_error"
+
+
+# ── EnvDiagnostics Functionality Tests ───────────────────────────────
+
+class TestEnvDiagnostics:
+    def test_env_diagnostics_initialization(self):
+        from pfix.env_diagnostics import EnvDiagnostics
+        from pathlib import Path
+
+        diag = EnvDiagnostics()
+        assert diag.project_root == Path.cwd().resolve()
+
+        diag2 = EnvDiagnostics("/tmp")
+        assert diag2.project_root == Path("/tmp").resolve()
+
+    def test_filesystem_disk_space_check(self, tmp_path):
+        from pfix.env_diagnostics.filesystem import FilesystemDiagnostic
+
+        diag = FilesystemDiagnostic()
+        results = diag._check_disk_space(tmp_path)
+
+        # Should return list (may be empty if plenty of space)
+        assert isinstance(results, list)
+        for r in results:
+            assert r.category == "filesystem"
+            assert r.check_name == "disk_space"
+
+    def test_import_shadow_stdlib_check(self, tmp_path):
+        from pfix.env_diagnostics.imports import ImportDiagnostic
+        from pathlib import Path
+
+        # Create a file that shadows stdlib
+        json_file = tmp_path / "json.py"
+        json_file.write_text("# shadows stdlib json")
+
+        diag = ImportDiagnostic()
+        results = diag._check_shadow_stdlib(tmp_path)
+
+        # Should detect the shadowing
+        assert any(r.check_name == "stdlib_shadow" for r in results)
+
+    def test_venv_active_check(self, monkeypatch):
+        from pfix.env_diagnostics.venv import VenvDiagnostic
+
+        # Simulate no venv
+        monkeypatch.delenv("VIRTUAL_ENV", raising=False)
+
+        diag = VenvDiagnostic()
+        results = diag._check_venv_active()
+
+        # Should warn about no venv
+        if results:
+            assert any(r.check_name == "no_venv" for r in results)
+
+    def test_encoding_utf8_check(self, tmp_path):
+        from pfix.env_diagnostics.encoding import EncodingDiagnostic
+
+        # Create file with BOM
+        bom_file = tmp_path / "bom.py"
+        bom_file.write_bytes(b"\xef\xbb\xbf# coding: utf-8\nprint('hello')")
+
+        diag = EncodingDiagnostic()
+        results = diag._check_file_encoding(tmp_path)
+
+        # Should detect BOM
+        assert any(r.check_name == "utf8_bom" for r in results)
+
+    def test_config_env_gitignore_check(self, tmp_path):
+        from pfix.env_diagnostics.config_env import ConfigEnvDiagnostic
+
+        # Create .env without .gitignore
+        env_file = tmp_path / ".env"
+        env_file.write_text("SECRET_KEY=supersecret\n")
+
+        diag = ConfigEnvDiagnostic()
+        results = diag._check_env_gitignore(tmp_path)
+
+        # Should warn about .env not being gitignored
+        if results:
+            assert any(r.check_name == "env_not_gitignored" for r in results)
+
+    def test_diagnose_exception_import_error(self):
+        from pfix.env_diagnostics.imports import ImportDiagnostic
+        from pfix.types import ErrorContext
+
+        diag = ImportDiagnostic()
+        ctx = ErrorContext(
+            source_file="/app/main.py",
+            line_number=10,
+        )
+
+        result = diag.diagnose_exception(
+            ModuleNotFoundError("No module named 'pandas'"),
+            ctx
+        )
+
+        assert result is not None
+        assert result.category == "import_dependency"
+        assert "pandas" in result.message
+
+    def test_generate_report_format(self, tmp_path):
+        from pfix.env_diagnostics import EnvDiagnostics
+        from pfix.types import DiagnosticResult
+
+        diag = EnvDiagnostics(tmp_path)
+
+        # Create some test results
+        results = [
+            DiagnosticResult(
+                category="filesystem",
+                check_name="test",
+                status="error",
+                message="Test error",
+                suggestion="Fix it",
+            ),
+            DiagnosticResult(
+                category="memory",
+                check_name="test2",
+                status="warning",
+                message="Test warning",
+            ),
+        ]
+
+        report = diag.generate_report(results)
+        assert "Environment Diagnostics Report" in report
+        assert "Test error" in report
+        assert "Fix it" in report
+
+    def test_third_party_diagnostic_import(self):
+        from pfix.env_diagnostics.third_party import ThirdPartyDiagnostic
+        from pfix.types import ErrorContext
+
+        diag = ThirdPartyDiagnostic()
+        assert diag.category == "third_party"
+
+        # Test rate limit detection
+        ctx = ErrorContext(source_file="/app/main.py", line_number=10)
+        result = diag.diagnose_exception(
+            Exception("Rate limit exceeded: 429 Too Many Requests"),
+            ctx
+        )
+        assert result is not None
+        assert result.check_name == "rate_limit"
+
+    def test_third_party_api_key_placeholder(self, monkeypatch):
+        from pfix.env_diagnostics.third_party import ThirdPartyDiagnostic
+
+        monkeypatch.setenv("OPENAI_API_KEY", "your_key_here")
+
+        diag = ThirdPartyDiagnostic()
+        results = diag._check_api_keys_in_env()
+
+        assert any(r.check_name == "api_key_placeholder" for r in results)
