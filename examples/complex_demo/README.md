@@ -14,20 +14,50 @@ import pfix
 ```toml
 # pyproject.toml - all config here
 [tool.pfix]
-model = "openrouter/anthropic/claude-sonnet-4"
+model = "openrouter/qwen/qwen3-coder-next"
 auto_apply = true
 auto_install_deps = true
 auto_restart = true
 ```
 
+## Configuration
+
+### pyproject.toml (behavior settings)
+
+Non-sensitive pfix behavior configuration:
+
+```toml
+[tool.pfix]
+model = "openrouter/qwen/qwen3-coder-next"
+auto_apply = true
+auto_install_deps = true
+auto_restart = true
+```
+
+### .env (API keys)
+
+Sensitive credentials - **never commit to git**:
+
+```bash
+# Copy template to .env and fill in your actual key
+cp .env.example .env
+
+# Edit .env:
+OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+The `.env` file is automatically loaded by pfix and is gitignored by default.
+
 ## Files
 
 ```
 complex_demo/
-├── pyproject.toml   # All pfix configuration here
-├── main.py          # Zero-config code
+├── pyproject.toml      # pfix behavior configuration (committed)
+├── .env.example        # API key template (committed)
+├── .env                # Your actual API key (NOT committed - add to .gitignore!)
+├── main.py             # Zero-config code
 ├── data/
-│   └── users.csv    # Sample data
+│   └── users.csv       # Sample data
 └── README.md
 ```
 
