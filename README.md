@@ -464,6 +464,7 @@ import pfix
 |----------|------|---------|-------------|
 | `OPENROUTER_API_KEY` | `str` | — | **Required** — OpenRouter API key |
 | `PFIX_MODEL` | `str` | `openrouter/anthropic/claude-sonnet-4` | LLM model to use |
+| `PFIX_API_BASE` | `str` | `https://openrouter.ai/api/v1` | API base URL |
 | `PFIX_AUTO_APPLY` | `bool` | `false` | Auto-apply fixes without confirmation |
 | `PFIX_AUTO_INSTALL_DEPS` | `bool` | `true` | Auto-install missing dependencies |
 | `PFIX_AUTO_RESTART` | `bool` | `false` | Restart process after fix applied |
@@ -477,6 +478,111 @@ import pfix
 | `PFIX_MCP_ENABLED` | `bool` | `false` | Enable MCP server |
 | `PFIX_MCP_TRANSPORT` | `str` | `stdio` | `stdio` or `http` |
 | `PFIX_PROJECT_ROOT` | `str` | `.` | Project root for relative paths |
+
+## LLM Models & Providers
+
+pfix uses [LiteLLM](https://litellm.ai) to support multiple LLM providers. You can use cloud APIs or run models locally.
+
+### OpenRouter (Cloud - Recommended)
+
+OpenRouter provides access to multiple models with a single API key.
+
+```bash
+# .env
+OPENROUTER_API_KEY=sk-or-v1-...
+PFIX_MODEL=openrouter/anthropic/claude-sonnet-4
+```
+
+**Recommended models:**
+| Model | Description | Best For |
+|-------|-------------|----------|
+| `openrouter/anthropic/claude-sonnet-4` | Claude 4 Sonnet | Balanced quality/speed |
+| `openrouter/anthropic/claude-opus-4` | Claude 4 Opus | Complex fixes |
+| `openrouter/anthropic/claude-haiku-4` | Claude 4 Haiku | Fast, cheap fixes |
+| `openrouter/qwen/qwen3-235b-a22b-2507` | Qwen3 235B | Code-heavy tasks |
+| `openrouter/qwen/qwen3.5-flash-02-23` | Qwen3.5 Flash | Fast responses |
+| `openrouter/nvidia/nemotron-3-super-120b-a12b:free` | Nemotron 3 Super | Free tier |
+| `openrouter/deepseek/deepseek-coder-v2` | DeepSeek Coder | Code-specific |
+
+### Ollama (Local - Free, Private)
+
+Run models locally for zero cost and complete privacy.
+
+**Setup:**
+```bash
+# Install Ollama: https://ollama.ai
+
+# Pull a code-capable model
+ollama pull codellama:7b
+ollama pull qwen2.5-coder:7b
+ollama pull deepseek-coder:6.7b
+```
+
+**Configure pfix:**
+```bash
+# .env
+PFIX_MODEL=ollama/codellama:7b
+PFIX_API_BASE=http://localhost:11434
+# No API key needed for local models
+```
+
+**Recommended local models:**
+| Model | Size | Speed | Quality |
+|-------|------|-------|---------|
+| `ollama/codellama:7b` | 7B | Fast | Good |
+| `ollama/qwen2.5-coder:7b` | 7B | Fast | Very Good |
+| `ollama/deepseek-coder:6.7b` | 6.7B | Fast | Very Good |
+| `ollama/codellama:13b` | 13B | Medium | Excellent |
+| `ollama/qwen2.5-coder:14b` | 14B | Medium | Excellent |
+
+### OpenAI
+
+```bash
+# .env
+PFIX_MODEL=gpt-4o
+PFIX_API_KEY=sk-...
+PFIX_API_BASE=https://api.openai.com/v1
+```
+
+**Models:** `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `gpt-3.5-turbo`
+
+### Anthropic (Direct)
+
+```bash
+# .env
+PFIX_MODEL=anthropic/claude-3-sonnet-20241022
+PFIX_API_KEY=sk-ant-...
+```
+
+**Models:** `claude-3-opus`, `claude-3-sonnet`, `claude-3-haiku`
+
+### Azure OpenAI
+
+```bash
+# .env
+PFIX_MODEL=azure/<your-deployment-name>
+PFIX_API_KEY=...
+PFIX_API_BASE=https://<resource>.openai.azure.com
+```
+
+### Google Vertex AI / Gemini
+
+```bash
+# .env
+PFIX_MODEL=vertex_ai/gemini-1.5-pro
+# or
+PFIX_MODEL=gemini/gemini-1.5-pro
+```
+
+### Choosing a Model
+
+**For beginners:** Start with `openrouter/anthropic/claude-sonnet-4` (good balance)
+
+**For cost savings:** Use Ollama locally or OpenRouter free models (`:free` suffix)
+
+**For complex fixes:** Use larger models (Claude Opus, GPT-4, Qwen 235B)
+
+**For speed:** Use smaller models (Haiku, GPT-4o-mini, local 7B models)
 
 ## Advanced Usage
 
@@ -569,6 +675,9 @@ See [`examples/`](examples/) directory for working examples:
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 
