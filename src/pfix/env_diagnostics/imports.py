@@ -82,10 +82,93 @@ class ImportDiagnostic(BaseDiagnostic):
         return results
 
     def _check_circular_imports(self, project_root: Path) -> list["DiagnosticResult"]:
-        """Detect circular import patterns."""
+        """Detect circular import patterns using module dependency graph."""
         from ..types import DiagnosticResult
+        import ast
+
         results = []
-        # Complex analysis - simplified for now
+        module_imports: dict[str, set[str]] = {}
+        module_paths: dict[str, Path] = {}
+
+        # Build import graph
+        for pyfile in project_root.rglob("*.py"):
+            if "__pycache__" in str(pyfile):
+                continue
+
+            # Convert file path to module name
+            rel_path = pyfile.relative_to(project_root)
+            if pyfile.name == "__init__.py":
+                module_name = str(rel_path.parent).replace("/", ".").replace("\\", ".")
+            else:
+                module_name = str(rel_path.with_suffix("")).replace("/", ".").replace("\\", ".")
+
+            module_paths[module_name] = pyfile
+
+            try:
+                content = pyfile.read_text()
+                tree = ast.parse(content)
+                imports = set()
+
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.ImportFrom):
+                        if node.module:
+                            # Handle relative imports
+                            if node.level > 0:
+                                # Convert relative to absolute
+                                parts = module_name.split(".")
+                                base = parts[:-node.level] if node.level <= len(parts) else []
+                                if node.module:
+                                    target = ".".join(base + [node.module])
+                                else:
+                                    target = ".".join(base)
+                                imports.add(target)
+                            else:
+                                imports.add(node.module.split(".")[0])
+
+                module_imports[module_name] = imports
+            except (SyntaxError, UnicodeDecodeError):
+                pass
+
+        # Find cycles using DFS
+        def find_cycle(start: str, visited: set[str], path: list[str]) -> list[str] | None:
+            if start in path:
+                return path[path.index(start):] + [start]
+            if start in visited:
+                return None
+            visited.add(start)
+            for imp in module_imports.get(start, set()):
+                if imp in module_imports:
+                    cycle = find_cycle(imp, visited, path + [start])
+                    if cycle:
+                        return cycle
+            return None
+
+        checked = set()
+        for module in module_imports:
+            if module not in checked:
+                cycle = find_cycle(module, set(), [])
+                if cycle and len(cycle) > 1:
+                    # Check if we already reported this cycle
+                    cycle_key = tuple(sorted(cycle[:-1]))
+                    if cycle_key not in checked:
+                        checked.add(cycle_key)
+                        cycle_str = " -> ".join(cycle)
+                        file_path = str(module_paths.get(cycle[0], "unknown"))
+                        results.append(DiagnosticResult(
+                            category=self.category,
+                            check_name="circular_import",
+                            status="error",
+                            message=f"Circular import detected: {cycle_str}",
+                            details={
+                                "cycle": cycle,
+                                "modules_involved": len(cycle) - 1,
+                            },
+                            suggestion="Refactor to break the cycle (use interface classes or lazy imports)",
+                            auto_fixable=False,
+                            abs_path=file_path if file_path != "unknown" else None,
+                            line_number=None,
+                        ))
+
         return results
 
     def _check_shadow_stdlib(self, project_root: Path) -> list["DiagnosticResult"]:
@@ -138,10 +221,57 @@ class ImportDiagnostic(BaseDiagnostic):
         return results
 
     def _check_version_conflicts(self) -> list["DiagnosticResult"]:
-        """Check for dependency version conflicts."""
+        """Check for dependency version conflicts using pip check."""
         from ..types import DiagnosticResult
         results = []
-        # Complex - requires pip check or similar
+
+        try:
+            import subprocess
+            import re
+
+            # Run pip check to find conflicts
+            result = subprocess.run(
+                [sys.executable, "-m", "pip", "check"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+
+            if result.returncode != 0 and result.stdout:
+                # Parse conflict lines
+                for line in result.stdout.strip().split("\n"):
+                    line = line.strip()
+                    if not line or "has requirement" not in line:
+                        continue
+
+                    # Extract package info from lines like:
+                    # "package-a 1.0 has requirement package-b>=2.0, but you have package-b 1.0"
+                    match = re.search(
+                        r"(\S+)\s+(\S+)\s+has requirement\s+(.+?),\s+but you have\s+(.+)",
+                        line
+                    )
+                    if match:
+                        results.append(DiagnosticResult(
+                            category=self.category,
+                            check_name="version_conflict",
+                            status="error",
+                            message=line,
+                            details={
+                                "package": match.group(1),
+                                "version": match.group(2),
+                                "requirement": match.group(3),
+                                "installed": match.group(4),
+                            },
+                            suggestion="Upgrade/downgrade packages to resolve conflict",
+                            auto_fixable=False,  # Risky to auto-fix version conflicts
+                            abs_path=None,
+                            line_number=None,
+                        ))
+
+        except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+            # pip not available or timeout
+            pass
+
         return results
 
     def _extract_imports(self, source: str) -> set[str]:
