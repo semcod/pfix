@@ -17,5 +17,5 @@ Catches runtime errors and fixes source code + dependencies via LLM + MCP.
 from .config import PfixConfig, configure, get_config
 from .decorator import apfix, pfix
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __all__ = ["pfix", "apfix", "configure", "get_config", "PfixConfig"]
