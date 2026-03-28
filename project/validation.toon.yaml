@@ -1,20 +1,12 @@
-# vallm batch | 42f | 10✓ 1⚠ 11✗ | 2026-03-28
+# vallm batch | 43f | 11✓ 0⚠ 11✗ | 2026-03-28
 
 SUMMARY:
-  scanned: 42  passed: 10 (23.8%)  warnings: 1  errors: 11  unsupported: 21
-
-WARNINGS[1]{path,score}:
-  src/pfix/analyzer.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,analyze_exception has cyclomatic complexity 16 (max: 15),89
-      complexity.lizard_cc,warning,analyze_exception: CC=16 exceeds limit 15,89
+  scanned: 43  passed: 11 (25.6%)  warnings: 0  errors: 11  unsupported: 21
 
 ERRORS[11]{path,score}:
-  src/pfix/mcp_server.py,0.69
-    issues[10]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'analyzer' not found,179
+  src/pfix/mcp_server.py,0.76
+    issues[8]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'mcp.server.fastmcp' not found,33
-      python.import.resolvable,error,Module 'analyzer' not found,55
       python.import.resolvable,error,Module 'llm' not found,56
       python.import.resolvable,error,Module 'config' not found,85
       python.import.resolvable,error,Module 'fixer' not found,86
@@ -45,17 +37,15 @@ ERRORS[11]{path,score}:
       python.import.resolvable,error,Module 'dependency' not found,39
       python.import.resolvable,error,Module 'fixer' not found,40
       python.import.resolvable,error,Module 'llm' not found,41
-  src/pfix/fixer.py,0.86
-    issues[5]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'analyzer' not found,18
-      python.import.resolvable,error,Module 'config' not found,19
-      python.import.resolvable,error,Module 'dependency' not found,20
-      python.import.resolvable,error,Module 'llm' not found,21
-      python.import.resolvable,error,Module 'git' not found,211
   src/pfix/llm.py,0.89
     issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'analyzer' not found,13
-      python.import.resolvable,error,Module 'config' not found,14
+      python.import.resolvable,error,Module 'analyzer' not found,12
+      python.import.resolvable,error,Module 'config' not found,13
+  src/pfix/fixer.py,0.91
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,18
+      python.import.resolvable,error,Module 'dependency' not found,19
+      python.import.resolvable,error,Module 'git' not found,273
   src/pfix/mcp_client.py,0.93
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,14

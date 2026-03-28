@@ -4,11 +4,11 @@
 
 - **Project**: /home/tom/github/semcod/pfix
 - **Primary Language**: python
-- **Languages**: python: 15, shell: 1
+- **Languages**: python: 16, shell: 1
 - **Analysis Mode**: static
 - **Total Functions**: 75
-- **Total Classes**: 6
-- **Modules**: 16
+- **Total Classes**: 9
+- **Modules**: 17
 - **Entry Points**: 25
 
 ## Architecture by Module
@@ -34,11 +34,6 @@
 - **Functions**: 7
 - **File**: `decorator.py`
 
-### src.pfix.analyzer
-- **Functions**: 6
-- **Classes**: 1
-- **File**: `analyzer.py`
-
 ### src.pfix.mcp_client
 - **Functions**: 6
 - **Classes**: 2
@@ -48,6 +43,10 @@
 - **Functions**: 6
 - **Classes**: 1
 - **File**: `config.py`
+
+### src.pfix.analyzer
+- **Functions**: 5
+- **File**: `analyzer.py`
 
 ### examples.demo_auto
 - **Functions**: 4
@@ -77,6 +76,11 @@
 ### src.pfix
 - **Functions**: 1
 - **File**: `__init__.py`
+
+### src.pfix.types
+- **Functions**: 1
+- **Classes**: 4
+- **File**: `types.py`
 
 ## Key Entry Points
 
@@ -110,7 +114,7 @@ Usage:
         ...
 - **Calls**: functools.wraps, decorator, src.pfix.config.get_config, kwargs.get, range, fn, console.print, src.pfix.decorator._try_quick_dep_fix
 
-### src.pfix.analyzer.ErrorContext.to_prompt
+### src.pfix.types.ErrorContext.to_prompt
 - **Calls**: parts.append, None.join, parts.append, parts.append, parts.append, parts.append, self.hints.items, list
 
 ### examples.demo_auto.main
@@ -119,12 +123,12 @@ Usage:
 ### examples.demo.main
 - **Calls**: print, print, examples.demo.fetch_json, print, print, examples.demo.average, print, print
 
+### src.pfix.mcp_client.MCPClient.call_tool
+- **Calls**: MCPResult, resp.json, data.get, MCPResult, self._session.post, MCPResult, MCPResult, result.get
+
 ### src.pfix._auto_activate
 > Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true.
 - **Calls**: Path.cwd, env_file.exists, None.lower, None.lower, inspect.currentframe, src.pfix.session.install_pfix_hook, load_dotenv, caller_globals.get
-
-### src.pfix.mcp_client.MCPClient.call_tool
-- **Calls**: MCPResult, resp.json, data.get, MCPResult, self._session.post, MCPResult, MCPResult, result.get
 
 ### examples.complex_demo.main.main
 - **Calls**: print, print, examples.complex_demo.main.load_and_process_data, print, print, examples.complex_demo.main.analyze_users, print, print
@@ -209,17 +213,17 @@ apfix [src.pfix.decorator]
 
 ### Flow 6: to_prompt
 ```
-to_prompt [src.pfix.analyzer.ErrorContext]
+to_prompt [src.pfix.types.ErrorContext]
 ```
 
-### Flow 7: _auto_activate
-```
-_auto_activate [src.pfix]
-```
-
-### Flow 8: call_tool
+### Flow 7: call_tool
 ```
 call_tool [src.pfix.mcp_client.MCPClient]
+```
+
+### Flow 8: _auto_activate
+```
+_auto_activate [src.pfix]
 ```
 
 ### Flow 9: _read_pyproject
@@ -250,17 +254,30 @@ __init__ [src.pfix.session.PFixSession]
 - **Methods**: 3
 - **Key Methods**: src.pfix.config.PfixConfig.from_env, src.pfix.config.PfixConfig._read_pyproject, src.pfix.config.PfixConfig.validate
 
+### src.pfix.types.FixProposal
+> Structured fix from LLM.
+- **Methods**: 2
+- **Key Methods**: src.pfix.types.FixProposal.has_code_fix, src.pfix.types.FixProposal.has_dependency_fix
+
 ### src.pfix.llm.FixProposal
 > Structured fix from LLM.
 - **Methods**: 2
 - **Key Methods**: src.pfix.llm.FixProposal.has_code_fix, src.pfix.llm.FixProposal.has_dependency_fix
 
-### src.pfix.analyzer.ErrorContext
+### src.pfix.types.ErrorContext
 > Structured error report for LLM consumption.
 - **Methods**: 1
-- **Key Methods**: src.pfix.analyzer.ErrorContext.to_prompt
+- **Key Methods**: src.pfix.types.ErrorContext.to_prompt
 
 ### src.pfix.mcp_client.MCPResult
+- **Methods**: 0
+
+### src.pfix.types.PfixConfig
+> Runtime configuration for pfix.
+- **Methods**: 0
+
+### src.pfix.types.FixEvent
+> Structured log event for each fix operation.
 - **Methods**: 0
 
 ## Data Transformation Functions
@@ -316,22 +333,22 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.cli.cmd_disable` - 16 calls
 - `src.pfix.decorator.apfix` - 16 calls
 - `src.pfix.cli.cmd_run` - 15 calls
-- `src.pfix.analyzer.ErrorContext.to_prompt` - 13 calls
+- `src.pfix.types.ErrorContext.to_prompt` - 13 calls
 - `src.pfix.cli.cmd_deps` - 12 calls
 - `src.pfix.dependency.install_packages` - 12 calls
 - `src.pfix.dependency.scan_project_deps` - 12 calls
 - `examples.demo_auto.main` - 11 calls
 - `examples.demo.main` - 11 calls
-- `src.pfix.analyzer.scan_missing_deps` - 11 calls
 - `src.pfix.mcp_client.MCPClient.call_tool` - 11 calls
-- `src.pfix.dev_mode.install_dev_mode_hook` - 9 calls
+- `src.pfix.analyzer.scan_missing_deps` - 11 calls
 - `examples.complex_demo.main.main` - 9 calls
+- `src.pfix.dev_mode.install_dev_mode_hook` - 9 calls
 - `src.pfix.llm.request_fix` - 9 calls
-- `src.pfix.dev_mode.wrap_module_functions` - 7 calls
 - `src.pfix.dependency.generate_requirements` - 7 calls
+- `src.pfix.dev_mode.wrap_module_functions` - 7 calls
 - `examples.complex_demo.main.load_and_process_data` - 6 calls
-- `src.pfix.mcp_server.start_server` - 5 calls
 - `src.pfix.session.auto_pfix` - 5 calls
+- `src.pfix.mcp_server.start_server` - 5 calls
 - `examples.demo.average` - 4 calls
 - `src.pfix.config.configure` - 4 calls
 - `src.pfix.dependency.detect_missing_from_error` - 4 calls
@@ -376,9 +393,9 @@ graph TD
     to_prompt --> join
     main --> print
     main --> fetch_json
-    _auto_activate --> cwd
-    _auto_activate --> exists
-    _auto_activate --> lower
+    call_tool --> MCPResult
+    call_tool --> json
+    call_tool --> get
 ```
 
 ## Reverse Engineering Guidelines

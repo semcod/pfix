@@ -222,6 +222,49 @@ def install_pfix_hook(
         if exc_tb:
             exc_value.__traceback__ = exc_tb
         
+        # Handle SyntaxError specially - it has filename/lineno directly
+        if exc_type is SyntaxError and exc_value.filename:
+            console.print("[dim]Debug: SyntaxError detected, extracting file info...[/]")
+            ctx = ErrorContext()
+            ctx.exception_type = "SyntaxError"
+            ctx.exception_message = str(exc_value)
+            ctx.source_file = exc_value.filename
+            ctx.line_number = exc_value.lineno or 0
+            ctx.failing_line = exc_value.text or ""
+            ctx.traceback_text = f"  File \"{exc_value.filename}\", line {exc_value.lineno}\n    {exc_value.text}\n    {' ' * (exc_value.offset - 1)}^\nSyntaxError: {exc_value}"
+            ctx.python_version = sys.version.split()[0]
+            
+            # Read source file
+            try:
+                source_path = Path(exc_value.filename)
+                if source_path.exists():
+                    ctx.source_code = source_path.read_text(encoding="utf-8")
+            except Exception:
+                pass
+            
+            console.print(f"[dim]Debug: source_file={ctx.source_file}, line={ctx.line_number}[/]")
+            
+            proposal = request_fix(ctx)
+            console.print(f"[dim]Debug: confidence={proposal.confidence}, has_fix={proposal.has_code_fix}[/]")
+            
+            if proposal.confidence > 0.1:
+                console.print(f"[blue]🔍 Confidence OK ({proposal.confidence:.0%}), applying fix...[/]")
+                old_auto = config.auto_apply
+                config.auto_apply = auto_apply
+                fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
+                config.auto_apply = old_auto
+                
+                if fixed and config.auto_restart:
+                    if ctx.source_file:
+                        _clear_pycache(Path(ctx.source_file))
+                    console.print("[green]🔄 Restarting...[/]")
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            else:
+                console.print(f"[yellow]⚠ Confidence too low ({proposal.confidence:.0%}), skipping[/]")
+            
+            original_hook(exc_type, exc_value, exc_tb)
+            return
+        
         if isinstance(exc_value, (ModuleNotFoundError, ImportError)):
             module = detect_missing_from_error(str(exc_value))
             if module:

@@ -9,16 +9,15 @@ import difflib
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
 
-from .analyzer import ErrorContext
 from .config import get_config
 from .dependency import install_packages, update_requirements_file
-from .llm import FixProposal
+from .types import ErrorContext, FixProposal
 
 console = Console(stderr=True)
 
@@ -34,88 +33,12 @@ def apply_fix(
 
     # 1. Dependencies
     if proposal.has_dependency_fix:
-        console.print(
-            Panel(
-                "\n".join(f"  {config.pkg_manager} install {d}" for d in proposal.dependencies),
-                title="[cyan]📦 Dependencies[/]",
-                border_style="cyan",
-            )
-        )
-        if not config.dry_run:
-            results = install_packages(proposal.dependencies)
-            if any(results.values()):
-                applied_any = True
-                update_requirements_file(proposal.dependencies)
+        applied_any |= _apply_dependencies(proposal, config.dry_run)
 
     # 2. Code fix
     if proposal.has_code_fix:
-        source_file = Path(ctx.source_file)
-        if not source_file.is_file():
-            console.print(f"[red]✗ File not found: {source_file}[/]")
-            return applied_any
-
-        original = source_file.read_text(encoding="utf-8")
-
-        if proposal.fixed_file_content:
-            new_content = proposal.fixed_file_content
-        elif proposal.fixed_function:
-            new_content = _replace_function(original, ctx.function_name, proposal.fixed_function)
-            if new_content is None:
-                console.print("[yellow]⚠ Could not locate function — skipping[/]")
-                return applied_any
-        else:
-            return applied_any
-
-        # Diff
-        diff = _make_diff(original, new_content, str(source_file))
-        if not diff.strip():
-            console.print("[yellow]⚠ No changes in fix[/]")
-            return applied_any
-
-        console.print(
-            Panel(
-                Syntax(diff, "diff", theme="monokai"),
-                title=f"[green]🔧 {proposal.fix_description}[/]",
-                subtitle=f"confidence: {proposal.confidence:.0%}",
-                border_style="green",
-            )
-        )
-
-        if config.dry_run:
-            console.print("[dim]  DRY RUN — not applying[/]")
-            return applied_any
-
-        # Confirm
-        should_apply = config.auto_apply
-        if not should_apply and confirm:
-            try:
-                answer = input("\n  Apply this fix? [y/N] ").strip().lower()
-                should_apply = answer in ("y", "yes")
-            except (EOFError, KeyboardInterrupt):
-                console.print("\n[yellow]  Skipped[/]")
-                return applied_any
-
-        if should_apply:
-            if not _validate_syntax(new_content):
-                console.print("[red]✗ Fixed code has syntax errors — aborting[/]")
-                return applied_any
-
-            if config.create_backups:
-                backup = _backup(source_file)
-                console.print(f"[dim]  Backup: {backup}[/]")
-
-            source_file.write_text(new_content, encoding="utf-8")
-            console.print(f"[green]✓ Fix applied to {source_file}[/]")
-            applied_any = True
-
-            # Clear pycache to prevent stale bytecode
-            _clear_pycache(source_file)
-
-            # Git auto-commit
-            if config.git_auto_commit:
-                _git_commit(source_file, proposal.fix_description)
-        else:
-            console.print("[yellow]  Fix skipped[/]")
+        result = _apply_code_fix(ctx, proposal, confirm, config)
+        applied_any |= result
 
     # 3. Diagnosis
     if proposal.diagnosis:
@@ -124,6 +47,145 @@ def apply_fix(
         )
 
     return applied_any
+
+
+def _apply_dependencies(proposal: FixProposal, dry_run: bool) -> bool:
+    """Install missing dependencies. Returns True if anything was applied."""
+    config = get_config()
+
+    console.print(
+        Panel(
+            "\n".join(f"  {config.pkg_manager} install {d}" for d in proposal.dependencies),
+            title="[cyan]📦 Dependencies[/]",
+            border_style="cyan",
+        )
+    )
+
+    if dry_run:
+        return False
+
+    results = install_packages(proposal.dependencies)
+    if any(results.values()):
+        update_requirements_file(proposal.dependencies)
+        return True
+    return False
+
+
+def _apply_code_fix(
+    ctx: ErrorContext,
+    proposal: FixProposal,
+    confirm: bool,
+    config,
+) -> bool:
+    """Apply code fix. Returns True if fix was applied."""
+    source_file = Path(ctx.source_file)
+
+    if not source_file.is_file():
+        console.print(f"[red]✗ File not found: {source_file}[/]")
+        return False
+
+    # Prepare fix
+    new_content, diff = _prepare_code_fix(ctx, proposal, source_file)
+    if new_content is None:
+        return False
+
+    # Display diff
+    _display_diff(diff, proposal)
+
+    if config.dry_run:
+        console.print("[dim]  DRY RUN — not applying[/]")
+        return False
+
+    # Confirm
+    if not _confirm_fix(config.auto_apply, confirm):
+        console.print("[yellow]  Fix skipped[/]")
+        return False
+
+    # Write fix
+    if not _write_fix(source_file, new_content, config.create_backups):
+        return False
+
+    # Post-fix actions
+    _post_fix(source_file, proposal.fix_description, config.git_auto_commit)
+
+    return True
+
+
+def _prepare_code_fix(
+    ctx: ErrorContext,
+    proposal: FixProposal,
+    source_file: Path,
+) -> Tuple[Optional[str], str]:
+    """Generate new_content and diff. Returns (new_content, diff) or (None, '')."""
+    original = source_file.read_text(encoding="utf-8")
+
+    if proposal.fixed_file_content:
+        new_content = proposal.fixed_file_content
+    elif proposal.fixed_function:
+        new_content = _replace_function(original, ctx.function_name, proposal.fixed_function)
+        if new_content is None:
+            console.print("[yellow]⚠ Could not locate function — skipping[/]")
+            return None, ""
+    else:
+        return None, ""
+
+    diff = _make_diff(original, new_content, str(source_file))
+    if not diff.strip():
+        console.print("[yellow]⚠ No changes in fix[/]")
+        return None, ""
+
+    return new_content, diff
+
+
+def _display_diff(diff: str, proposal: FixProposal) -> None:
+    """Display diff panel."""
+    console.print(
+        Panel(
+            Syntax(diff, "diff", theme="monokai"),
+            title=f"[green]🔧 {proposal.fix_description}[/]",
+            subtitle=f"confidence: {proposal.confidence:.0%}",
+            border_style="green",
+        )
+    )
+
+
+def _confirm_fix(auto_apply: bool, confirm: bool) -> bool:
+    """Ask user for confirmation. Returns True if should apply."""
+    if auto_apply:
+        return True
+    if not confirm:
+        return True
+
+    try:
+        answer = input("\n  Apply this fix? [y/N] ").strip().lower()
+        return answer in ("y", "yes")
+    except (EOFError, KeyboardInterrupt):
+        console.print("\n[yellow]  Skipped[/]")
+        return False
+
+
+def _write_fix(path: Path, content: str, create_backups: bool) -> bool:
+    """Write fix to file with backup and validation. Returns True if successful."""
+    if not _validate_syntax(content):
+        console.print("[red]✗ Fixed code has syntax errors — aborting[/]")
+        return False
+
+    if create_backups:
+        backup = _backup(path)
+        console.print(f"[dim]  Backup: {backup}[/]")
+
+    path.write_text(content, encoding="utf-8")
+    console.print(f"[green]✓ Fix applied to {path}[/]")
+
+    return True
+
+
+def _post_fix(path: Path, message: str, git_auto_commit: bool) -> None:
+    """Post-fix actions: clear pycache and git commit."""
+    _clear_pycache(path)
+
+    if git_auto_commit:
+        _git_commit(path, message)
 
 
 def _replace_function(source: str, func_name: str, new_func: str) -> Optional[str]:

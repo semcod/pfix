@@ -22,7 +22,7 @@ from .config import PfixConfig, configure, get_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.23"
+__version__ = "0.1.24"
 __all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig"]
 
 # ── Auto-activation on import ─────────────────────────────────────

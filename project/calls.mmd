@@ -5,59 +5,59 @@ flowchart LR
         examples__complex_demo__main__load_and_process_data["load_and_process_data"]
     end
     subgraph examples__demo
-        examples__demo__average["average"]
-        examples__demo__fetch_json["fetch_json"]
         examples__demo__greet["greet"]
         examples__demo__main["main"]
+        examples__demo__average["average"]
+        examples__demo__fetch_json["fetch_json"]
     end
     subgraph examples__demo_auto
-        examples__demo_auto__average["average"]
-        examples__demo_auto__main["main"]
-        examples__demo_auto__fetch_json["fetch_json"]
         examples__demo_auto__greet["greet"]
+        examples__demo_auto__average["average"]
+        examples__demo_auto__fetch_json["fetch_json"]
+        examples__demo_auto__main["main"]
     end
     subgraph src__pfix
-        src__pfix__session__PFixSession____init__["__init__"]
+        src__pfix__mcp_client__MCPClient____init__["__init__"]
+        src__pfix__fixer__apply_fix["apply_fix"]
+        src__pfix__dependency__is_module_available["is_module_available"]
+        src__pfix__decorator___ensure_deps["_ensure_deps"]
+        src__pfix__cli__cmd_dev["cmd_dev"]
+        src__pfix__cli___install_excepthook["_install_excepthook"]
+        src__pfix__dev_mode__wrap_module_functions["wrap_module_functions"]
+        src__pfix__cli__cmd_run["cmd_run"]
+        src__pfix__session__PFixSession___handle_exception["_handle_exception"]
+        src__pfix__dependency__scan_project_deps["scan_project_deps"]
+        src__pfix__mcp_server___build_ctx["_build_ctx"]
+        src__pfix__analyzer__analyze_exception["analyze_exception"]
+        src__pfix__decorator___try_quick_dep_fix["_try_quick_dep_fix"]
+        src__pfix__dependency__install_packages["install_packages"]
+        src__pfix__session__install_pfix_hook["install_pfix_hook"]
+        src__pfix__analyzer___extract_imports["_extract_imports"]
+        src__pfix__analyzer__classify_error["classify_error"]
         src__pfix___auto_activate["_auto_activate"]
-        src__pfix__dev_mode___create_wrapper["_create_wrapper"]
-        src__pfix__fixer___git_commit["_git_commit"]
-        src__pfix__cli__cmd_deps["cmd_deps"]
+        src__pfix__dependency__update_requirements_file["update_requirements_file"]
         src__pfix__llm__request_fix["request_fix"]
         src__pfix__dev_mode__is_site_package["is_site_package"]
-        src__pfix__cli__cmd_dev["cmd_dev"]
-        src__pfix__cli__cmd_server["cmd_server"]
-        src__pfix__cli__cmd_check["cmd_check"]
-        src__pfix__decorator___ensure_deps["_ensure_deps"]
-        src__pfix__dev_mode__wrap_module_functions["wrap_module_functions"]
-        src__pfix__fixer__apply_fix["apply_fix"]
-        src__pfix__decorator___try_quick_dep_fix["_try_quick_dep_fix"]
-        src__pfix__mcp_server___build_ctx["_build_ctx"]
-        src__pfix__mcp_server__start_server["start_server"]
-        src__pfix__analyzer__scan_missing_deps["scan_missing_deps"]
+        src__pfix__dev_mode___create_wrapper["_create_wrapper"]
         src__pfix__llm___parse_response["_parse_response"]
-        src__pfix__config__PfixConfig__from_env["from_env"]
-        src__pfix__dependency__is_module_available["is_module_available"]
-        src__pfix__dependency__install_packages["install_packages"]
-        src__pfix__cli___install_excepthook["_install_excepthook"]
-        src__pfix__dependency__generate_requirements["generate_requirements"]
-        src__pfix__dev_mode__install_dev_mode_hook["install_dev_mode_hook"]
-        src__pfix__analyzer__classify_error["classify_error"]
-        src__pfix__decorator__apfix["apfix"]
-        src__pfix__analyzer___extract_imports["_extract_imports"]
-        src__pfix__config__get_config["get_config"]
-        src__pfix__fixer___make_diff["_make_diff"]
-        src__pfix__dependency__detect_missing_from_error["detect_missing_from_error"]
-        src__pfix__config__configure["configure"]
-        src__pfix__decorator__pfix["pfix"]
-        src__pfix__mcp_server__create_mcp_server["create_mcp_server"]
-        src__pfix__session__PFixSession___handle_exception["_handle_exception"]
-        src__pfix__dependency__update_requirements_file["update_requirements_file"]
+        src__pfix__mcp_server__start_server["start_server"]
         src__pfix__dependency__resolve_package_name["resolve_package_name"]
-        src__pfix__dependency__scan_project_deps["scan_project_deps"]
-        src__pfix__analyzer__analyze_exception["analyze_exception"]
-        src__pfix__cli__cmd_run["cmd_run"]
-        src__pfix__session__install_pfix_hook["install_pfix_hook"]
-        src__pfix__mcp_client__MCPClient____init__["__init__"]
+        src__pfix__fixer___make_diff["_make_diff"]
+        src__pfix__config__PfixConfig__from_env["from_env"]
+        src__pfix__cli__cmd_check["cmd_check"]
+        src__pfix__config__get_config["get_config"]
+        src__pfix__fixer___git_commit["_git_commit"]
+        src__pfix__session__PFixSession____init__["__init__"]
+        src__pfix__dependency__generate_requirements["generate_requirements"]
+        src__pfix__decorator__apfix["apfix"]
+        src__pfix__cli__cmd_server["cmd_server"]
+        src__pfix__decorator__pfix["pfix"]
+        src__pfix__cli__cmd_deps["cmd_deps"]
+        src__pfix__dev_mode__install_dev_mode_hook["install_dev_mode_hook"]
+        src__pfix__analyzer__scan_missing_deps["scan_missing_deps"]
+        src__pfix__mcp_server__create_mcp_server["create_mcp_server"]
+        src__pfix__config__configure["configure"]
+        src__pfix__dependency__detect_missing_from_error["detect_missing_from_error"]
     end
     examples__demo_auto__main --> examples__demo_auto__fetch_json
     examples__demo_auto__main --> examples__demo_auto__average
@@ -78,23 +78,25 @@ flowchart LR
     src__pfix__cli___install_excepthook --> src__pfix__analyzer__analyze_exception
     src__pfix__cli___install_excepthook --> src__pfix__llm__request_fix
     src__pfix__cli___install_excepthook --> src__pfix__fixer__apply_fix
-    src__pfix__analyzer__analyze_exception --> src__pfix__analyzer___extract_imports
-    src__pfix__analyzer__analyze_exception --> src__pfix__analyzer__scan_missing_deps
+    src__pfix__mcp_client__MCPClient____init__ --> src__pfix__config__get_config
     src__pfix__fixer__apply_fix --> src__pfix__config__get_config
     src__pfix__fixer__apply_fix --> src__pfix__fixer___make_diff
     src__pfix__fixer__apply_fix --> src__pfix__dependency__install_packages
     src__pfix__fixer___git_commit --> src__pfix__config__get_config
     src__pfix___auto_activate --> src__pfix__session__install_pfix_hook
-    src__pfix__mcp_client__MCPClient____init__ --> src__pfix__config__get_config
-    src__pfix__dev_mode__wrap_module_functions --> src__pfix__dev_mode___create_wrapper
-    src__pfix__dev_mode___create_wrapper --> src__pfix__analyzer__analyze_exception
-    src__pfix__dev_mode___create_wrapper --> src__pfix__llm__request_fix
-    src__pfix__dev_mode___create_wrapper --> src__pfix__config__get_config
-    src__pfix__dev_mode___create_wrapper --> src__pfix__fixer__apply_fix
-    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__is_site_package
-    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__wrap_module_functions
     src__pfix__config__get_config --> src__pfix__config__PfixConfig__from_env
     src__pfix__config__configure --> src__pfix__config__PfixConfig__from_env
+    src__pfix__analyzer__analyze_exception --> src__pfix__analyzer___extract_imports
+    src__pfix__analyzer__analyze_exception --> src__pfix__analyzer__scan_missing_deps
+    src__pfix__session__PFixSession____init__ --> src__pfix__config__get_config
+    src__pfix__session__PFixSession___handle_exception --> src__pfix__analyzer__analyze_exception
+    src__pfix__session__PFixSession___handle_exception --> src__pfix__analyzer__classify_error
+    src__pfix__session__PFixSession___handle_exception --> src__pfix__llm__request_fix
+    src__pfix__session__PFixSession___handle_exception --> src__pfix__fixer__apply_fix
+    src__pfix__session__PFixSession___handle_exception --> src__pfix__dependency__detect_missing_from_error
+    src__pfix__session__install_pfix_hook --> src__pfix__config__get_config
+    src__pfix__session__install_pfix_hook --> src__pfix__analyzer__analyze_exception
+    src__pfix__session__install_pfix_hook --> src__pfix__llm__request_fix
     src__pfix__dependency__install_packages --> src__pfix__config__get_config
     src__pfix__dependency__scan_project_deps --> src__pfix__config__get_config
     src__pfix__dependency__scan_project_deps --> src__pfix__dependency__is_module_available
@@ -105,6 +107,13 @@ flowchart LR
     src__pfix__mcp_server__start_server --> src__pfix__mcp_server__create_mcp_server
     examples__complex_demo__main__main --> examples__complex_demo__main__load_and_process_data
     examples__complex_demo__main__main --> examples__complex_demo__main__analyze_users
+    src__pfix__dev_mode__wrap_module_functions --> src__pfix__dev_mode___create_wrapper
+    src__pfix__dev_mode___create_wrapper --> src__pfix__analyzer__analyze_exception
+    src__pfix__dev_mode___create_wrapper --> src__pfix__llm__request_fix
+    src__pfix__dev_mode___create_wrapper --> src__pfix__config__get_config
+    src__pfix__dev_mode___create_wrapper --> src__pfix__fixer__apply_fix
+    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__is_site_package
+    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__wrap_module_functions
     src__pfix__decorator__pfix --> src__pfix__config__get_config
     src__pfix__decorator__pfix --> src__pfix__decorator___ensure_deps
     src__pfix__decorator__pfix --> src__pfix__decorator___try_quick_dep_fix
@@ -116,15 +125,6 @@ flowchart LR
     src__pfix__decorator___try_quick_dep_fix --> src__pfix__dependency__detect_missing_from_error
     src__pfix__decorator___try_quick_dep_fix --> src__pfix__dependency__resolve_package_name
     src__pfix__decorator___try_quick_dep_fix --> src__pfix__dependency__install_packages
-    src__pfix__session__PFixSession____init__ --> src__pfix__config__get_config
-    src__pfix__session__PFixSession___handle_exception --> src__pfix__analyzer__analyze_exception
-    src__pfix__session__PFixSession___handle_exception --> src__pfix__analyzer__classify_error
-    src__pfix__session__PFixSession___handle_exception --> src__pfix__llm__request_fix
-    src__pfix__session__PFixSession___handle_exception --> src__pfix__fixer__apply_fix
-    src__pfix__session__PFixSession___handle_exception --> src__pfix__dependency__detect_missing_from_error
-    src__pfix__session__install_pfix_hook --> src__pfix__config__get_config
-    src__pfix__session__install_pfix_hook --> src__pfix__analyzer__analyze_exception
-    src__pfix__session__install_pfix_hook --> src__pfix__llm__request_fix
     src__pfix__llm__request_fix --> src__pfix__config__get_config
     src__pfix__llm__request_fix --> src__pfix__analyzer__classify_error
     src__pfix__llm__request_fix --> src__pfix__llm___parse_response

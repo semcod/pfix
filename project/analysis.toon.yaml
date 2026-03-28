@@ -1,9 +1,9 @@
-# code2llm | 13f 2452L | python:12,shell:1 | 2026-03-28
+# code2llm | 14f 2541L | python:13,shell:1 | 2026-03-28
 # CC̄=5.1 | critical:2/75 | dups:0 | cycles:1
 
 HEALTH[2]:
-  🟡 CC    analyze_exception CC=16 (limit:15)
   🟡 CC    apply_fix CC=20 (limit:15)
+  🟡 CC    analyze_exception CC=16 (limit:15)
 
 REFACTOR[2]:
   1. split 2 high-CC methods  (CC>15)
@@ -16,9 +16,9 @@ PIPELINES[23]:
       PURITY: 100% pure
   [3] Src [main]: main → cmd_run → configure
       PURITY: 100% pure
-  [4] Src [to_prompt]: to_prompt
+  [4] Src [__init__]: __init__ → get_config
       PURITY: 100% pure
-  [5] Src [_auto_activate]: _auto_activate → install_pfix_hook → get_config
+  [5] Src [connect]: connect
       PURITY: 100% pure
 
 LAYERS:
@@ -26,13 +26,14 @@ LAYERS:
   │ cli                        418L  0C    9m  CC=12     ←0
   │ session                    269L  1C    8m  CC=10     ←1
   │ decorator                  265L  0C    5m  CC=4      ←0
-  │ !! analyzer                   224L  1C    6m  CC=16     ←5
   │ !! fixer                      219L  0C    7m  CC=20     ←5
   │ mcp_server                 215L  0C    3m  CC=5      ←1
   │ dependency                 205L  0C    7m  CC=12     ←5
   │ config                     160L  1C    6m  CC=12     ←9
+  │ types                      159L  4C    1m  CC=11     ←0
   │ dev_mode                   158L  0C    4m  CC=6      ←1
-  │ llm                        138L  1C    2m  CC=6      ←5
+  │ !! analyzer                   155L  0C    5m  CC=16     ←5
+  │ llm                        137L  1C    2m  CC=6      ←5
   │ mcp_client                  81L  2C    6m  CC=4      ←0
   │ __init__                    76L  0C    1m  CC=8      ←0
   │

@@ -11,79 +11,10 @@ import ast
 import inspect
 import sys
 import traceback
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
-
-@dataclass
-class ErrorContext:
-    """Structured error report for LLM consumption."""
-
-    # Error
-    exception_type: str = ""
-    exception_message: str = ""
-    traceback_text: str = ""
-
-    # Source
-    source_file: str = ""
-    source_code: str = ""
-    function_name: str = ""
-    function_source: str = ""
-    line_number: int = 0
-    failing_line: str = ""
-
-    # Environment
-    local_vars: dict[str, str] = field(default_factory=dict)
-    imports: list[str] = field(default_factory=list)
-    python_version: str = ""
-
-    # Project context
-    project_deps: list[str] = field(default_factory=list)
-    missing_deps: list[str] = field(default_factory=list)
-
-    # Decorator metadata
-    hints: dict[str, Any] = field(default_factory=dict)
-
-    def to_prompt(self) -> str:
-        parts = [
-            "## Error Report",
-            f"**Exception**: `{self.exception_type}: {self.exception_message}`",
-            f"**File**: `{self.source_file}` line {self.line_number}",
-            f"**Function**: `{self.function_name}`",
-            "",
-            "### Traceback",
-            f"```\n{self.traceback_text}\n```",
-        ]
-
-        if self.source_code:
-            parts += ["", "### Full Source File", f"```python\n{self.source_code}\n```"]
-
-        if self.function_source:
-            parts += ["", "### Function Source", f"```python\n{self.function_source}\n```"]
-
-        if self.local_vars:
-            parts.append("\n### Local Variables")
-            for k, v in list(self.local_vars.items())[:30]:
-                parts.append(f"- `{k}` = `{v}`")
-
-        if self.imports:
-            parts.append("\n### File Imports")
-            for imp in self.imports:
-                parts.append(f"- `{imp}`")
-
-        if self.missing_deps:
-            parts.append("\n### Missing Dependencies (pipreqs scan)")
-            for dep in self.missing_deps:
-                parts.append(f"- `{dep}`")
-
-        if self.hints:
-            parts.append("\n### Developer Hints (@pfix decorator)")
-            for k, v in self.hints.items():
-                parts.append(f"- **{k}**: {v}")
-
-        parts.append(f"\n### Python {self.python_version}")
-        return "\n".join(parts)
+from .types import ErrorContext
 
 
 def analyze_exception(
@@ -94,56 +25,132 @@ def analyze_exception(
 ) -> ErrorContext:
     """Build ErrorContext from a caught exception."""
     ctx = ErrorContext()
-    ctx.exception_type = type(exc).__name__
-    ctx.exception_message = str(exc)
-    ctx.traceback_text = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    ctx.hints = hints or {}
     ctx.python_version = sys.version.split()[0]
 
-    # Walk traceback to innermost user-code frame
-    tb = exc.__traceback__
-    if tb is not None:
-        while tb.tb_next is not None:
-            tb = tb.tb_next
-        frame = tb.tb_frame
-        ctx.line_number = tb.tb_lineno
-        ctx.source_file = frame.f_code.co_filename
-        ctx.function_name = frame.f_code.co_name  # Get function name from frame
-        if local_vars is None:
-            local_vars = frame.f_locals
-        ctx.local_vars = {
-            k: _safe_repr(v) for k, v in (local_vars or {}).items()
-            if not k.startswith("__")
-        }
+    # 1. Extract traceback context
+    ctx.exception_type, ctx.exception_message, ctx.traceback_text = _extract_exception_info(exc)
 
-    # Function source
-    if func is not None:
-        try:
-            ctx.function_source = inspect.getsource(func)
-            ctx.function_name = func.__qualname__
-            ctx.source_file = inspect.getfile(func)
-        except (OSError, TypeError):
-            ctx.function_name = getattr(func, "__name__", "<unknown>")
+    # 2. Extract frame context from traceback
+    frame_info = _extract_frame_context(exc, local_vars)
+    ctx.source_file = frame_info.get("source_file", "")
+    ctx.line_number = frame_info.get("line_number", 0)
+    ctx.function_name = frame_info.get("function_name", "")
+    ctx.local_vars = frame_info.get("local_vars", {})
 
-    # Full file source
-    if ctx.source_file and Path(ctx.source_file).is_file():
-        try:
-            ctx.source_code = Path(ctx.source_file).read_text(encoding="utf-8")
-            lines = ctx.source_code.splitlines()
-            if 0 < ctx.line_number <= len(lines):
-                ctx.failing_line = lines[ctx.line_number - 1]
-        except Exception:
-            pass
+    # 3. Extract function source if func provided
+    func_info = _extract_function_source(func)
+    if func_info["function_source"]:
+        ctx.function_source = func_info["function_source"]
+        ctx.function_name = func_info.get("function_name", ctx.function_name)
+        ctx.source_file = func_info.get("source_file", ctx.source_file)
 
-    # Extract imports
-    if ctx.source_code:
-        ctx.imports = _extract_imports(ctx.source_code)
+    # 4. Extract file context
+    file_info = _extract_file_context(ctx.source_file, ctx.line_number)
+    ctx.source_code = file_info.get("source_code", "")
+    ctx.failing_line = file_info.get("failing_line", "")
 
-    # Scan for missing deps via pipreqs
-    if ctx.source_file:
-        ctx.missing_deps = scan_missing_deps(Path(ctx.source_file).parent)
+    # 5. Extract environment
+    ctx.imports = _extract_imports(ctx.source_code) if ctx.source_code else []
+    ctx.missing_deps = _scan_missing_deps(ctx.source_file) if ctx.source_file else []
 
-    ctx.hints = hints or {}
     return ctx
+
+
+def _extract_exception_info(exc: BaseException) -> tuple[str, str, str]:
+    """Extract exception type, message, and traceback text."""
+    exc_type = type(exc).__name__
+    exc_message = str(exc)
+    tb_text = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    return exc_type, exc_message, tb_text
+
+
+def _extract_frame_context(
+    exc: BaseException,
+    local_vars: Optional[dict] = None,
+) -> dict:
+    """Extract context from innermost traceback frame."""
+    result = {
+        "source_file": "",
+        "line_number": 0,
+        "function_name": "",
+        "local_vars": {},
+    }
+
+    tb = exc.__traceback__
+    if tb is None:
+        return result
+
+    # Walk to innermost user-code frame
+    while tb.tb_next is not None:
+        tb = tb.tb_next
+
+    frame = tb.tb_frame
+    result["line_number"] = tb.tb_lineno
+    result["source_file"] = frame.f_code.co_filename
+    result["function_name"] = frame.f_code.co_name
+
+    if local_vars is None:
+        local_vars = frame.f_locals
+
+    result["local_vars"] = {
+        k: _safe_repr(v) for k, v in (local_vars or {}).items()
+        if not k.startswith("__")
+    }
+
+    return result
+
+
+def _extract_function_source(func: Optional[Any]) -> dict:
+    """Extract function source code via inspect."""
+    result = {
+        "function_source": "",
+        "function_name": "",
+        "source_file": "",
+    }
+
+    if func is None:
+        return result
+
+    try:
+        result["function_source"] = inspect.getsource(func)
+        result["function_name"] = func.__qualname__
+        result["source_file"] = inspect.getfile(func)
+    except (OSError, TypeError):
+        result["function_name"] = getattr(func, "__name__", "<unknown>")
+
+    return result
+
+
+def _extract_file_context(source_file: str, line_number: int) -> dict:
+    """Read source file and extract failing line."""
+    result = {
+        "source_code": "",
+        "failing_line": "",
+    }
+
+    if not source_file or not Path(source_file).is_file():
+        return result
+
+    try:
+        result["source_code"] = Path(source_file).read_text(encoding="utf-8")
+        lines = result["source_code"].splitlines()
+        if 0 < line_number <= len(lines):
+            result["failing_line"] = lines[line_number - 1]
+    except Exception:
+        pass
+
+    return result
+
+
+def _scan_missing_deps(source_file: str) -> list[str]:
+    """Scan for missing deps via pipreqs."""
+    if not source_file:
+        return []
+    try:
+        return scan_missing_deps(Path(source_file).parent)
+    except Exception:
+        return []
 
 
 def classify_error(ctx: ErrorContext) -> str:

@@ -52,7 +52,7 @@ def create_mcp_server():
         hint: str = "",
     ) -> str:
         """Analyze a Python error and return diagnosis + fix proposal (no changes applied)."""
-        from .analyzer import ErrorContext
+        from .types import ErrorContext
         from .llm import request_fix
 
         ctx = _build_ctx(
@@ -176,7 +176,7 @@ def _build_ctx(
     traceback_text, function_name, line_number, hint,
 ):
     """Build ErrorContext from MCP tool arguments."""
-    from .analyzer import ErrorContext
+    from .types import ErrorContext
 
     source_code = ""
     if source_file and Path(source_file).is_file():

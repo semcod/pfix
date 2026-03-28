@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pfix
 
 ![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.10-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-75-green)
-> **75** functions | **6** classes | **16** files | CC̄ = 4.5
+> **75** functions | **8** classes | **17** files | CC̄ = 4.5
 
 > Auto-generated project documentation from source code analysis.
 
@@ -150,18 +150,20 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 pfix/
-    ├── demo_auto    ├── demo        ├── cli        ├── analyzer        ├── fixer    ├── pfix/        ├── mcp_client        ├── config        ├── dev_mode        ├── dependency        ├── mcp_server        ├── main├── project        ├── decorator        ├── session        ├── llm```
+    ├── demo_auto    ├── demo        ├── cli        ├── mcp_client        ├── fixer    ├── pfix/        ├── analyzer        ├── config        ├── dev_mode        ├── session        ├── types        ├── dependency        ├── mcp_server├── project        ├── main        ├── decorator        ├── llm```
 
 ## API Overview
 
 ### Classes
 
-- **`ErrorContext`** — Structured error report for LLM consumption.
 - **`MCPResult`** — —
 - **`MCPClient`** — Client for MCP servers (filesystem, editor tools).
 - **`PfixConfig`** — Central configuration.
 - **`PFixSession`** — Session context that catches and auto-fixes exceptions.
+- **`ErrorContext`** — Structured error report for LLM consumption.
 - **`FixProposal`** — Structured fix from LLM.
+- **`PfixConfig`** — Runtime configuration for pfix.
+- **`FixEvent`** — Structured log event for each fix operation.
 
 ### Functions
 
@@ -181,16 +183,19 @@ pfix/
 - `cmd_disable()` — Disable pfix auto-activation.
 - `cmd_deps(args)` — —
 - `cmd_server(args)` — —
+- `apply_fix(ctx, proposal, confirm)` — Apply a FixProposal. Returns True if anything was applied.
 - `analyze_exception(exc, func, local_vars, hints)` — Build ErrorContext from a caught exception.
 - `classify_error(ctx)` — Classify error to guide fix strategy.
 - `scan_missing_deps(project_dir)` — Use pipreqs to detect imports that aren't installed.
-- `apply_fix(ctx, proposal, confirm)` — Apply a FixProposal. Returns True if anything was applied.
 - `get_config()` — —
 - `configure()` — Override global config programmatically.
 - `reset_config()` — Reset global config (useful in tests).
 - `is_site_package(module)` — Check if module is from site-packages (third-party).
 - `wrap_module_functions(module)` — Wrap all callable attributes of a module with error handling.
 - `install_dev_mode_hook()` — Install the development mode import hook.
+- `pfix_session(target_file)` — Create pfix session for file-level auto-healing.
+- `auto_pfix(func)` — Decorator that auto-fixes exceptions in wrapped function.
+- `install_pfix_hook(target_file, auto_apply)` — Install global pfix excepthook.
 - `resolve_package_name(module_name)` — Map Python module name → PyPI package name.
 - `is_module_available(module_name)` — —
 - `install_packages(packages, dry_run)` — Install packages via pip or uv. Returns {package: success}.
@@ -205,9 +210,6 @@ pfix/
 - `main()` — —
 - `pfix(func)` — Self-healing decorator. Catches errors, fixes code via LLM.
 - `apfix(func)` — Async version of @pfix.
-- `pfix_session(target_file)` — Create pfix session for file-level auto-healing.
-- `auto_pfix(func)` — Decorator that auto-fixes exceptions in wrapped function.
-- `install_pfix_hook(target_file, auto_apply)` — Install global pfix excepthook.
 - `request_fix(error_ctx)` — Send error to LLM, get fix proposal.
 
 
@@ -218,17 +220,18 @@ pfix/
 📄 `examples.demo_auto` (4 functions)
 📄 `project`
 📦 `src.pfix` (1 functions)
-📄 `src.pfix.analyzer` (6 functions, 1 classes)
+📄 `src.pfix.analyzer` (5 functions)
 📄 `src.pfix.cli` (9 functions)
 📄 `src.pfix.config` (6 functions, 1 classes)
 📄 `src.pfix.decorator` (7 functions)
 📄 `src.pfix.dependency` (7 functions)
 📄 `src.pfix.dev_mode` (4 functions)
 📄 `src.pfix.fixer` (7 functions)
-📄 `src.pfix.llm` (2 functions, 1 classes)
+📄 `src.pfix.llm` (2 functions)
 📄 `src.pfix.mcp_client` (6 functions, 2 classes)
 📄 `src.pfix.mcp_server` (3 functions)
 📄 `src.pfix.session` (8 functions, 1 classes)
+📄 `src.pfix.types` (1 functions, 4 classes)
 
 ## Requirements
 

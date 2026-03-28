@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
 
 import litellm
 
-from .analyzer import ErrorContext, classify_error
+from .analyzer import classify_error
 from .config import get_config
+from .types import ErrorContext, FixProposal
 
 litellm.suppress_debug_info = True
 
@@ -42,30 +42,6 @@ RESPONSE JSON:
   "breaking_changes": false
 }
 """
-
-
-@dataclass
-class FixProposal:
-    """Structured fix from LLM."""
-
-    diagnosis: str = ""
-    error_category: str = ""
-    fix_description: str = ""
-    fixed_function: str = ""
-    fixed_file_content: str = ""
-    dependencies: list[str] = field(default_factory=list)
-    new_imports: list[str] = field(default_factory=list)
-    confidence: float = 0.0
-    breaking_changes: bool = False
-    raw_response: str = ""
-
-    @property
-    def has_code_fix(self) -> bool:
-        return bool(self.fixed_function or self.fixed_file_content)
-
-    @property
-    def has_dependency_fix(self) -> bool:
-        return bool(self.dependencies)
 
 
 def request_fix(error_ctx: ErrorContext) -> FixProposal:

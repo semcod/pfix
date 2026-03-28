@@ -1,23 +1,24 @@
-# pfix | 13f 2452L | python:12,shell:1 | 2026-03-28
-# stats: 64 func | 0 cls | 13 mod | CC̄=5.1 | critical:2 | cycles:0
+# pfix | 14f 2518L | python:13,shell:1 | 2026-03-28
+# stats: 64 func | 0 cls | 14 mod | CC̄=5.1 | critical:2 | cycles:0
 # alerts[5]: fan-out apply_fix=24; fan-out create_mcp_server=22; fan-out install_pfix_hook=21; CC apply_fix=20; fan-out analyze_exception=19
 # hotspots[5]: apply_fix fan=24; create_mcp_server fan=22; install_pfix_hook fan=21; analyze_exception fan=19; main fan=18
-# evolution: baseline
+# evolution: CC̄ 5.1→5.1 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[13]:
+M[14]:
   project.sh,24
   src/pfix/__init__.py,76
-  src/pfix/analyzer.py,224
+  src/pfix/analyzer.py,155
   src/pfix/cli.py,418
   src/pfix/config.py,160
   src/pfix/decorator.py,265
   src/pfix/dependency.py,205
   src/pfix/dev_mode.py,158
   src/pfix/fixer.py,219
-  src/pfix/llm.py,138
+  src/pfix/llm.py,114
   src/pfix/mcp_client.py,81
   src/pfix/mcp_server.py,215
   src/pfix/session.py,269
+  src/pfix/types.py,159
 D:
   src/pfix/fixer.py:
     e: apply_fix,_replace_function,_make_diff,_validate_syntax,_backup,_clear_pycache,_git_commit
@@ -29,8 +30,7 @@ D:
     _clear_pycache(source_file)
     _git_commit(filepath;message)
   src/pfix/analyzer.py:
-    e: ErrorContext,analyze_exception,classify_error,scan_missing_deps,_extract_imports,_safe_repr
-    ErrorContext: to_prompt(0)  # Structured error report for LLM consumption...
+    e: analyze_exception,classify_error,scan_missing_deps,_extract_imports,_safe_repr
     analyze_exception(exc;func;local_vars;hints)
     classify_error(ctx)
     scan_missing_deps(project_dir)
@@ -62,6 +62,12 @@ D:
     update_requirements_file(packages;requirements_path)
     generate_requirements(project_dir)
     detect_missing_from_error(exception_message)
+  src/pfix/types.py:
+    e: ErrorContext,FixProposal,PfixConfig,FixEvent
+    ErrorContext: to_prompt(0)  # Structured error report for LLM consumption...
+    FixProposal:  # Structured fix from LLM...
+    PfixConfig:  # Runtime configuration for pfix...
+    FixEvent:  # Structured log event for each fix operation...
   src/pfix/session.py:
     e: PFixSession,pfix_session,auto_pfix,install_pfix_hook
     PFixSession: __init__(1),__enter__(0),__exit__(3),__call__(1),_handle_exception(3)  # Session context that catches and auto-fixes exceptions...
