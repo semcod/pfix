@@ -22,7 +22,7 @@ from .config import PfixConfig, configure, get_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.21"
+__version__ = "0.1.22"
 __all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig"]
 
 # ── Auto-activation on import ─────────────────────────────────────
@@ -67,6 +67,10 @@ def _auto_activate():
 # Run auto-activation
 try:
     _auto_activate()
-except Exception:
+except Exception as e:
     # Never break user code if auto-activation fails
+    import sys
+    print(f"[pfix-debug] Auto-activation failed: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc()
     pass

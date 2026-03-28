@@ -1,0 +1,25 @@
+flowchart TD
+
+    %% Entry points (blue)
+    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
+
+    subgraph Core
+        src__pfix__cli__main["main"]
+        src__pfix__cli__cmd_run["cmd_run"]
+        src__pfix__cli__cmd_dev["cmd_dev"]
+        src__pfix__cli__cmd_check["cmd_check"]
+        src__pfix__cli__cmd_enable["cmd_enable"]
+        src__pfix__cli__cmd_disable["cmd_disable"]
+        src__pfix__cli__cmd_deps["cmd_deps"]
+        src__pfix__cli__cmd_server["cmd_server"]
+        src__pfix__cli___install_excepthook["_install_excepthook"]
+        src__pfix__analyzer__ErrorContext__to_prompt["to_prompt"]
+        src__pfix__analyzer__analyze_exception{{analyze_exception CC=16}}
+        src__pfix__fixer__apply_fix{{apply_fix CC=20}}
+        src__pfix___auto_activate["_auto_activate"]
+        src__pfix__mcp_client__MCPClient__connect["connect"]
+        src__pfix__mcp_client__MCPClient__disconnect["disconnect"]
+        ...["+20 more"]
+    end
+
+    class src__pfix__cli__main,src__pfix__cli__cmd_run,src__pfix__cli__cmd_dev,src__pfix__cli__cmd_check,src__pfix__cli__cmd_enable,src__pfix__cli__cmd_disable,src__pfix__cli__cmd_deps,src__pfix__cli__cmd_server,src__pfix__cli___install_excepthook,src__pfix__analyzer__ErrorContext__to_prompt entry

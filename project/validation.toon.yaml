@@ -1,0 +1,75 @@
+# vallm batch | 42f | 10✓ 1⚠ 11✗ | 2026-03-28
+
+SUMMARY:
+  scanned: 42  passed: 10 (23.8%)  warnings: 1  errors: 11  unsupported: 21
+
+WARNINGS[1]{path,score}:
+  src/pfix/analyzer.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,analyze_exception has cyclomatic complexity 16 (max: 15),89
+      complexity.lizard_cc,warning,analyze_exception: CC=16 exceeds limit 15,89
+
+ERRORS[11]{path,score}:
+  src/pfix/mcp_server.py,0.69
+    issues[10]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,179
+      python.import.resolvable,error,Module 'mcp.server.fastmcp' not found,33
+      python.import.resolvable,error,Module 'analyzer' not found,55
+      python.import.resolvable,error,Module 'llm' not found,56
+      python.import.resolvable,error,Module 'config' not found,85
+      python.import.resolvable,error,Module 'fixer' not found,86
+      python.import.resolvable,error,Module 'llm' not found,87
+      python.import.resolvable,error,Module 'dependency' not found,128
+      python.import.resolvable,error,Module 'dependency' not found,140
+      python.import.resolvable,error,Module 'dependency' not found,151
+  examples/complex_demo/main.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pandas' not found,11
+  src/pfix/decorator.py,0.82
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,31
+      python.import.resolvable,error,Module 'config' not found,32
+      python.import.resolvable,error,Module 'dependency' not found,33
+      python.import.resolvable,error,Module 'fixer' not found,34
+      python.import.resolvable,error,Module 'llm' not found,35
+  src/pfix/__init__.py,0.83
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,21
+      python.import.resolvable,error,Module 'decorator' not found,22
+      python.import.resolvable,error,Module 'session' not found,23
+      python.import.resolvable,error,Module 'session' not found,54
+  src/pfix/session.py,0.85
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,37
+      python.import.resolvable,error,Module 'config' not found,38
+      python.import.resolvable,error,Module 'dependency' not found,39
+      python.import.resolvable,error,Module 'fixer' not found,40
+      python.import.resolvable,error,Module 'llm' not found,41
+  src/pfix/fixer.py,0.86
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,18
+      python.import.resolvable,error,Module 'config' not found,19
+      python.import.resolvable,error,Module 'dependency' not found,20
+      python.import.resolvable,error,Module 'llm' not found,21
+      python.import.resolvable,error,Module 'git' not found,211
+  src/pfix/llm.py,0.89
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,13
+      python.import.resolvable,error,Module 'config' not found,14
+  src/pfix/mcp_client.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,14
+  src/pfix/config.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'tomli' not found,119
+  src/pfix/dependency.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,22
+  tests/test_pfix.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,6
+
+UNSUPPORTED[3]{bucket,count}:
+  *.md,9
+  *.txt,1
+  other,11

@@ -1,0 +1,41 @@
+# redup/duplication | 4 groups | 15f 2596L | 2026-03-28
+
+SUMMARY:
+  files_scanned: 15
+  total_lines:   2596
+  dup_groups:    4
+  dup_fragments: 8
+  saved_lines:   38
+  scan_ms:       4709
+
+DUPLICATES[4] (ranked by impact):
+  [f418c9199b147ebd]   STRU  main  L=17 N=2 saved=17 sim=1.00
+      examples/demo.py:0-16  (main)
+      examples/demo_auto.py:0-16  (main)
+  [7720aa1a49c23d3f]   STRU  is_module_available  L=9 N=2 saved=9 sim=1.00
+      src/pfix/dependency.py:0-8  (is_module_available)
+      src/pfix/fixer.py:0-8  (_validate_syntax)
+  [f882810daad0f612]   EXAC  fetch_json  L=7 N=2 saved=7 sim=1.00
+      examples/demo.py:0-6  (fetch_json)
+      examples/demo_auto.py:0-6  (fetch_json)
+  [33b79134356f52d7]   EXAC  greet  L=5 N=2 saved=5 sim=1.00
+      examples/demo.py:0-4  (greet)
+      examples/demo_auto.py:0-5  (greet)
+
+REFACTOR[4] (ranked by priority):
+  [1] ○ extract_function   → examples/utils/main.py
+      WHY: 2 occurrences of 17-line block across 2 files — saves 17 lines
+      FILES: examples/demo.py, examples/demo_auto.py
+  [2] ○ extract_function   → src/pfix/utils/is_module_available.py
+      WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
+      FILES: src/pfix/dependency.py, src/pfix/fixer.py
+  [3] ○ extract_function   → examples/utils/fetch_json.py
+      WHY: 2 occurrences of 7-line block across 2 files — saves 7 lines
+      FILES: examples/demo.py, examples/demo_auto.py
+  [4] ○ extract_function   → examples/utils/greet.py
+      WHY: 2 occurrences of 5-line block across 2 files — saves 5 lines
+      FILES: examples/demo.py, examples/demo_auto.py
+
+METRICS-TARGET:
+  dup_groups:  4 → 0
+  saved_lines: 38 lines recoverable

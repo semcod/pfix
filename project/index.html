@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>code2llm Analysis Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #475569;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+        }
+        
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --surface-hover: #f1f5f9;
+                --border: #e2e8f0;
+                --text: #1e293b;
+                --text-muted: #64748b;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .search {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+        
+        .search input:focus {
+            border-color: var(--accent);
+        }
+        
+        .search input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        
+        .file-group {
+            margin-bottom: 1rem;
+        }
+        
+        .file-group-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 0.875rem;
+        }
+        
+        .file-item:hover {
+            background: var(--surface-hover);
+        }
+        
+        .file-item.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .file-item.active .file-meta {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .file-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        /* Main content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .content-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .content-title h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .content-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+        
+        .btn:hover {
+            background: var(--border);
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .content-body {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+        
+        .welcome {
+            max-width: 600px;
+            margin: 2rem auto;
+            text-align: center;
+        }
+        
+        .welcome h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        /* Markdown rendered content styles */
+        .markdown-content {
+            line-height: 1.6;
+            max-width: 100%;
+        }
+        
+        .markdown-content h1, .markdown-content h2, .markdown-content h3,
+        .markdown-content h4, .markdown-content h5, .markdown-content h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        .markdown-content h1 { font-size: 1.75rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+        .markdown-content h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+        .markdown-content h3 { font-size: 1.25rem; }
+        .markdown-content h4 { font-size: 1.1rem; }
+        
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .markdown-content ul, .markdown-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .markdown-content code {
+            background: var(--surface);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.875em;
+        }
+        
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+            margin-left: 0;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+        
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .markdown-content th, .markdown-content td {
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        
+        .markdown-content th {
+            background: var(--surface);
+            font-weight: 600;
+        }
+        
+        .markdown-content tr:nth-child(even) {
+            background: var(--surface-hover);
+        }
+        
+        .markdown-content a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .markdown-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .markdown-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+        
+        .markdown-content hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 1.5rem 0;
+        }
+        
+        /* Mermaid diagram styles */
+        .mermaid-content {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .mermaid-content .mermaid {
+            background: transparent;
+        }
+        
+        /* Image preview styles */
+        .image-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .image-preview img {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                max-height: 40vh;
+            }
+            
+            .file-list {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 0.25rem;
+                padding: 0.5rem;
+            }
+            
+            .file-group {
+                display: flex;
+                flex-direction: row;
+                margin: 0;
+            }
+            
+            .file-group-title {
+                display: none;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                min-width: 80px;
+                padding: 0.5rem;
+                text-align: center;
+            }
+            
+            .file-info {
+                display: none;
+            }
+            
+            .file-size {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>🔍 code2llm</h1>
+                <p>Analysis Results Browser</p>
+            </div>
+            <div class="search">
+                <input type="text" id="search" placeholder="Search files..." oninput="filterFiles(this.value)">
+            </div>
+            <div class="file-list" id="fileList">
+                <!-- Files will be rendered here -->
+            </div>
+        </aside>
+        
+        <main class="content">
+            <div class="content-header">
+                <div class="content-title">
+                    <span id="contentIcon">📁</span>
+                    <h2 id="contentTitle">Welcome</h2>
+                </div>
+                <div class="content-actions" id="contentActions">
+                    <!-- Actions will be rendered here -->
+                </div>
+            </div>
+            <div class="content-body" id="contentBody">
+                <div class="welcome">
+                    <h2>Analysis Results</h2>
+                    <p>Select a file from the sidebar to view its contents. This interface works on GitHub Pages without any server required.</p>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        
+        const files = [{"name": "calls.png", "rel_path": "calls.png", "path": "calls.png", "size": "167.2KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "compact_flow.png", "rel_path": "compact_flow.png", "path": "compact_flow.png", "size": "10.5KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "flow.png", "rel_path": "flow.png", "path": "flow.png", "size": "21.1KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "README.md", "rel_path": "README.md", "path": "README.md", "size": "9.3KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# code2llm - Generated Analysis Files\n\nThis directory contains the complete analysis of your project generated by `code2llm`. Each file serves a specific purpose for understanding, refactoring, and documenting your codebase.\n\n## 📁 Generated Files Overview\n\nWhen you run `code2llm ./ -f all`, the following files are created:\n\n### 🎯 Core Analysis Files\n\n| File | Format | Purpose | Key Insights |\n|------|--------|---------|--------------|\n| `evolution.toon.yaml` | **YAML** | **📋 Refactoring queue** - Prioritized improvements | 0 refactoring actions needed |\n| `map.toon.yaml` | **YAML** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |\n\n### 🤖 LLM-Ready Documentation\n\n| File | Format | Purpose | Use Case |\n|------|--------|---------|----------|\n| `prompt.txt` | **Text** | **📝 Ready-to-send prompt** - Lists all files with instructions | Attach to LLM conversation as context guide |\n| `context.md` | **Markdown** | **📖 LLM narrative** - Architecture summary | Paste into ChatGPT/Claude for code analysis |\n\n### 📊 Visualizations\n\n| File | Format | Purpose | Description |\n|------|--------|---------|-------------|\n| `flow.mmd` | **Mermaid** | **🔄 Control flow diagram** | Function call paths with complexity styling |\n| `calls.mmd` | **Mermaid** | **📞 Call graph** | Function dependencies (edges only) |\n| `compact_flow.mmd` | **Mermaid** | **📦 Module overview** | Aggregated module-level view |\n\n## 🚀 Quick Start Commands\n\n### Basic Analysis\n```bash\n# Quick health check (TOON format only)\ncode2llm ./ -f toon\n\n# Generate all formats (what created these files)\ncode2llm ./ -f all\n\n# LLM-ready context only\ncode2llm ./ -f context\n```\n\n### Performance Options\n```bash\n# Fast analysis for large projects\ncode2llm ./ -f toon --strategy quick\n\n# Memory-limited analysis\ncode2llm ./ -f all --max-memory 500\n\n# Skip PNG generation (faster)\ncode2llm ./ -f all --no-png\n```\n\n### Refactoring Focus\n```bash\n# Get refactoring recommendations\ncode2llm ./ -f evolution\n\n# Focus on specific code smells\ncode2llm ./ -f toon --refactor --smell god_function\n\n# Data flow analysis\ncode2llm ./ -f flow --data-flow\n```\n\n## 📖 Understanding Each File\n\n### `analysis.toon` - Health Diagnostics\n**Purpose**: Quick overview of code health issues\n**Key sections**:\n- **HEALTH**: Critical issues (🔴) and warnings (🟡)\n- **REFACTOR**: Prioritized refactoring actions\n- **COUPLING**: Module dependencies and potential cycles\n- **LAYERS**: Package complexity metrics\n- **FUNCTIONS**: High-complexity functions (CC ≥ 10)\n- **CLASSES**: Complex classes needing attention\n\n**Example usage**:\n```bash\n# View health issues\ncat analysis.toon | head -30\n\n# Check refactoring priorities\ngrep \"REFACTOR\" analysis.toon\n```\n\n### `evolution.toon.yaml` - Refactoring Queue\n**Purpose**: Step-by-step refactoring plan\n**Key sections**:\n- **NEXT**: Immediate actions to take\n- **RISKS**: Potential breaking changes\n- **METRICS-TARGET**: Success criteria\n\n**Example usage**:\n```bash\n# Get refactoring plan\ncat evolution.toon.yaml\n\n# Track progress\ngrep \"NEXT\" evolution.toon.yaml\n```\n\n### `flow.toon` - Legacy Data Flow Analysis\n**Purpose**: Understand data movement through the system (legacy / explicit opt-in)\n**Key sections**:\n- **PIPELINES**: Data processing chains\n- **CONTRACTS**: Function input/output contracts\n- **SIDE_EFFECTS**: Functions with external impacts\n\n**Example usage**:\n```bash\n# Find data pipelines\ngrep \"PIPELINES\" flow.toon\n\n# Identify side effects\ngrep \"SIDE_EFFECTS\" flow.toon\n```\n\n### `map.toon.yaml` - Structural Map + Project Header\n**Purpose**: High-level architecture overview plus compact project header\n**Key sections**:\n- **MODULES**: All modules with basic stats\n- **IMPORTS**: Dependency relationships\n- **EXPORTS**: Public API surface and signatures\n- **HEADER**: Stats, alerts, hotspots, evolution trend\n\n**Example usage**:\n```bash\n# See project structure\ncat map.toon.yaml | head -50\n\n# Find public APIs\ngrep \"SIGNATURES\" map.toon.yaml\n```\n\n### `project.toon.yaml` - Compact Analysis View\n**Purpose**: Compact module view generated from project.yaml data\n**Status**: Legacy view generated on demand from unified project.yaml\n\n**Example usage**:\n```bash\n# View compact project structure\ncat project.toon.yaml | head -30\n\n# Find largest files\ngrep -E \"^  .*[0-9]{3,}$\" project.toon.yaml | sort -t',' -k2 -n -r | head -10\n```\n\n### `prompt.txt` - Ready-to-Send LLM Prompt\n**Purpose**: Pre-formatted prompt listing all generated files for LLM conversation\n**Generation**: Written when `code2llm` runs with a source path and requests `-f all` (including `--no-chunk`) or `code2logic`\n**Contents**:\n- **Files section**: Lists all existing generated files with descriptions, including `project.toon.yaml` when generated by `-f all`\n- **Source files section**: Highlights important source files such as `cli_exports/orchestrator.py`\n- **Missing section**: Shows which files weren't generated (if any)\n- **Task section**: Refactoring brief with concrete execution instructions, not just analysis\n- **Priority Order section**: State-dependent refactoring priorities, starting with blockers and then architecture cleanup\n- **Requirements section**: Guidelines for suggested changes\n\n**Example usage**:\n```bash\n# View the prompt\ncat prompt.txt\n\n# Copy to clipboard and paste into ChatGPT/Claude\ncat prompt.txt | pbcopy  # macOS\ncat prompt.txt | xclip -sel clip  # Linux\n```\n\n### `context.md` - LLM Narrative\n**Purpose**: Ready-to-paste context for AI assistants\n**Key sections**:\n- **Overview**: Project statistics\n- **Architecture**: Module breakdown\n- **Entry Points**: Public interfaces\n- **Patterns**: Design patterns detected\n\n**Example usage**:\n```bash\n# Copy to clipboard for LLM\ncat context.md | pbcopy  # macOS\ncat context.md | xclip -sel clip  # Linux\n\n# Use with Claude/ChatGPT for code analysis\n```\n\n### Visualization Files (`*.mmd`, `*.png`)\n**Purpose**: Visual understanding of code structure\n**Files**:\n- `flow.mmd` - Detailed control flow with complexity colors\n- `calls.mmd` - Simple call graph\n- `compact_flow.mmd` - High-level module view\n- `*.png` - Pre-rendered images\n\n**Example usage**:\n```bash\n# View diagrams\nopen flow.png  # macOS\nxdg-open flow.png  # Linux\n\n# Edit in Mermaid Live Editor\n# Copy content of .mmd files to https://mermaid.live\n```\n\n## 🔍 Common Analysis Patterns\n\n### 1. Code Health Assessment\n```bash\n# Quick health check\ncode2llm ./ -f toon\ncat analysis.toon | grep -E \"(HEALTH|REFACTOR)\"\n```\n\n### 2. Refactoring Planning\n```bash\n# Get refactoring queue\ncode2llm ./ -f evolution\ncat evolution.toon.yaml\n\n# Focus on specific issues\ncode2llm ./ -f toon --refactor --smell god_function\n```\n\n### 3. LLM Assistance\n```bash\n# Generate context for AI\ncode2llm ./ -f context\ncat context.md\n\n# Use with Claude: \"Based on this context, help me refactor the god modules\"\n```\n\n### 4. Team Documentation\n```bash\n# Generate all docs for team\ncode2llm ./ -f all -o ./docs/\n\n# Create visual diagrams\nopen docs/flow.png\n```\n\n## 📊 Interpreting Metrics\n\n### Complexity Metrics (CC)\n- **🔴 Critical (≥5.0)**: Immediate refactoring needed\n- **🟠 High (3.0-4.9)**: Consider refactoring\n- **🟡 Medium (1.5-2.9)**: Monitor complexity\n- **🟢 Low (0.1-1.4)**: Acceptable\n- **⚪ Basic (0.0)**: Simple functions\n\n### Module Health\n- **GOD Module**: Too large (>500 lines, >20 methods)\n- **HUB**: High fan-out (calls many modules)\n- **FAN-IN**: High incoming dependencies\n- **CYCLES**: Circular dependencies\n\n### Data Flow Indicators\n- **PIPELINE**: Sequential data processing\n- **CONTRACT**: Clear input/output specification\n- **SIDE_EFFECT**: External state modification\n\n## 🛠️ Integration Examples\n\n### CI/CD Pipeline\n```bash\n#!/bin/bash\n# Analyze code quality in CI\ncode2llm ./ -f toon -o ./analysis\nif grep -q \"🔴 GOD\" ./analysis/analysis.toon; then\n    echo \"❌ God modules detected\"\n    exit 1\nfi\n```\n\n### Pre-commit Hook\n```bash\n#!/bin/sh\n# .git/hooks/pre-commit\ncode2llm ./ -f toon -o ./temp_analysis\nif grep -q \"🔴\" ./temp_analysis/analysis.toon; then\n    echo \"⚠️  Critical issues found. Review before committing.\"\nfi\nrm -rf ./temp_analysis\n```\n\n### Documentation Generation\n```bash\n# Generate docs for README\ncode2llm ./ -f context -o ./docs/\necho \"## Architecture\" >> README.md\ncat docs/context.md >> README.md\n```\n\n## 📚 Next Steps\n\n1. **Review `analysis.toon`** - Identify critical issues\n2. **Check `evolution.toon.yaml`** - Plan refactoring priorities\n3. **Use `context.md`** - Get LLM assistance for complex changes\n4. **Reference visualizations** - Understand system architecture\n5. **Track progress** - Re-run analysis after changes\n\n## 🔧 Advanced Usage\n\n### Custom Analysis\n```bash\n# Deep analysis with all insights\ncode2llm ./ -m hybrid -f all --max-depth 15 -v\n\n# Performance-optimized\ncode2llm ./ -m static -f toon --strategy quick\n\n# Refactoring-focused\ncode2llm ./ -f toon,evolution --refactor\n```\n\n### Output Customization\n```bash\n# Separate output directories\ncode2llm ./ -f all -o ./analysis-$(date +%Y%m%d)\n\n# Split YAML into multiple files\ncode2llm ./ -f yaml --split-output\n\n# Separate orphaned functions\ncode2llm ./ -f yaml --separate-orphans\n```\n\n---\n\n**Generated by**: `code2llm ./ -f all --readme`  \n**Analysis Date**: 2026-03-28  \n**Total Functions**: 75  \n**Total Classes**: 6  \n**Modules**: 16  \n\nFor more information about code2llm, visit: https://github.com/tom-sapletta/code2llm\n", "is_subdir": false}, {"name": "context.md", "rel_path": "context.md", "path": "context.md", "size": "11.6KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# System Architecture Analysis\n\n## Overview\n\n- **Project**: /home/tom/github/semcod/pfix\n- **Primary Language**: python\n- **Languages**: python: 15, shell: 1\n- **Analysis Mode**: static\n- **Total Functions**: 75\n- **Total Classes**: 6\n- **Modules**: 16\n- **Entry Points**: 25\n\n## Architecture by Module\n\n### src.pfix.cli\n- **Functions**: 9\n- **File**: `cli.py`\n\n### src.pfix.session\n- **Functions**: 8\n- **Classes**: 1\n- **File**: `session.py`\n\n### src.pfix.fixer\n- **Functions**: 7\n- **File**: `fixer.py`\n\n### src.pfix.dependency\n- **Functions**: 7\n- **File**: `dependency.py`\n\n### src.pfix.decorator\n- **Functions**: 7\n- **File**: `decorator.py`\n\n### src.pfix.analyzer\n- **Functions**: 6\n- **Classes**: 1\n- **File**: `analyzer.py`\n\n### src.pfix.mcp_client\n- **Functions**: 6\n- **Classes**: 2\n- **File**: `mcp_client.py`\n\n### src.pfix.config\n- **Functions**: 6\n- **Classes**: 1\n- **File**: `config.py`\n\n### examples.demo_auto\n- **Functions**: 4\n- **File**: `demo_auto.py`\n\n### examples.demo\n- **Functions**: 4\n- **File**: `demo.py`\n\n### src.pfix.dev_mode\n- **Functions**: 4\n- **File**: `dev_mode.py`\n\n### src.pfix.mcp_server\n- **Functions**: 3\n- **File**: `mcp_server.py`\n\n### examples.complex_demo.main\n- **Functions**: 3\n- **File**: `main.py`\n\n### src.pfix.llm\n- **Functions**: 2\n- **Classes**: 1\n- **File**: `llm.py`\n\n### src.pfix\n- **Functions**: 1\n- **File**: `__init__.py`\n\n## Key Entry Points\n\nMain execution flows into the system:\n\n### src.pfix.config.PfixConfig.from_env\n> Load config from .env + environment + pyproject.toml.\n- **Calls**: cls, cls._read_pyproject, pyproject.items, load_dotenv, shutil.which, Path.cwd, env_file.exists, os.getenv\n\n### src.pfix.cli.main\n- **Calls**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument, run_p.add_argument, run_p.add_argument, run_p.add_argument\n\n### src.pfix.decorator.pfix\n> Self-healing decorator. Catches errors, fixes code via LLM.\n\nArgs:\n    retries: Max fix attempts (default: config.max_retries).\n    auto_apply: Apply \n- **Calls**: functools.wraps, decorator, src.pfix.config.get_config, range, fn, src.pfix.decorator._ensure_deps, fn, console.print\n\n### src.pfix.session.PFixSession._handle_exception\n> Handle exception — analyze and fix. Returns True if fixed.\n- **Calls**: console.print, isinstance, src.pfix.analyzer.analyze_exception, src.pfix.analyzer.classify_error, console.print, src.pfix.llm.request_fix, src.pfix.fixer.apply_fix, src.pfix.dependency.detect_missing_from_error\n\n### src.pfix.decorator.apfix\n> Async version of @pfix.\n\nUsage:\n    @apfix\n    async def fetch():\n        ...\n- **Calls**: functools.wraps, decorator, src.pfix.config.get_config, kwargs.get, range, fn, console.print, src.pfix.decorator._try_quick_dep_fix\n\n### src.pfix.analyzer.ErrorContext.to_prompt\n- **Calls**: parts.append, None.join, parts.append, parts.append, parts.append, parts.append, self.hints.items, list\n\n### examples.demo_auto.main\n- **Calls**: print, print, examples.demo_auto.fetch_json, print, print, examples.demo_auto.average, print, print\n\n### examples.demo.main\n- **Calls**: print, print, examples.demo.fetch_json, print, print, examples.demo.average, print, print\n\n### src.pfix._auto_activate\n> Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true.\n- **Calls**: Path.cwd, env_file.exists, None.lower, None.lower, inspect.currentframe, src.pfix.session.install_pfix_hook, load_dotenv, caller_globals.get\n\n### src.pfix.mcp_client.MCPClient.call_tool\n- **Calls**: MCPResult, resp.json, data.get, MCPResult, self._session.post, MCPResult, MCPResult, result.get\n\n### examples.complex_demo.main.main\n- **Calls**: print, print, examples.complex_demo.main.load_and_process_data, print, print, examples.complex_demo.main.analyze_users, print, print\n\n### src.pfix.config.PfixConfig._read_pyproject\n- **Calls**: None.get, path.exists, open, tomllib.load, data.get\n\n### src.pfix.session.PFixSession.__init__\n- **Calls**: src.pfix.config.get_config, inspect.currentframe, None.resolve, frame.f_back.f_globals.get, Path\n\n### src.pfix.session.auto_pfix\n> Decorator that auto-fixes exceptions in wrapped function.\n- **Calls**: functools.wraps, decorator, inspect.getfile, PFixSession, fn\n\n### src.pfix.mcp_client.MCPClient.connect\n- **Calls**: httpx.AsyncClient, logger.warning\n\n### src.pfix.mcp_client.MCPClient.edit_file\n- **Calls**: MCPResult, self.call_tool\n\n### src.pfix.mcp_client.MCPClient.run_command\n- **Calls**: MCPResult, self.call_tool\n\n### src.pfix.mcp_client.MCPClient.__init__\n- **Calls**: src.pfix.config.get_config\n\n### src.pfix.mcp_client.MCPClient.disconnect\n- **Calls**: self._session.aclose\n\n### src.pfix.config.PfixConfig.validate\n- **Calls**: warnings.append\n\n### src.pfix.session.PFixSession.__exit__\n> Handle exception if one occurred. Returns True if handled.\n- **Calls**: self._handle_exception\n\n### src.pfix.session.PFixSession.__call__\n> Run function with exception handling.\n- **Calls**: func\n\n### src.pfix.session.pfix_session\n> Create pfix session for file-level auto-healing.\n- **Calls**: PFixSession\n\n### src.pfix.config.reset_config\n> Reset global config (useful in tests).\n\n### src.pfix.session.PFixSession.__enter__\n\n## Process Flows\n\nKey execution flows identified:\n\n### Flow 1: from_env\n```\nfrom_env [src.pfix.config.PfixConfig]\n```\n\n### Flow 2: main\n```\nmain [src.pfix.cli]\n```\n\n### Flow 3: pfix\n```\npfix [src.pfix.decorator]\n  └─ →> get_config\n```\n\n### Flow 4: _handle_exception\n```\n_handle_exception [src.pfix.session.PFixSession]\n  └─ →> analyze_exception\n  └─ →> classify_error\n```\n\n### Flow 5: apfix\n```\napfix [src.pfix.decorator]\n  └─ →> get_config\n```\n\n### Flow 6: to_prompt\n```\nto_prompt [src.pfix.analyzer.ErrorContext]\n```\n\n### Flow 7: _auto_activate\n```\n_auto_activate [src.pfix]\n```\n\n### Flow 8: call_tool\n```\ncall_tool [src.pfix.mcp_client.MCPClient]\n```\n\n### Flow 9: _read_pyproject\n```\n_read_pyproject [src.pfix.config.PfixConfig]\n```\n\n### Flow 10: __init__\n```\n__init__ [src.pfix.session.PFixSession]\n  └─ →> get_config\n```\n\n## Key Classes\n\n### src.pfix.mcp_client.MCPClient\n> Client for MCP servers (filesystem, editor tools).\n- **Methods**: 6\n- **Key Methods**: src.pfix.mcp_client.MCPClient.__init__, src.pfix.mcp_client.MCPClient.connect, src.pfix.mcp_client.MCPClient.disconnect, src.pfix.mcp_client.MCPClient.call_tool, src.pfix.mcp_client.MCPClient.edit_file, src.pfix.mcp_client.MCPClient.run_command\n\n### src.pfix.session.PFixSession\n> Session context that catches and auto-fixes exceptions.\n- **Methods**: 5\n- **Key Methods**: src.pfix.session.PFixSession.__init__, src.pfix.session.PFixSession.__enter__, src.pfix.session.PFixSession.__exit__, src.pfix.session.PFixSession.__call__, src.pfix.session.PFixSession._handle_exception\n\n### src.pfix.config.PfixConfig\n> Central configuration.\n- **Methods**: 3\n- **Key Methods**: src.pfix.config.PfixConfig.from_env, src.pfix.config.PfixConfig._read_pyproject, src.pfix.config.PfixConfig.validate\n\n### src.pfix.llm.FixProposal\n> Structured fix from LLM.\n- **Methods**: 2\n- **Key Methods**: src.pfix.llm.FixProposal.has_code_fix, src.pfix.llm.FixProposal.has_dependency_fix\n\n### src.pfix.analyzer.ErrorContext\n> Structured error report for LLM consumption.\n- **Methods**: 1\n- **Key Methods**: src.pfix.analyzer.ErrorContext.to_prompt\n\n### src.pfix.mcp_client.MCPResult\n- **Methods**: 0\n\n## Data Transformation Functions\n\nKey functions that process and transform data:\n\n### src.pfix.fixer._validate_syntax\n- **Output to**: ast.parse\n\n### src.pfix.config.PfixConfig.validate\n- **Output to**: warnings.append\n\n### examples.complex_demo.main.load_and_process_data\n> Load CSV, process it, return statistics.\n- **Output to**: pd.read_csv, None.mean, len, list, None.sum\n\n### src.pfix.llm._parse_response\n> Parse LLM JSON response.\n- **Output to**: FixProposal, raw.strip, re.search, data.get, data.get\n\n## Behavioral Patterns\n\n### recursion_install_packages\n- **Type**: recursion\n- **Confidence**: 0.90\n- **Functions**: src.pfix.dependency.install_packages\n\n### state_machine_MCPClient\n- **Type**: state_machine\n- **Confidence**: 0.70\n- **Functions**: src.pfix.mcp_client.MCPClient.__init__, src.pfix.mcp_client.MCPClient.connect, src.pfix.mcp_client.MCPClient.disconnect, src.pfix.mcp_client.MCPClient.call_tool, src.pfix.mcp_client.MCPClient.edit_file\n\n### state_machine_PFixSession\n- **Type**: state_machine\n- **Confidence**: 0.70\n- **Functions**: src.pfix.session.PFixSession.__init__, src.pfix.session.PFixSession.__enter__, src.pfix.session.PFixSession.__exit__, src.pfix.session.PFixSession.__call__, src.pfix.session.PFixSession._handle_exception\n\n## Public API Surface\n\nFunctions exposed as public API (no underscore prefix):\n\n- `src.pfix.config.PfixConfig.from_env` - 52 calls\n- `src.pfix.mcp_server.create_mcp_server` - 43 calls\n- `src.pfix.fixer.apply_fix` - 37 calls\n- `src.pfix.cli.cmd_enable` - 36 calls\n- `src.pfix.cli.main` - 35 calls\n- `src.pfix.session.install_pfix_hook` - 34 calls\n- `src.pfix.decorator.pfix` - 27 calls\n- `src.pfix.analyzer.analyze_exception` - 22 calls\n- `src.pfix.cli.cmd_check` - 19 calls\n- `src.pfix.cli.cmd_dev` - 18 calls\n- `src.pfix.dependency.update_requirements_file` - 18 calls\n- `src.pfix.cli.cmd_disable` - 16 calls\n- `src.pfix.decorator.apfix` - 16 calls\n- `src.pfix.cli.cmd_run` - 15 calls\n- `src.pfix.analyzer.ErrorContext.to_prompt` - 13 calls\n- `src.pfix.cli.cmd_deps` - 12 calls\n- `src.pfix.dependency.install_packages` - 12 calls\n- `src.pfix.dependency.scan_project_deps` - 12 calls\n- `examples.demo_auto.main` - 11 calls\n- `examples.demo.main` - 11 calls\n- `src.pfix.analyzer.scan_missing_deps` - 11 calls\n- `src.pfix.mcp_client.MCPClient.call_tool` - 11 calls\n- `src.pfix.dev_mode.install_dev_mode_hook` - 9 calls\n- `examples.complex_demo.main.main` - 9 calls\n- `src.pfix.llm.request_fix` - 9 calls\n- `src.pfix.dev_mode.wrap_module_functions` - 7 calls\n- `src.pfix.dependency.generate_requirements` - 7 calls\n- `examples.complex_demo.main.load_and_process_data` - 6 calls\n- `src.pfix.mcp_server.start_server` - 5 calls\n- `src.pfix.session.auto_pfix` - 5 calls\n- `examples.demo.average` - 4 calls\n- `src.pfix.config.configure` - 4 calls\n- `src.pfix.dependency.detect_missing_from_error` - 4 calls\n- `src.pfix.cli.cmd_server` - 3 calls\n- `examples.complex_demo.main.analyze_users` - 3 calls\n- `examples.demo_auto.fetch_json` - 2 calls\n- `examples.demo_auto.average` - 2 calls\n- `examples.demo.fetch_json` - 2 calls\n- `src.pfix.mcp_client.MCPClient.connect` - 2 calls\n- `src.pfix.mcp_client.MCPClient.edit_file` - 2 calls\n\n## System Interactions\n\nHow components interact:\n\n```mermaid\ngraph TD\n    from_env --> cls\n    from_env --> _read_pyproject\n    from_env --> items\n    from_env --> load_dotenv\n    from_env --> which\n    main --> ArgumentParser\n    main --> add_subparsers\n    main --> add_parser\n    main --> add_argument\n    pfix --> wraps\n    pfix --> decorator\n    pfix --> get_config\n    pfix --> range\n    pfix --> fn\n    _handle_exception --> print\n    _handle_exception --> isinstance\n    _handle_exception --> analyze_exception\n    _handle_exception --> classify_error\n    apfix --> wraps\n    apfix --> decorator\n    apfix --> get_config\n    apfix --> get\n    apfix --> range\n    to_prompt --> append\n    to_prompt --> join\n    main --> print\n    main --> fetch_json\n    _auto_activate --> cwd\n    _auto_activate --> exists\n    _auto_activate --> lower\n```\n\n## Reverse Engineering Guidelines\n\n1. **Entry Points**: Start analysis from the entry points listed above\n2. **Core Logic**: Focus on classes with many methods\n3. **Data Flow**: Follow data transformation functions\n4. **Process Flows**: Use the flow diagrams for execution paths\n5. **API Surface**: Public API functions reveal the interface\n\n## Context for LLM\n\nMaintain the identified architectural patterns and public API surface when suggesting changes.", "is_subdir": false}, {"name": "calls.mmd", "rel_path": "calls.mmd", "path": "calls.mmd", "size": "8.4KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart LR\n    subgraph examples__complex_demo\n        examples__complex_demo__main__main[&quot;main&quot;]\n        examples__complex_demo__main__analyze_users[&quot;analyze_users&quot;]\n        examples__complex_demo__main__load_and_process_data[&quot;load_and_process_data&quot;]\n    end\n    subgraph examples__demo\n        examples__demo__average[&quot;average&quot;]\n        examples__demo__fetch_json[&quot;fetch_json&quot;]\n        examples__demo__greet[&quot;greet&quot;]\n        examples__demo__main[&quot;main&quot;]\n    end\n    subgraph examples__demo_auto\n        examples__demo_auto__average[&quot;average&quot;]\n        examples__demo_auto__main[&quot;main&quot;]\n        examples__demo_auto__fetch_json[&quot;fetch_json&quot;]\n        examples__demo_auto__greet[&quot;greet&quot;]\n    end\n    subgraph src__pfix\n        src__pfix__session__PFixSession____init__[&quot;__init__&quot;]\n        src__pfix___auto_activate[&quot;_auto_activate&quot;]\n        src__pfix__dev_mode___create_wrapper[&quot;_create_wrapper&quot;]\n        src__pfix__fixer___git_commit[&quot;_git_commit&quot;]\n        src__pfix__cli__cmd_deps[&quot;cmd_deps&quot;]\n        src__pfix__llm__request_fix[&quot;request_fix&quot;]\n        src__pfix__dev_mode__is_site_package[&quot;is_site_package&quot;]\n        src__pfix__cli__cmd_dev[&quot;cmd_dev&quot;]\n        src__pfix__cli__cmd_server[&quot;cmd_server&quot;]\n        src__pfix__cli__cmd_check[&quot;cmd_check&quot;]\n        src__pfix__decorator___ensure_deps[&quot;_ensure_deps&quot;]\n        src__pfix__dev_mode__wrap_module_functions[&quot;wrap_module_functions&quot;]\n        src__pfix__fixer__apply_fix[&quot;apply_fix&quot;]\n        src__pfix__decorator___try_quick_dep_fix[&quot;_try_quick_dep_fix&quot;]\n        src__pfix__mcp_server___build_ctx[&quot;_build_ctx&quot;]\n        src__pfix__mcp_server__start_server[&quot;start_server&quot;]\n        src__pfix__analyzer__scan_missing_deps[&quot;scan_missing_deps&quot;]\n        src__pfix__llm___parse_response[&quot;_parse_response&quot;]\n        src__pfix__config__PfixConfig__from_env[&quot;from_env&quot;]\n        src__pfix__dependency__is_module_available[&quot;is_module_available&quot;]\n        src__pfix__dependency__install_packages[&quot;install_packages&quot;]\n        src__pfix__cli___install_excepthook[&quot;_install_excepthook&quot;]\n        src__pfix__dependency__generate_requirements[&quot;generate_requirements&quot;]\n        src__pfix__dev_mode__install_dev_mode_hook[&quot;install_dev_mode_hook&quot;]\n        src__pfix__analyzer__classify_error[&quot;classify_error&quot;]\n        src__pfix__decorator__apfix[&quot;apfix&quot;]\n        src__pfix__analyzer___extract_imports[&quot;_extract_imports&quot;]\n        src__pfix__config__get_config[&quot;get_config&quot;]\n        src__pfix__fixer___make_diff[&quot;_make_diff&quot;]\n        src__pfix__dependency__detect_missing_from_error[&quot;detect_missing_from_error&quot;]\n        src__pfix__config__configure[&quot;configure&quot;]\n        src__pfix__decorator__pfix[&quot;pfix&quot;]\n        src__pfix__mcp_server__create_mcp_server[&quot;create_mcp_server&quot;]\n        src__pfix__session__PFixSession___handle_exception[&quot;_handle_exception&quot;]\n        src__pfix__dependency__update_requirements_file[&quot;update_requirements_file&quot;]\n        src__pfix__dependency__resolve_package_name[&quot;resolve_package_name&quot;]\n        src__pfix__dependency__scan_project_deps[&quot;scan_project_deps&quot;]\n        src__pfix__analyzer__analyze_exception[&quot;analyze_exception&quot;]\n        src__pfix__cli__cmd_run[&quot;cmd_run&quot;]\n        src__pfix__session__install_pfix_hook[&quot;install_pfix_hook&quot;]\n        src__pfix__mcp_client__MCPClient____init__[&quot;__init__&quot;]\n    end\n    examples__demo_auto__main --&gt; examples__demo_auto__fetch_json\n    examples__demo_auto__main --&gt; examples__demo_auto__average\n    examples__demo_auto__main --&gt; examples__demo_auto__greet\n    examples__demo__main --&gt; examples__demo__fetch_json\n    examples__demo__main --&gt; examples__demo__average\n    examples__demo__main --&gt; examples__demo__greet\n    src__pfix__cli__cmd_run --&gt; src__pfix__config__configure\n    src__pfix__cli__cmd_run --&gt; src__pfix__cli___install_excepthook\n    src__pfix__cli__cmd_dev --&gt; src__pfix__config__configure\n    src__pfix__cli__cmd_dev --&gt; src__pfix__dev_mode__install_dev_mode_hook\n    src__pfix__cli__cmd_check --&gt; src__pfix__config__get_config\n    src__pfix__cli__cmd_deps --&gt; src__pfix__dependency__scan_project_deps\n    src__pfix__cli__cmd_deps --&gt; src__pfix__dependency__generate_requirements\n    src__pfix__cli__cmd_deps --&gt; src__pfix__dependency__install_packages\n    src__pfix__cli__cmd_server --&gt; src__pfix__mcp_server__start_server\n    src__pfix__cli___install_excepthook --&gt; src__pfix__config__get_config\n    src__pfix__cli___install_excepthook --&gt; src__pfix__analyzer__analyze_exception\n    src__pfix__cli___install_excepthook --&gt; src__pfix__llm__request_fix\n    src__pfix__cli___install_excepthook --&gt; src__pfix__fixer__apply_fix\n    src__pfix__analyzer__analyze_exception --&gt; src__pfix__analyzer___extract_imports\n    src__pfix__analyzer__analyze_exception --&gt; src__pfix__analyzer__scan_missing_deps\n    src__pfix__fixer__apply_fix --&gt; src__pfix__config__get_config\n    src__pfix__fixer__apply_fix --&gt; src__pfix__fixer___make_diff\n    src__pfix__fixer__apply_fix --&gt; src__pfix__dependency__install_packages\n    src__pfix__fixer___git_commit --&gt; src__pfix__config__get_config\n    src__pfix___auto_activate --&gt; src__pfix__session__install_pfix_hook\n    src__pfix__mcp_client__MCPClient____init__ --&gt; src__pfix__config__get_config\n    src__pfix__dev_mode__wrap_module_functions --&gt; src__pfix__dev_mode___create_wrapper\n    src__pfix__dev_mode___create_wrapper --&gt; src__pfix__analyzer__analyze_exception\n    src__pfix__dev_mode___create_wrapper --&gt; src__pfix__llm__request_fix\n    src__pfix__dev_mode___create_wrapper --&gt; src__pfix__config__get_config\n    src__pfix__dev_mode___create_wrapper --&gt; src__pfix__fixer__apply_fix\n    src__pfix__dev_mode__install_dev_mode_hook --&gt; src__pfix__dev_mode__is_site_package\n    src__pfix__dev_mode__install_dev_mode_hook --&gt; src__pfix__dev_mode__wrap_module_functions\n    src__pfix__config__get_config --&gt; src__pfix__config__PfixConfig__from_env\n    src__pfix__config__configure --&gt; src__pfix__config__PfixConfig__from_env\n    src__pfix__dependency__install_packages --&gt; src__pfix__config__get_config\n    src__pfix__dependency__scan_project_deps --&gt; src__pfix__config__get_config\n    src__pfix__dependency__scan_project_deps --&gt; src__pfix__dependency__is_module_available\n    src__pfix__dependency__update_requirements_file --&gt; src__pfix__config__get_config\n    src__pfix__dependency__generate_requirements --&gt; src__pfix__config__get_config\n    src__pfix__mcp_server__create_mcp_server --&gt; src__pfix__mcp_server___build_ctx\n    src__pfix__mcp_server__create_mcp_server --&gt; src__pfix__llm__request_fix\n    src__pfix__mcp_server__start_server --&gt; src__pfix__mcp_server__create_mcp_server\n    examples__complex_demo__main__main --&gt; examples__complex_demo__main__load_and_process_data\n    examples__complex_demo__main__main --&gt; examples__complex_demo__main__analyze_users\n    src__pfix__decorator__pfix --&gt; src__pfix__config__get_config\n    src__pfix__decorator__pfix --&gt; src__pfix__decorator___ensure_deps\n    src__pfix__decorator__pfix --&gt; src__pfix__decorator___try_quick_dep_fix\n    src__pfix__decorator__apfix --&gt; src__pfix__config__get_config\n    src__pfix__decorator__apfix --&gt; src__pfix__decorator___try_quick_dep_fix\n    src__pfix__decorator__apfix --&gt; src__pfix__analyzer__analyze_exception\n    src__pfix__decorator__apfix --&gt; src__pfix__llm__request_fix\n    src__pfix__decorator___ensure_deps --&gt; src__pfix__dependency__install_packages\n    src__pfix__decorator___try_quick_dep_fix --&gt; src__pfix__dependency__detect_missing_from_error\n    src__pfix__decorator___try_quick_dep_fix --&gt; src__pfix__dependency__resolve_package_name\n    src__pfix__decorator___try_quick_dep_fix --&gt; src__pfix__dependency__install_packages\n    src__pfix__session__PFixSession____init__ --&gt; src__pfix__config__get_config\n    src__pfix__session__PFixSession___handle_exception --&gt; src__pfix__analyzer__analyze_exception\n    src__pfix__session__PFixSession___handle_exception --&gt; src__pfix__analyzer__classify_error\n    src__pfix__session__PFixSession___handle_exception --&gt; src__pfix__llm__request_fix\n    src__pfix__session__PFixSession___handle_exception --&gt; src__pfix__fixer__apply_fix\n    src__pfix__session__PFixSession___handle_exception --&gt; src__pfix__dependency__detect_missing_from_error\n    src__pfix__session__install_pfix_hook --&gt; src__pfix__config__get_config\n    src__pfix__session__install_pfix_hook --&gt; src__pfix__analyzer__analyze_exception\n    src__pfix__session__install_pfix_hook --&gt; src__pfix__llm__request_fix\n    src__pfix__llm__request_fix --&gt; src__pfix__config__get_config\n    src__pfix__llm__request_fix --&gt; src__pfix__analyzer__classify_error\n    src__pfix__llm__request_fix --&gt; src__pfix__llm___parse_response\n", "is_subdir": false}, {"name": "compact_flow.mmd", "rel_path": "compact_flow.mmd", "path": "compact_flow.mmd", "size": "222B", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n    examples__complex_demo[&quot;examples.complex_demo&lt;br/&gt;3 funcs&quot;]\n    examples__demo[&quot;examples.demo&lt;br/&gt;4 funcs&quot;]\n    examples__demo_auto[&quot;examples.demo_auto&lt;br/&gt;4 funcs&quot;]\n    src__pfix[&quot;src.pfix&lt;br/&gt;64 funcs&quot;]\n", "is_subdir": false}, {"name": "flow.mmd", "rel_path": "flow.mmd", "path": "flow.mmd", "size": "1.2KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n\n    %% Entry points (blue)\n    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff\n\n    subgraph Core\n        src__pfix__cli__main[&quot;main&quot;]\n        src__pfix__cli__cmd_run[&quot;cmd_run&quot;]\n        src__pfix__cli__cmd_dev[&quot;cmd_dev&quot;]\n        src__pfix__cli__cmd_check[&quot;cmd_check&quot;]\n        src__pfix__cli__cmd_enable[&quot;cmd_enable&quot;]\n        src__pfix__cli__cmd_disable[&quot;cmd_disable&quot;]\n        src__pfix__cli__cmd_deps[&quot;cmd_deps&quot;]\n        src__pfix__cli__cmd_server[&quot;cmd_server&quot;]\n        src__pfix__cli___install_excepthook[&quot;_install_excepthook&quot;]\n        src__pfix__analyzer__ErrorContext__to_prompt[&quot;to_prompt&quot;]\n        src__pfix__analyzer__analyze_exception{{analyze_exception CC=16}}\n        src__pfix__fixer__apply_fix{{apply_fix CC=20}}\n        src__pfix___auto_activate[&quot;_auto_activate&quot;]\n        src__pfix__mcp_client__MCPClient__connect[&quot;connect&quot;]\n        src__pfix__mcp_client__MCPClient__disconnect[&quot;disconnect&quot;]\n        ...[&quot;+20 more&quot;]\n    end\n\n    class src__pfix__cli__main,src__pfix__cli__cmd_run,src__pfix__cli__cmd_dev,src__pfix__cli__cmd_check,src__pfix__cli__cmd_enable,src__pfix__cli__cmd_disable,src__pfix__cli__cmd_deps,src__pfix__cli__cmd_server,src__pfix__cli___install_excepthook,src__pfix__analyzer__ErrorContext__to_prompt entry\n", "is_subdir": false}, {"name": "prompt.txt", "rel_path": "prompt.txt", "path": "prompt.txt", "size": "2.9KB", "icon": "📄", "type": "text", "type_name": "Text", "content": "You are an AI assistant helping me understand and improve a codebase.\nUse the attached/generated files as the authoritative context.\nYour goal is to refactor the project based on these files, not just summarize it.\n\nwe are in project path: .\n\nFiles for analysis:\n\nNote: project/validation.toon.yaml and project/duplication.toon.yaml are generated by external tools (vallm and redup)\n- project/analysis.toon.yaml  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities) [1KB]\n- project/map.toon.yaml  (Structural map - files, sizes, imports, exports, signatures, project header) [3KB]\n- project/evolution.toon.yaml  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history) [1KB]\n- project/project.toon.yaml  (Compact project overview - generated from project.yaml data) [2KB]\n- project/context.md  (LLM narrative - architecture summary and project context) [11KB]\n\nMissing files (not generated in this run):\n- project/README.md\n\nTask:\n- Treat this prompt as a refactoring brief: identify the highest-priority changes and prepare concrete edits.\n- Use the file set to decide whether the first pass should focus on correctness, duplication, complexity reduction, or architecture cleanup.\n- If you can safely implement the refactor, do it; otherwise give an exact file-by-file change plan and test plan.\n- Use analysis.toon.yaml to locate high-CC functions and god modules that should be split first.\n- Keep module boundaries intact and update imports/exports according to map.toon.yaml.\n- Use evolution.toon.yaml as the execution backlog and work from the top-ranked items.\n- Keep project.toon.yaml aligned with the refactored architecture.\n\nPriority Order:\nP1 — Split or simplify the highest-CC / god modules identified in analysis.toon.yaml.\nP1 — Preserve module boundaries and update imports/exports according to map.toon.yaml.\nP2 — Keep the compact project overview in project.toon.yaml aligned with the refactor.\nP2 — Execute the highest-impact items from evolution.toon.yaml in order of benefit/risk.\n\nFocus Areas for Analysis:\n1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon.yaml\n2. **Structural Map** - Use map.toon.yaml to inspect imports, exports, signatures, and the project header\n3. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon.yaml\n4. **Project Overview** - Review the compact project overview from project.toon.yaml\n\nAnalysis Strategy:\n- Start with analysis.toon.yaml for health metrics, then map.toon.yaml for structure and signatures\n- Review evolution.toon.yaml for action priorities and next steps\n- Compare the compact project overview in project.toon.yaml with the main analysis files\n\nConstraints:\n- Prefer minimal, incremental changes.\n- Maintain full backward compatibility.\n- Base recommendations on concrete metrics from the provided files.\n- If uncertain, ask clarifying questions.\n", "is_subdir": false}, {"name": "analysis.toon.yaml", "rel_path": "analysis.toon.yaml", "path": "analysis.toon.yaml", "size": "1.9KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm | 13f 2452L | python:12,shell:1 | 2026-03-28\n# CC̄=5.1 | critical:2/75 | dups:0 | cycles:1\n\nHEALTH[2]:\n  🟡 CC    analyze_exception CC=16 (limit:15)\n  🟡 CC    apply_fix CC=20 (limit:15)\n\nREFACTOR[2]:\n  1. split 2 high-CC methods  (CC&gt;15)\n  2. break 1 circular dependencies\n\nPIPELINES[23]:\n  [1] Src [main]: main → fetch_json\n      PURITY: 100% pure\n  [2] Src [main]: main → fetch_json\n      PURITY: 100% pure\n  [3] Src [main]: main → cmd_run → configure\n      PURITY: 100% pure\n  [4] Src [to_prompt]: to_prompt\n      PURITY: 100% pure\n  [5] Src [_auto_activate]: _auto_activate → install_pfix_hook → get_config\n      PURITY: 100% pure\n\nLAYERS:\n  src/                            CC̄=5.1    ←in:0  →out:1\n  │ cli                        418L  0C    9m  CC=12     ←0\n  │ session                    269L  1C    8m  CC=10     ←1\n  │ decorator                  265L  0C    5m  CC=4      ←0\n  │ !! analyzer                   224L  1C    6m  CC=16     ←5\n  │ !! fixer                      219L  0C    7m  CC=20     ←5\n  │ mcp_server                 215L  0C    3m  CC=5      ←1\n  │ dependency                 205L  0C    7m  CC=12     ←5\n  │ config                     160L  1C    6m  CC=12     ←9\n  │ dev_mode                   158L  0C    4m  CC=6      ←1\n  │ llm                        138L  1C    2m  CC=6      ←5\n  │ mcp_client                  81L  2C    6m  CC=4      ←0\n  │ __init__                    76L  0C    1m  CC=8      ←0\n  │\n  ./                              CC̄=0.0    ←in:0  →out:0\n  │ project.sh                  24L  0C    0m  CC=0.0    ←0\n  │\n\nCOUPLING:\n                 src  src.pfix\n       src        ──         1\n  src.pfix        ←1        ──\n  CYCLES: 1\n\nEXTERNAL:\n  validation: run `vallm batch .` → validation.toon\n  duplication: run `redup scan .` → duplication.toon\n", "is_subdir": false}, {"name": "evolution.toon.yaml", "rel_path": "evolution.toon.yaml", "path": "evolution.toon.yaml", "size": "1.6KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm/evolution | 64 func | 12f | 2026-03-28\n\nNEXT[2] (ranked by impact):\n  [1] !  SPLIT-FUNC      apply_fix  CC=20  fan=24\n      WHY: CC=20 exceeds 15\n      EFFORT: ~1h  IMPACT: 480\n\n  [2] !  SPLIT-FUNC      analyze_exception  CC=16  fan=19\n      WHY: CC=16 exceeds 15\n      EFFORT: ~1h  IMPACT: 304\n\n\nRISKS[0]: none\n\nMETRICS-TARGET:\n  CC̄:          5.1 → ≤3.6\n  max-CC:      20 → ≤10\n  god-modules: 0 → 0\n  high-CC(≥15): 2 → ≤1\n  hub-types:   0 → ≤0\n\nPATTERNS (language parser shared logic):\n  _extract_declarations() in base.py — unified extraction for:\n    - TypeScript: interfaces, types, classes, functions, arrow funcs\n    - PHP: namespaces, traits, classes, functions, includes\n    - Ruby: modules, classes, methods, requires\n    - C++: classes, structs, functions, #includes\n    - C#: classes, interfaces, methods, usings\n    - Java: classes, interfaces, methods, imports\n    - Go: packages, functions, structs\n    - Rust: modules, functions, traits, use statements\n\n  Shared regex patterns per language:\n    - import: language-specific import/require/using patterns\n    - class: class/struct/trait declarations with inheritance\n    - function: function/method signatures with visibility\n    - brace_tracking: for C-family languages ({ })\n    - end_keyword_tracking: for Ruby (module/class/def...end)\n\n  Benefits:\n    - Consistent extraction logic across all languages\n    - Reduced code duplication (~70% reduction in parser LOC)\n    - Easier maintenance: fix once, apply everywhere\n    - Standardized FunctionInfo/ClassInfo models\n\nHISTORY:\n  (first run — no previous data)\n", "is_subdir": false}, {"name": "map.toon.yaml", "rel_path": "map.toon.yaml", "path": "map.toon.yaml", "size": "3.9KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# pfix | 13f 2452L | python:12,shell:1 | 2026-03-28\n# stats: 64 func | 0 cls | 13 mod | CC̄=5.1 | critical:2 | cycles:0\n# alerts[5]: fan-out apply_fix=24; fan-out create_mcp_server=22; fan-out install_pfix_hook=21; CC apply_fix=20; fan-out analyze_exception=19\n# hotspots[5]: apply_fix fan=24; create_mcp_server fan=22; install_pfix_hook fan=21; analyze_exception fan=19; main fan=18\n# evolution: baseline\n# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods\nM[13]:\n  project.sh,24\n  src/pfix/__init__.py,76\n  src/pfix/analyzer.py,224\n  src/pfix/cli.py,418\n  src/pfix/config.py,160\n  src/pfix/decorator.py,265\n  src/pfix/dependency.py,205\n  src/pfix/dev_mode.py,158\n  src/pfix/fixer.py,219\n  src/pfix/llm.py,138\n  src/pfix/mcp_client.py,81\n  src/pfix/mcp_server.py,215\n  src/pfix/session.py,269\nD:\n  src/pfix/fixer.py:\n    e: apply_fix,_replace_function,_make_diff,_validate_syntax,_backup,_clear_pycache,_git_commit\n    apply_fix(ctx;proposal;confirm)\n    _replace_function(source;func_name;new_func)\n    _make_diff(old;new;filename)\n    _validate_syntax(code)\n    _backup(filepath)\n    _clear_pycache(source_file)\n    _git_commit(filepath;message)\n  src/pfix/analyzer.py:\n    e: ErrorContext,analyze_exception,classify_error,scan_missing_deps,_extract_imports,_safe_repr\n    ErrorContext: to_prompt(0)  # Structured error report for LLM consumption...\n    analyze_exception(exc;func;local_vars;hints)\n    classify_error(ctx)\n    scan_missing_deps(project_dir)\n    _extract_imports(source)\n    _safe_repr(obj;max_len)\n  src/pfix/cli.py:\n    e: main,cmd_run,cmd_dev,cmd_check,cmd_enable,cmd_disable,cmd_deps,cmd_server,_install_excepthook\n    main(argv)\n    cmd_run(args)\n    cmd_dev(args)\n    cmd_check()\n    cmd_enable()\n    cmd_disable()\n    cmd_deps(args)\n    cmd_server(args)\n    _install_excepthook()\n  src/pfix/config.py:\n    e: PfixConfig,get_config,configure,reset_config\n    PfixConfig: from_env(1),_read_pyproject(0),validate(0)  # Central configuration...\n    get_config()\n    configure()\n    reset_config()\n  src/pfix/dependency.py:\n    e: resolve_package_name,is_module_available,install_packages,scan_project_deps,update_requirements_file,generate_requirements,detect_missing_from_error\n    resolve_package_name(module_name)\n    is_module_available(module_name)\n    install_packages(packages;dry_run)\n    scan_project_deps(project_dir)\n    update_requirements_file(packages;requirements_path)\n    generate_requirements(project_dir)\n    detect_missing_from_error(exception_message)\n  src/pfix/session.py:\n    e: PFixSession,pfix_session,auto_pfix,install_pfix_hook\n    PFixSession: __init__(1),__enter__(0),__exit__(3),__call__(1),_handle_exception(3)  # Session context that catches and auto-fixes exceptions...\n    pfix_session(target_file)\n    auto_pfix(func)\n    install_pfix_hook(target_file;auto_apply)\n  src/pfix/__init__.py:\n    e: _auto_activate\n    _auto_activate()\n  src/pfix/dev_mode.py:\n    e: is_site_package,wrap_module_functions,_create_wrapper,install_dev_mode_hook\n    is_site_package(module)\n    wrap_module_functions(module)\n    _create_wrapper(func;module_name)\n    install_dev_mode_hook()\n  src/pfix/llm.py:\n    e: FixProposal,request_fix,_parse_response\n    FixProposal:  # Structured fix from LLM...\n    request_fix(error_ctx)\n    _parse_response(raw)\n  src/pfix/mcp_server.py:\n    e: create_mcp_server,_build_ctx,start_server\n    create_mcp_server()\n    _build_ctx(exception_type;exception_message;source_file;traceback_text;function_name;line_number;hint)\n    start_server(transport;host;port)\n  src/pfix/mcp_client.py:\n    e: MCPResult,MCPClient\n    MCPResult:\n    MCPClient: __init__(1),connect(0),disconnect(0),call_tool(2),edit_file(2),run_command(1)  # Client for MCP servers (filesystem, editor tools)...\n  src/pfix/decorator.py:\n    e: pfix,pfix,pfix,apfix,_ensure_deps,_try_quick_dep_fix,_try_reload_module\n    pfix(func)\n    pfix(func)\n    pfix(func)\n    apfix(func)\n    _ensure_deps(deps)\n    _try_quick_dep_fix(exc)\n    _try_reload_module(func)\n  project.sh:\n", "is_subdir": false}, {"name": "project.toon.yaml", "rel_path": "project.toon.yaml", "path": "project.toon.yaml", "size": "2.2KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# pfix | 64 func | 12f | 2715L | python | 2026-03-28\n\nHEALTH:\n  CC̄=5.1  critical=10 (limit:10)  dup=0  cycles=1\n\nALERTS[19]:\n  !!! high_fan_out     apply_fix = 24 (limit:10)\n  !!! high_fan_out     create_mcp_server = 22 (limit:10)\n  !!! high_fan_out     install_pfix_hook = 21 (limit:10)\n  !!  cc_exceeded      apply_fix = 20 (limit:15)\n  !!  high_fan_out     analyze_exception = 19 (limit:10)\n  !!  high_fan_out     main = 18 (limit:10)\n  !!  high_fan_out     pfix = 18 (limit:10)\n  !!  high_fan_out     PfixConfig.from_env = 17 (limit:10)\n  !!  high_fan_out     update_requirements_file = 16 (limit:10)\n  !   cc_exceeded      analyze_exception = 16 (limit:15)\n\nMODULES[13] (top by size):\n  M[src/pfix/cli.py] 418L C:0 F:9 CC↑12 D:0 (python)\n  M[src/pfix/session.py] 269L C:1 F:8 CC↑10 D:1 (python)\n  M[src/pfix/decorator.py] 265L C:0 F:5 CC↑4 D:0 (python)\n  M[src/pfix/analyzer.py] 224L C:1 F:6 CC↑16 D:5 (python)\n  M[src/pfix/fixer.py] 219L C:0 F:7 CC↑20 D:5 (python)\n  M[src/pfix/mcp_server.py] 215L C:0 F:3 CC↑5 D:1 (python)\n  M[src/pfix/dependency.py] 205L C:0 F:7 CC↑12 D:5 (python)\n  M[src/pfix/config.py] 160L C:1 F:6 CC↑12 D:9 (python)\n  M[src/pfix/dev_mode.py] 158L C:0 F:4 CC↑6 D:1 (python)\n  M[src/pfix/llm.py] 138L C:1 F:2 CC↑6 D:5 (python)\n  M[src/pfix/mcp_client.py] 81L C:2 F:6 CC↑4 D:0 (python)\n  M[src/pfix/__init__.py] 76L C:0 F:1 CC↑8 D:0 (python)\n  M[project.sh] 24L C:0 F:0 CC↑0 D:0 (shell)\n  LANGS: python:12/shell:1\n\nHOTSPOTS[10]:\n  ★ apply_fix fan=24  // Apply a FixProposal. Returns True if anything was applied.\n  ★ create_mcp_server fan=22  // Create FastMCP server with pfix tools.\n\nReturns the server instance (requires `p\n  ★ install_pfix_hook fan=21  // Install global pfix excepthook.\n  ★ analyze_exception fan=19  // Analysis pipeline, 19 stages\n  ★ main fan=18  // Orchestrates 18 calls\n\nREFACTOR[6]:\n  [1] M/L Split analyze_exception (CC=16 → target CC&lt;10)\n  [2] M/L Split apply_fix (CC=20 → target CC&lt;10)\n  [3] M/L Break circular dependency: src.pfix.dependency.install_packages\n  [4] M/M Reduce apply_fix fan-out (currently 24)\n  [5] M/M Reduce create_mcp_server fan-out (currently 22)\n\nEVOLUTION:\n  2026-03-28 CC̄=5.1 crit=10 2715L // Automated analysis\n", "is_subdir": false}];
+        let currentFile = null;
+
+        function renderFileList(filter = '') {
+            const list = document.getElementById('fileList');
+            const filtered = files.filter(f => 
+                f.name.toLowerCase().includes(filter.toLowerCase()) ||
+                f.path.toLowerCase().includes(filter.toLowerCase())
+            );
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">No files found</div>';
+                return;
+            }
+            
+            // Group by type
+            const groups = {};
+            for (const file of filtered) {
+                const type = file.type_name;
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(file);
+            }
+            
+            let html = '';
+            for (const [typeName, groupFiles] of Object.entries(groups)) {
+                html += `
+                    <div class="file-group">
+                        <div class="file-group-title">${typeName} Files (${groupFiles.length})</div>
+                        ${groupFiles.map(f => `
+                            <div class="file-item ${currentFile?.name === f.name ? 'active' : ''}" 
+                                 onclick="selectFile('${f.name}')">
+                                <span class="file-icon">${f.icon}</span>
+                                <div class="file-info">
+                                    <div class="file-name">${f.name}</div>
+                                    <div class="file-meta">${f.path}</div>
+                                </div>
+                                <span class="file-size">${f.size}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            list.innerHTML = html;
+        }
+
+        function selectFile(name) {
+            const file = files.find(f => f.name === name);
+            if (!file) return;
+            
+            currentFile = file;
+            
+            document.getElementById('contentIcon').textContent = file.icon;
+            document.getElementById('contentTitle').textContent = file.name;
+            
+            // Actions
+            const actions = document.getElementById('contentActions');
+            actions.innerHTML = `
+                <a href="${file.rel_path}" download class="btn">⬇ Download</a>
+                <a href="${file.rel_path}" target="_blank" class="btn btn-primary">↗ Open Raw</a>
+            `;
+            
+            // Content
+            const body = document.getElementById('contentBody');
+            if (file.type === 'markdown') {
+                // Render markdown as HTML using marked.js
+                body.innerHTML = `<div class="markdown-content">${marked.parse(file.content)}</div>`;
+            } else if (file.type === 'html') {
+                // For HTML files, show in iframe for safety
+                body.innerHTML = `<iframe src="${file.rel_path}" style="width:100%;height:100%;border:none;border-radius:0.5rem;"></iframe>`;
+            } else if (file.type === 'image') {
+                // For images, display the actual image
+                body.innerHTML = `<div class="image-preview"><img src="${file.rel_path}" alt="${file.name}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:0.5rem;"></div>`;
+            } else if (file.type === 'mermaid') {
+                // Render mermaid diagram
+                const diagramId = 'mermaid-diagram-' + Date.now();
+                body.innerHTML = `<div class="mermaid-content"><pre class="mermaid" id="${diagramId}">${file.content}</pre></div>`;
+                // Initialize mermaid on the new element
+                setTimeout(() => {
+                    mermaid.init(undefined, document.getElementById(diagramId));
+                }, 0);
+            } else if (file.type === 'json') {
+                try {
+                    const json = JSON.parse(file.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
+                    const formatted = JSON.stringify(json, null, 2);
+                    body.innerHTML = `<pre><code class="language-json">${formatted.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                    hljs.highlightElement(body.querySelector('code'));
+                } catch {
+                    body.innerHTML = `<pre>${file.content}</pre>`;
+                }
+            } else if (file.type === 'yaml') {
+                // YAML with syntax highlighting
+                body.innerHTML = `<pre><code class="language-yaml">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'toon') {
+                // TOON with simple highlighting (use ini as closest match for key: value format)
+                body.innerHTML = `<pre><code class="language-ini">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'code') {
+                // Code files with auto-highlighting
+                body.innerHTML = `<pre><code>${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            } else {
+                body.innerHTML = `<pre>${file.content}</pre>`;
+            }
+            
+            renderFileList(document.getElementById('search').value);
+        }
+
+        function filterFiles(query) {
+            renderFileList(query);
+        }
+
+        function renderStats() {
+            const stats = {};
+            for (const f of files) {
+                stats[f.type_name] = (stats[f.type_name] || 0) + 1;
+            }
+            
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `
+                    <div class="stat-card">
+                        <div class="stat-value">${count}</div>
+                        <div class="stat-label">${type}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Initialize
+        renderStats();
+        renderFileList();
+        
+        // Select first file if available
+        if (files.length > 0) {
+            selectFile(files[0].name);
+        }
+    </script>
+</body>
+</html>

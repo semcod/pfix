@@ -1,0 +1,103 @@
+# pfix | 13f 2452L | python:12,shell:1 | 2026-03-28
+# stats: 64 func | 0 cls | 13 mod | CC̄=5.1 | critical:2 | cycles:0
+# alerts[5]: fan-out apply_fix=24; fan-out create_mcp_server=22; fan-out install_pfix_hook=21; CC apply_fix=20; fan-out analyze_exception=19
+# hotspots[5]: apply_fix fan=24; create_mcp_server fan=22; install_pfix_hook fan=21; analyze_exception fan=19; main fan=18
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[13]:
+  project.sh,24
+  src/pfix/__init__.py,76
+  src/pfix/analyzer.py,224
+  src/pfix/cli.py,418
+  src/pfix/config.py,160
+  src/pfix/decorator.py,265
+  src/pfix/dependency.py,205
+  src/pfix/dev_mode.py,158
+  src/pfix/fixer.py,219
+  src/pfix/llm.py,138
+  src/pfix/mcp_client.py,81
+  src/pfix/mcp_server.py,215
+  src/pfix/session.py,269
+D:
+  src/pfix/fixer.py:
+    e: apply_fix,_replace_function,_make_diff,_validate_syntax,_backup,_clear_pycache,_git_commit
+    apply_fix(ctx;proposal;confirm)
+    _replace_function(source;func_name;new_func)
+    _make_diff(old;new;filename)
+    _validate_syntax(code)
+    _backup(filepath)
+    _clear_pycache(source_file)
+    _git_commit(filepath;message)
+  src/pfix/analyzer.py:
+    e: ErrorContext,analyze_exception,classify_error,scan_missing_deps,_extract_imports,_safe_repr
+    ErrorContext: to_prompt(0)  # Structured error report for LLM consumption...
+    analyze_exception(exc;func;local_vars;hints)
+    classify_error(ctx)
+    scan_missing_deps(project_dir)
+    _extract_imports(source)
+    _safe_repr(obj;max_len)
+  src/pfix/cli.py:
+    e: main,cmd_run,cmd_dev,cmd_check,cmd_enable,cmd_disable,cmd_deps,cmd_server,_install_excepthook
+    main(argv)
+    cmd_run(args)
+    cmd_dev(args)
+    cmd_check()
+    cmd_enable()
+    cmd_disable()
+    cmd_deps(args)
+    cmd_server(args)
+    _install_excepthook()
+  src/pfix/config.py:
+    e: PfixConfig,get_config,configure,reset_config
+    PfixConfig: from_env(1),_read_pyproject(0),validate(0)  # Central configuration...
+    get_config()
+    configure()
+    reset_config()
+  src/pfix/dependency.py:
+    e: resolve_package_name,is_module_available,install_packages,scan_project_deps,update_requirements_file,generate_requirements,detect_missing_from_error
+    resolve_package_name(module_name)
+    is_module_available(module_name)
+    install_packages(packages;dry_run)
+    scan_project_deps(project_dir)
+    update_requirements_file(packages;requirements_path)
+    generate_requirements(project_dir)
+    detect_missing_from_error(exception_message)
+  src/pfix/session.py:
+    e: PFixSession,pfix_session,auto_pfix,install_pfix_hook
+    PFixSession: __init__(1),__enter__(0),__exit__(3),__call__(1),_handle_exception(3)  # Session context that catches and auto-fixes exceptions...
+    pfix_session(target_file)
+    auto_pfix(func)
+    install_pfix_hook(target_file;auto_apply)
+  src/pfix/__init__.py:
+    e: _auto_activate
+    _auto_activate()
+  src/pfix/dev_mode.py:
+    e: is_site_package,wrap_module_functions,_create_wrapper,install_dev_mode_hook
+    is_site_package(module)
+    wrap_module_functions(module)
+    _create_wrapper(func;module_name)
+    install_dev_mode_hook()
+  src/pfix/llm.py:
+    e: FixProposal,request_fix,_parse_response
+    FixProposal:  # Structured fix from LLM...
+    request_fix(error_ctx)
+    _parse_response(raw)
+  src/pfix/mcp_server.py:
+    e: create_mcp_server,_build_ctx,start_server
+    create_mcp_server()
+    _build_ctx(exception_type;exception_message;source_file;traceback_text;function_name;line_number;hint)
+    start_server(transport;host;port)
+  src/pfix/mcp_client.py:
+    e: MCPResult,MCPClient
+    MCPResult:
+    MCPClient: __init__(1),connect(0),disconnect(0),call_tool(2),edit_file(2),run_command(1)  # Client for MCP servers (filesystem, editor tools)...
+  src/pfix/decorator.py:
+    e: pfix,pfix,pfix,apfix,_ensure_deps,_try_quick_dep_fix,_try_reload_module
+    pfix(func)
+    pfix(func)
+    pfix(func)
+    apfix(func)
+    _ensure_deps(deps)
+    _try_quick_dep_fix(exc)
+    _try_reload_module(func)
+  project.sh:
