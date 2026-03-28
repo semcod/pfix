@@ -22,7 +22,7 @@ from .config import PfixConfig, configure, get_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.10"
+__version__ = "0.1.11"
 __all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig"]
 
 # ── Auto-activation on import ─────────────────────────────────────
@@ -33,6 +33,14 @@ def _auto_activate():
     """Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true."""
     import os
     from pathlib import Path
+    from dotenv import load_dotenv
+    
+    # Load .env file first
+    for parent in [Path.cwd(), *Path.cwd().parents]:
+        env_file = parent / ".env"
+        if env_file.exists():
+            load_dotenv(env_file)
+            break
     
     # Check if explicitly disabled
     if os.getenv("PFIX_AUTO_ACTIVATE", "true").lower() in ("false", "0", "no"):
