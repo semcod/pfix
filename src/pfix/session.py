@@ -232,10 +232,16 @@ def install_pfix_hook(
                     console.print(f"[green]✓ Installed {pkg}[/]")
                     return
         
+        console.print("[dim]Debug: Analyzing exception...[/]")
         ctx = analyze_exception(exc_value)
+        console.print(f"[dim]Debug: source_file={ctx.source_file}, func={ctx.function_name}[/]")
+        
+        console.print("[dim]Debug: Requesting fix from LLM...[/]")
         proposal = request_fix(ctx)
+        console.print(f"[dim]Debug: confidence={proposal.confidence}, has_fix={proposal.has_code_fix}[/]")
         
         if proposal.confidence > 0.1:
+            console.print(f"[blue]🔍 Confidence OK ({proposal.confidence:.0%}), applying fix...[/]")
             old_auto = config.auto_apply
             config.auto_apply = auto_apply
             fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
@@ -247,6 +253,8 @@ def install_pfix_hook(
                     _clear_pycache(Path(ctx.source_file))
                 console.print("[green]🔄 Restarting...[/]")
                 os.execv(sys.executable, [sys.executable] + sys.argv)
+        else:
+            console.print(f"[yellow]⚠ Confidence too low ({proposal.confidence:.0%}), skipping[/]")
         
         original_hook(exc_type, exc_value, exc_tb)
     

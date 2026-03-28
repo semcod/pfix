@@ -272,52 +272,182 @@ Add to your MCP config (`.claude/mcp.json` or VS Code settings):
 
 ## Configuration
 
-### .env
+pfix supports multiple configuration methods (in order of priority):
+1. Environment variables (override everything)
+2. `.env` file in project root
+3. `pyproject.toml` `[tool.pfix]` section
+4. `setup.cfg` `[pfix]` section
+5. `setup.py` keyword arguments
+6. Programmatic `configure()`
 
-| Variable | Default | Description |
-|---|---|---|
-| `OPENROUTER_API_KEY` | — | **Required** — OpenRouter API key |
-| `PFIX_MODEL` | `openrouter/anthropic/claude-sonnet-4` | LLM model to use |
-| `PFIX_AUTO_APPLY` | `false` | Auto-apply fixes without confirmation |
-| `PFIX_AUTO_INSTALL_DEPS` | `true` | Auto-install missing dependencies |
-| `PFIX_AUTO_RESTART` | `false` | Restart process after fix applied |
-| `PFIX_MAX_RETRIES` | `3` | Max fix attempts per error |
-| `PFIX_DRY_RUN` | `false` | Show proposed fixes without applying |
-| `PFIX_CREATE_BACKUPS` | `true` | Create `.pfix_backups/` before fixing |
-| `PFIX_PKG_MANAGER` | auto | `pip` or `uv` (auto-detected) |
-| `PFIX_GIT_COMMIT` | `false` | Auto-commit fixes to git |
-| `PFIX_GIT_PREFIX` | `pfix: ` | Git commit message prefix |
-| `PFIX_MCP_ENABLED` | `false` | Enable MCP server |
-| `PFIX_MCP_TRANSPORT` | `stdio` | `stdio` or `http` |
-| `PFIX_ENABLED` | `true` | Master switch to disable pfix |
+### Configuration Priority
 
-### pyproject.toml
+Higher numbers win (environment variables have highest priority):
+
+```
+[6] Environment variables (PFIX_*)
+[5] .env file
+[4] pyproject.toml [tool.pfix]
+[3] setup.cfg [pfix]
+[2] setup.py setup()
+[1] configure() programmatic
+```
+
+### Method 1: .env (Recommended for Development)
+
+Create a `.env` file in your project root:
+
+```bash
+# Required
+OPENROUTER_API_KEY=sk-or-v1-...
+
+# Behavior
+PFIX_AUTO_APPLY=true              # Auto-apply fixes without confirmation
+PFIX_AUTO_INSTALL_DEPS=true       # Auto-install missing dependencies
+PFIX_AUTO_RESTART=true              # Restart process after fix
+PFIX_MAX_RETRIES=3
+PFIX_CREATE_BACKUPS=false           # Disable backups
+
+# Optional
+PFIX_MODEL=openrouter/anthropic/claude-sonnet-4
+PFIX_PKG_MANAGER=uv               # pip or uv
+PFIX_GIT_COMMIT=false             # Auto-commit fixes
+PFIX_GIT_PREFIX="pfix: "
+```
+
+**Note:** `.env` is searched from current working directory upward, so it works from any subdirectory (e.g., `examples/`).
+
+### Method 2: pyproject.toml (Recommended for Projects)
+
+Add to your `pyproject.toml`:
 
 ```toml
 [tool.pfix]
 model = "openrouter/anthropic/claude-sonnet-4"
 auto_apply = true
 auto_install_deps = true
+auto_restart = true
 max_retries = 3
 create_backups = false
-git_auto_commit = true
-git_prefix = "fix: "
+git_auto_commit = false
+git_commit_prefix = "pfix: "
+enabled = true
+dry_run = false
+pkg_manager = "uv"  # auto, pip, or uv
+mcp_enabled = false
+mcp_transport = "stdio"
+mcp_server_url = "http://localhost:3001"
 ```
 
-### Programmatic
+**Benefits:**
+- Version controlled with your project
+- Works with any Python packaging tool
+- No external files needed
+
+### Method 3: setup.cfg (Legacy Projects)
+
+For projects using `setup.cfg`:
+
+```ini
+[metadata]
+name = myproject
+version = 1.0.0
+...
+
+[pfix]
+model = openrouter/anthropic/claude-sonnet-4
+auto_apply = true
+auto_install_deps = true
+auto_restart = false
+max_retries = 3
+create_backups = true
+```
+
+### Method 4: setup.py (Legacy Projects)
+
+For projects using `setup.py`:
+
+```python
+from setuptools import setup
+
+setup(
+    name="myproject",
+    version="1.0.0",
+    # ... other setup args
+    
+    # pfix configuration
+    pfix_model="openrouter/anthropic/claude-sonnet-4",
+    pfix_auto_apply=True,
+    pfix_auto_install_deps=True,
+    pfix_auto_restart=False,
+    pfix_max_retries=3,
+    pfix_create_backups=True,
+    pfix_enabled=True,
+)
+```
+
+**Note:** `setup.py` config requires pfix to be installed in the same environment.
+
+### Method 5: Programmatic Configuration
+
+Configure at runtime in your Python code:
 
 ```python
 from pfix import configure
 
+# Before importing pfix or using the hook
 configure(
+    # LLM settings
+    llm_model="openrouter/anthropic/claude-sonnet-4",
+    llm_api_key="sk-or-v1-...",
+    llm_temperature=0.2,
+    llm_max_tokens=4096,
+    
+    # Behavior
     auto_apply=True,
+    auto_install_deps=True,
+    auto_restart=True,
+    max_retries=3,
+    enabled=True,
     dry_run=False,
+    
+    # Project
     pkg_manager="uv",
     create_backups=False,
-    git_auto_commit=True,
-    max_retries=5,
+    project_root="/path/to/project",
+    
+    # Git
+    git_auto_commit=False,
+    git_commit_prefix="pfix: ",
+    
+    # MCP
+    mcp_enabled=False,
+    mcp_transport="stdio",
 )
+
+# Now import pfix to activate with these settings
+import pfix
 ```
+
+### Configuration Reference
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `OPENROUTER_API_KEY` | `str` | — | **Required** — OpenRouter API key |
+| `PFIX_MODEL` | `str` | `openrouter/anthropic/claude-sonnet-4` | LLM model to use |
+| `PFIX_AUTO_APPLY` | `bool` | `false` | Auto-apply fixes without confirmation |
+| `PFIX_AUTO_INSTALL_DEPS` | `bool` | `true` | Auto-install missing dependencies |
+| `PFIX_AUTO_RESTART` | `bool` | `false` | Restart process after fix applied |
+| `PFIX_MAX_RETRIES` | `int` | `3` | Max fix attempts per error |
+| `PFIX_DRY_RUN` | `bool` | `false` | Show proposed fixes without applying |
+| `PFIX_CREATE_BACKUPS` | `bool` | `true` | Create `.pfix_backups/` before fixing |
+| `PFIX_ENABLED` | `bool` | `true` | Master switch to disable pfix |
+| `PFIX_PKG_MANAGER` | `str` | auto | `pip`, `uv`, or auto-detected |
+| `PFIX_GIT_COMMIT` | `bool` | `false` | Auto-commit fixes to git |
+| `PFIX_GIT_PREFIX` | `str` | `pfix: ` | Git commit message prefix |
+| `PFIX_MCP_ENABLED` | `bool` | `false` | Enable MCP server |
+| `PFIX_MCP_TRANSPORT` | `str` | `stdio` | `stdio` or `http` |
+| `PFIX_PROJECT_ROOT` | `str` | `.` | Project root for relative paths |
 
 ## Advanced Usage
 
@@ -410,6 +540,9 @@ See [`examples/`](examples/) directory for working examples:
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 
