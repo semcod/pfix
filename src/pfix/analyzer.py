@@ -107,6 +107,7 @@ def analyze_exception(
         frame = tb.tb_frame
         ctx.line_number = tb.tb_lineno
         ctx.source_file = frame.f_code.co_filename
+        ctx.function_name = frame.f_code.co_name  # Get function name from frame
         if local_vars is None:
             local_vars = frame.f_locals
         ctx.local_vars = {

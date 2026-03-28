@@ -17,9 +17,8 @@ def fetch_json(url: str) -> dict:
 
 def average(numbers: list[float]) -> float:
     """Calculate average — ZeroDivisionError will be auto-fixed."""
-    if len(numbers) == 0:
-        return float('nan')
     return sum(numbers) / len(numbers)  # Bug: fails on empty list
+
 
 def greet(name: str, age: int) -> str:
     """Greet user — TypeError will be auto-fixed."""
