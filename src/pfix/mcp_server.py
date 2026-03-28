@@ -12,6 +12,7 @@ Start:
 Tools:
     pfix_analyze    — analyze error, return diagnosis
     pfix_fix        — analyze + apply fix to file
+    pfix_diagnose   — run environment diagnostics
     pfix_deps_scan  — scan project for missing deps
     pfix_deps_install — install a package
     pfix_deps_generate — generate requirements.txt via pipreqs
@@ -158,6 +159,61 @@ def create_mcp_server():
                 "content": content,
             }, indent=2)
         return json.dumps({"error": "Failed to generate requirements.txt"})
+
+    @mcp.tool()
+    def pfix_diagnose(
+        project_path: str = ".",
+        categories: str = "",
+    ) -> str:
+        """Run environment diagnostics on project.
+
+        Args:
+            project_path: Path to project directory
+            categories: Comma-separated list of categories to check
+                       (imports,filesystem,venv,memory,network,etc.)
+        """
+        from .env_diagnostics import EnvDiagnostics
+
+        target = Path(project_path)
+        if not target.exists():
+            return json.dumps({"error": f"Path not found: {project_path}"})
+
+        diag = EnvDiagnostics(target)
+
+        # Parse categories if provided
+        cat_list = None
+        if categories:
+            cat_list = [c.strip() for c in categories.split(",") if c.strip()]
+
+        results = diag.check_all(categories=cat_list)
+
+        # Count by status
+        critical = sum(1 for r in results if r.status == "critical")
+        errors = sum(1 for r in results if r.status == "error")
+        warnings = sum(1 for r in results if r.status == "warning")
+
+        return json.dumps({
+            "project": str(target),
+            "categories_checked": cat_list or "all",
+            "total_issues": len(results),
+            "critical": critical,
+            "errors": errors,
+            "warnings": warnings,
+            "issues": [
+                {
+                    "category": r.category,
+                    "check": r.check_name,
+                    "status": r.status,
+                    "message": r.message,
+                    "suggestion": r.suggestion,
+                    "auto_fixable": r.auto_fixable,
+                    "path": r.abs_path,
+                    "line": r.line_number,
+                }
+                for r in results
+                if r.status != "ok"
+            ],
+        }, indent=2)
 
     @mcp.tool()
     def pfix_edit_file(path: str, content: str) -> str:
