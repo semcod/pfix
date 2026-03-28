@@ -17,9 +17,9 @@ from typing import Any
 
 import pytest
 
-from ...analyzer import analyze_exception
-from ...fixer import apply_fix
-from ...llm import request_fix
+from pfix.analyzer import analyze_exception
+from pfix.fixer import apply_fix
+from pfix.llm import request_fix
 
 
 # pytest hooks

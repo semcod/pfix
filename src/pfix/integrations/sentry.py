@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from ...analyzer import analyze_exception
-from ...llm import request_fix
-from ...types import ErrorContext, FixProposal
+from pfix.analyzer import analyze_exception
+from pfix.llm import request_fix
+from pfix.types import ErrorContext, FixProposal
 
 
 class PfixSentryIntegration:

@@ -69,6 +69,9 @@ def main(argv: list[str] | None = None) -> int:
     # version
     sub.add_parser("version", help="Show version")
 
+    # status
+    sub.add_parser("status", help="Show diagnostic status")
+
     args = parser.parse_args(argv)
 
     if args.command == "run":
@@ -89,6 +92,8 @@ def main(argv: list[str] | None = None) -> int:
         from pfix import __version__
         console.print(f"pfix {__version__}")
         return 0
+    elif args.command == "status":
+        return cmd_status()
     else:
         parser.print_help()
         return 0

@@ -1,0 +1,8 @@
+- id: pfix-check
+  name: pfix syntax & deps check
+  description: Check Python syntax and detect missing dependencies
+  entry: python -m pfix.integrations.precommit
+  language: python
+  types: [python]
+  pass_filenames: true
+  require_serial: false

@@ -28,8 +28,8 @@ import sys
 import traceback
 from typing import Any, Callable, Optional
 
-from ...analyzer import analyze_exception
-from ...production import PfixMonitor
+from pfix.analyzer import analyze_exception
+from pfix.production import PfixMonitor
 
 
 class PfixMiddleware:
