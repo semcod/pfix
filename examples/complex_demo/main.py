@@ -1,16 +1,10 @@
 """
 pfix Complex Demo — Data Processing Library
 
-This example demonstrates pfix handling:
-- Missing library (pandas) → auto-install
-- Type errors → auto-fix
-- File not found → auto-fix
-- Logic errors → auto-fix
-
-Configuration via pyproject.toml only (no .env)
+Zero-config example: just `import pfix`, configuration is in pyproject.toml
 """
 
-import pfix  # Auto-activates with PFIX_AUTO_APPLY=true from pyproject.toml
+import pfix
 
 
 def load_and_process_data(filepath: str) -> dict:

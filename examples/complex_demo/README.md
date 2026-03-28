@@ -1,33 +1,34 @@
 # pfix Complex Demo — pyproject.toml Configuration
 
-This example demonstrates pfix working with complex library integration (pandas) using **only pyproject.toml configuration** (no `.env` file).
+This example demonstrates pfix working with **zero Python code configuration**. All settings are in `pyproject.toml`.
 
 ## What's Different
 
-Unlike `demo_auto.py` which uses `.env` for configuration, this example uses **pyproject.toml** `[tool.pfix]` section for all settings.
+Unlike other examples that use `.env` or `configure()`, this example uses **only pyproject.toml** `[tool.pfix]` section:
 
-## Files
-
+```python
+# main.py - just import, no config needed
+import pfix
 ```
-complex_demo/
-├── main.py          # Demo script with multiple bugs
-├── data/
-│   └── users.csv    # Sample data file
-└── README.md        # This file
-```
-
-## Configuration (pyproject.toml)
-
-The main project `pyproject.toml` contains:
 
 ```toml
+# pyproject.toml - all config here
 [tool.pfix]
 model = "openrouter/anthropic/claude-sonnet-4"
 auto_apply = true
 auto_install_deps = true
 auto_restart = true
-max_retries = 3
-create_backups = false
+```
+
+## Files
+
+```
+complex_demo/
+├── pyproject.toml   # All pfix configuration here
+├── main.py          # Zero-config code
+├── data/
+│   └── users.csv    # Sample data
+└── README.md
 ```
 
 ## Prerequisites
