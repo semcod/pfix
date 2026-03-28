@@ -220,24 +220,24 @@ def cmd_enable() -> int:
     """Enable pfix auto-activation and add config to pyproject.toml."""
     import shutil
     import site
-    
+
     # Find pfix package location
     import pfix
     pfix_pkg = Path(pfix.__file__).parent
-    
+
     # Find site-packages directory
     site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
     if not site_packages:
         site_packages = Path(site.getusersitepackages())
-    
+
     if not site_packages or not site_packages.exists():
         console.print("[red]✗ Cannot find site-packages directory[/]")
         return 1
-    
-    # 1. Install .pth file for auto-activation
+
+    # Install .pth file for auto-activation
     source_file = pfix_pkg / "auto_activate.pth"
     dest_file = site_packages / "pfix_auto.pth"
-    
+
     if source_file.exists():
         try:
             shutil.copy2(source_file, dest_file)
@@ -297,19 +297,19 @@ def cmd_enable() -> int:
 def cmd_disable() -> int:
     """Disable pfix auto-activation."""
     import site
-    
+
     # Find site-packages directory
     site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
     if not site_packages:
         site_packages = Path(site.getusersitepackages())
-    
+
     if not site_packages or not site_packages.exists():
         console.print("[red]✗ Cannot find site-packages directory[/]")
         return 1
-    
+
     # Remove .pth file
     dest_file = site_packages / "pfix_auto.pth"
-    
+
     if dest_file.exists():
         try:
             dest_file.unlink()
@@ -325,6 +325,101 @@ def cmd_disable() -> int:
     else:
         console.print("[yellow]⚠ pfix auto-activation was not enabled[/]")
         return 0
+
+
+def cmd_status() -> int:
+    """Show diagnostic status of pfix."""
+    from pfix import __version__
+    from pfix.config import get_config
+    import site
+    import sys
+
+    config = get_config()
+    warnings = config.validate()
+
+    # Header
+    console.print(f"\n[bold cyan]pfix {__version__}[/bold cyan]")
+    console.print("[dim]Self-healing Python — fix code & deps via LLM + MCP[/]\n")
+
+    # Installation Status
+    table = Table(title="Installation Status", show_header=False)
+    table.add_column("Item", style="cyan")
+    table.add_column("Status")
+
+    # Check if pfix is importable
+    table.add_row("pfix package", "[green]✓ installed[/]")
+
+    # Check auto-activation .pth file
+    site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
+    if not site_packages:
+        site_packages = Path(site.getusersitepackages()) if site.getusersitepackages() else None
+
+    pth_file = site_packages / "pfix_auto.pth" if site_packages else None
+    if pth_file and pth_file.exists():
+        table.add_row("Auto-activation", f"[green]✓ enabled[/] ([dim]{pth_file}[/dim])")
+    else:
+        table.add_row("Auto-activation", "[yellow]⚠ disabled[/] ([dim]run: pfix enable[/dim])")
+
+    # Check pyproject.toml
+    pyproject = Path.cwd() / "pyproject.toml"
+    if pyproject.exists():
+        content = pyproject.read_text()
+        if "[tool.pfix]" in content:
+            table.add_row("Configuration", f"[green]✓ found[/] ([dim]{pyproject}[/dim])")
+        else:
+            table.add_row("Configuration", f"[yellow]⚠ missing [tool.pfix] section[/] ([dim]{pyproject}[/dim])")
+    else:
+        table.add_row("Configuration", "[yellow]⚠ no pyproject.toml[/]")
+
+    # Check .env file
+    env_file = None
+    for parent in [Path.cwd(), *Path.cwd().parents]:
+        e = parent / ".env"
+        if e.exists():
+            env_file = e
+            break
+    if env_file:
+        table.add_row("Environment", f"[green]✓ .env found[/] ([dim]{env_file}[/dim])")
+    else:
+        table.add_row("Environment", "[yellow]⚠ no .env file[/]")
+
+    console.print(table)
+
+    # Configuration Status
+    console.print()
+    cfg_table = Table(title="Configuration", show_header=False)
+    cfg_table.add_column("Setting", style="cyan")
+    cfg_table.add_column("Value")
+
+    cfg_table.add_row("Model", config.llm_model)
+    cfg_table.add_row("API Key", "[green]✓ set[/]" if config.llm_api_key else "[red]✗ missing[/]")
+    cfg_table.add_row("API Base", config.llm_api_base)
+    cfg_table.add_row("Pkg Manager", config.pkg_manager)
+    cfg_table.add_row("Python", sys.version.split()[0])
+    cfg_table.add_row("Working Directory", str(Path.cwd()))
+
+    console.print(cfg_table)
+
+    # Warnings and issues
+    if warnings:
+        console.print()
+        for w in warnings:
+            console.print(f"[yellow]⚠ {w}[/]")
+
+    # Summary
+    console.print()
+    if not warnings and (pth_file and pth_file.exists()):
+        console.print("[green]✓ pfix is properly configured and ready[/]")
+    elif not config.llm_api_key:
+        console.print("[yellow]⚠ pfix requires an API key to function[/]")
+        console.print("[dim]  Set OPENROUTER_API_KEY in .env or environment[/]")
+    else:
+        console.print("[green]✓ pfix is functional[/]")
+        if not (pth_file and pth_file.exists()):
+            console.print("[dim]  (run 'pfix enable' for auto-activation)[/]")
+
+    console.print()
+    return 0 if not warnings else 1
 
 
 def cmd_deps(args) -> int:
