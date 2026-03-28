@@ -66,6 +66,29 @@ def main(argv: list[str] | None = None) -> int:
     # disable (remove auto-activation)
     sub.add_parser("disable", help="Disable pfix auto-activation")
 
+    # rollback
+    rollback_p = sub.add_parser("rollback", help="Rollback fixes")
+    rollback_p.add_argument("--last", action="store_true", help="Rollback most recent fix")
+    rollback_p.add_argument("--file", type=str, help="Rollback fixes for specific file")
+    rollback_p.add_argument("--before", type=str, help="Rollback all fixes before date (YYYY-MM-DD)")
+    rollback_p.add_argument("--history", action="store_true", help="Show fix history")
+
+    # audit
+    audit_p = sub.add_parser("audit", help="Audit trail and compliance")
+    audit_p.add_argument("--report", action="store_true", help="Show audit report")
+    audit_p.add_argument("--days", type=int, default=7, help="Report period in days")
+
+    # init
+    sub.add_parser("init", help="Interactive setup wizard")
+
+    # dashboard
+    sub.add_parser("dashboard", help="TUI dashboard with statistics")
+
+    # explain
+    explain_p = sub.add_parser("explain", help="Explain errors and fixes (educational)")
+    explain_p.add_argument("what", nargs="?", default="last", help="'last' or exception type (e.g., TypeError)")
+    explain_p.add_argument("--file", type=str, help="Explain specific file:line")
+
     # version
     sub.add_parser("version", help="Show version")
 
@@ -94,6 +117,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     elif args.command == "status":
         return cmd_status()
+    elif args.command == "rollback":
+        return cmd_rollback(args)
+    elif args.command == "audit":
+        return cmd_audit(args)
+    elif args.command == "init":
+        return cmd_init()
+    elif args.command == "dashboard":
+        return cmd_dashboard()
+    elif args.command == "explain":
+        return cmd_explain(args)
     else:
         parser.print_help()
         return 0
@@ -125,6 +158,11 @@ def cmd_run(args) -> int:
     sys.modules["__main__"] = module
     try:
         spec.loader.exec_module(module)
+    except SyntaxError as e:
+        # Handle SyntaxError with pfix
+        from pfix.syntax_error_handler import handle_syntax_error
+        handle_syntax_error(e, auto_apply=args.auto)
+        return 1
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
     except Exception as e:
@@ -167,6 +205,11 @@ def cmd_dev(args) -> int:
     sys.modules["__main__"] = module
     try:
         spec.loader.exec_module(module)
+    except SyntaxError as e:
+        # Handle SyntaxError with pfix
+        from pfix.syntax_error_handler import handle_syntax_error
+        handle_syntax_error(e, auto_apply=args.auto)
+        return 1
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
     except Exception as e:
