@@ -108,6 +108,9 @@ def apply_fix(
             console.print(f"[green]✓ Fix applied to {source_file}[/]")
             applied_any = True
 
+            # Clear pycache to prevent stale bytecode
+            _clear_pycache(source_file)
+
             # Git auto-commit
             if config.git_auto_commit:
                 _git_commit(source_file, proposal.fix_description)
@@ -184,6 +187,21 @@ def _backup(filepath: Path) -> Path:
     backup = backup_dir / f"{filepath.name}.{ts}.bak"
     shutil.copy2(filepath, backup)
     return backup
+
+
+def _clear_pycache(source_file: Path):
+    """Clear __pycache__ entries for a source file to prevent stale bytecode."""
+    try:
+        pycache_dir = source_file.parent / "__pycache__"
+        if pycache_dir.exists():
+            stem = source_file.stem
+            for pyc_file in pycache_dir.glob(f"{stem}.*.pyc"):
+                try:
+                    pyc_file.unlink()
+                except Exception:
+                    pass
+    except Exception:
+        pass
 
 
 def _git_commit(filepath: Path, message: str):
