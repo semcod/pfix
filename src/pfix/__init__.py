@@ -22,7 +22,7 @@ from .config import PfixConfig, configure, get_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.33"
+__version__ = "0.1.34"
 __all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig"]
 
 # ── Auto-activation on import ─────────────────────────────────────
@@ -63,6 +63,17 @@ def _auto_activate():
             caller_file = caller_globals.get("__file__")
         
         install_pfix_hook(caller_file, auto_apply=True)
+
+    # Check for runtime_todo auto-activation
+    runtime_todo_enabled = os.getenv("PFIX_RUNTIME_TODO", "false").lower() in ("true", "1", "yes")
+    if runtime_todo_enabled:
+        try:
+            from .runtime_todo import RuntimeCollector, TodoFile
+            todo = TodoFile(os.getenv("PFIX_TODO_FILE", "TODO.md"))
+            collector = RuntimeCollector(todo, enabled=True)
+            collector.install_excepthook()
+        except Exception:
+            pass  # Never break user code
 
 # Run auto-activation
 try:

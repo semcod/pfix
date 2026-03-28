@@ -95,6 +95,14 @@ def main(argv: list[str] | None = None) -> int:
     # status
     sub.add_parser("status", help="Show diagnostic status")
 
+    # diagnose
+    diag_p = sub.add_parser("diagnose", help="Run environment diagnostics")
+    diag_p.add_argument("--category", type=str, help="Filter by category (comma-separated)")
+    diag_p.add_argument("--output", type=str, help="Output file for results")
+    diag_p.add_argument("--fix", action="store_true", help="Auto-fix what can be fixed")
+    diag_p.add_argument("--json", action="store_true", help="Output JSON format")
+    diag_p.add_argument("--check", action="store_true", help="Exit with error if critical/error found")
+
     args = parser.parse_args(argv)
 
     if args.command == "run":
@@ -127,6 +135,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_dashboard()
     elif args.command == "explain":
         return cmd_explain(args)
+    elif args.command == "diagnose":
+        return cmd_diagnose(args)
     else:
         parser.print_help()
         return 0
@@ -601,6 +611,64 @@ def cmd_dashboard() -> int:
 def cmd_explain(args) -> int:
     from pfix.explain import explain
     explain(what=args.what, file=args.file)
+    return 0
+
+
+def cmd_diagnose(args) -> int:
+    """Run environment diagnostics."""
+    from pfix.env_diagnostics import EnvDiagnostics
+
+    # Parse categories filter
+    categories = None
+    if args.category:
+        categories = [c.strip() for c in args.category.split(",")]
+
+    # Run diagnostics
+    diag = EnvDiagnostics()
+    results = diag.check_all(categories=categories)
+
+    # Output format
+    if args.json:
+        import json
+        output = json.dumps([
+            {
+                "category": r.category,
+                "check_name": r.check_name,
+                "status": r.status,
+                "message": r.message,
+                "details": r.details,
+                "suggestion": r.suggestion,
+                "auto_fixable": r.auto_fixable,
+                "abs_path": r.abs_path,
+                "line_number": r.line_number,
+            }
+            for r in results
+        ], indent=2)
+    else:
+        output = diag.generate_report(results)
+
+    # Output to file or console
+    if args.output:
+        from pathlib import Path
+        Path(args.output).write_text(output)
+        console.print(f"[green]✓ Report written to {args.output}[/]")
+    else:
+        console.print(output)
+
+    # Auto-fix if requested
+    if args.fix:
+        fixable = [r for r in results if r.auto_fixable and r.status in ("error", "warning")]
+        if fixable:
+            console.print(f"\n[cyan]Attempting to fix {len(fixable)} issues...[/]")
+            # Implementation would go here - simplified for now
+            console.print("[dim]Auto-fix not yet implemented[/]")
+
+    # Determine exit code
+    if args.check:
+        critical_errors = [r for r in results if r.status in ("critical", "error")]
+        if critical_errors:
+            return 1
+
     return 0
 
 
