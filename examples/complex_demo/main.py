@@ -4,7 +4,6 @@ pfix Complex Demo — Data Processing Library
 Zero-config example: just `import pfix`, configuration is in pyproject.toml
 """
 
-import pfix
 
 
 def load_and_process_data(filepath: str) -> dict:
