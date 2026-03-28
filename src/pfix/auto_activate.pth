@@ -1,0 +1,60 @@
+"""
+pfix Auto-Activation for Virtual Environments
+
+This file enables pfix for ALL Python scripts in a virtual environment
+without needing `import pfix` in user code.
+
+Installation: Copy/link this file to venv/lib/python*/site-packages/pfix_auto.pth
+"""
+
+import sys
+import os
+from pathlib import Path
+
+def _auto_activate_pfix():
+    """Auto-activate pfix if configured in pyproject.toml or .env"""
+    try:
+        # Only activate if pfix is installed
+        import pfix
+        from pfix.config import get_config
+        
+        config = get_config()
+        
+        # Check if we should auto-activate
+        # 1. Check pyproject.toml settings
+        if hasattr(config, 'enabled') and not config.enabled:
+            return
+            
+        # 2. Check environment (user can disable)
+        if os.getenv('PFIX_DISABLE_AUTO', '').lower() in ('true', '1', 'yes'):
+            return
+            
+        # 3. Check if we have configuration (pyproject.toml or .env)
+        # If no config found, don't activate silently
+        project_root = Path.cwd()
+        has_config = (
+            (project_root / "pyproject.toml").exists() or
+            any((p / ".env").exists() for p in [project_root] + list(project_root.parents))
+        )
+        
+        if not has_config:
+            return
+            
+        # Auto-activate based on configuration
+        if config.auto_apply or os.getenv('PFIX_AUTO_APPLY', '').lower() in ('true', '1', 'yes'):
+            # Install global exception hook
+            from pfix.session import install_pfix_hook
+            install_pfix_hook(auto_apply=config.auto_apply)
+            
+            # Check for dev mode
+            if os.getenv('PFIX_DEV_MODE', '').lower() == 'true':
+                from pfix.dev_mode import install_dev_mode_hook
+                install_dev_mode_hook()
+                
+    except ImportError:
+        pass  # pfix not installed, skip silently
+    except Exception:
+        pass  # Never break user code
+
+# Execute immediately on Python startup
+_auto_activate_pfix()

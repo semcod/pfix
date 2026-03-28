@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pfix"
-version = "0.1.19"
+version = "0.1.20"
 description = "Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP"
 readme = "README.md"
 license = "Apache-2.0"
@@ -70,7 +70,7 @@ line-length = 120
 testpaths = ["tests"]
 
 [tool.pfix]
-model = "openrouter/anthropic/claude-sonnet-4"
+model = "openrouter/qwen/qwen3-coder-next"
 auto_apply = true
 auto_install_deps = true
 auto_restart = true

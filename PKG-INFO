@@ -153,7 +153,7 @@ Add to your MCP config (`.claude/mcp.json` or VS Code settings):
 | Variable | Default | Description |
 |---|---|---|
 | `OPENROUTER_API_KEY` | — | Required |
-| `PFIX_MODEL` | `openrouter/anthropic/claude-sonnet-4` | LLM model |
+| `PFIX_MODEL` | `openrouter/qwen/qwen3-coder-next` | LLM model |
 | `PFIX_AUTO_APPLY` | `false` | Auto-apply fixes |
 | `PFIX_AUTO_INSTALL_DEPS` | `true` | Auto pip/uv install |
 | `PFIX_AUTO_RESTART` | `false` | Restart after fix |
@@ -167,7 +167,7 @@ Add to your MCP config (`.claude/mcp.json` or VS Code settings):
 
 ```toml
 [tool.pfix]
-model = "openrouter/anthropic/claude-sonnet-4"
+model = "openrouter/qwen/qwen3-coder-next"
 auto_apply = false
 max_retries = 3
 ```

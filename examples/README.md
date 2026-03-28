@@ -278,7 +278,7 @@ export OPENROUTER_API_KEY=sk-or-v1-...
 cat > .env << EOF
 OPENROUTER_API_KEY=sk-or-v1-...
 PFIX_AUTO_APPLY=true
-PFIX_MODEL=openrouter/anthropic/claude-sonnet-4
+PFIX_MODEL=openrouter/qwen/qwen3-coder-next
 EOF
 ```
 

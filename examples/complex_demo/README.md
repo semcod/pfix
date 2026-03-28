@@ -74,14 +74,33 @@ cd /home/tom/github/semcod/pfix
 pip install -e .
 ```
 
-## Running
+## Quick Development Usage (No import needed!)
+
+Use `pfix-python` wrapper - works like normal `python` but with pfix auto-activated:
+
+```bash
+# Instead of:
+python main.py
+
+# Use:
+pfix-python main.py
+```
+
+**Benefit:** No `import pfix` needed in your code files!
+
+The wrapper is in `venv/bin/pfix-python` when you activate the virtual environment.
+
+## Standard Usage (With import)
 
 ```bash
 cd /home/tom/github/semcod/pfix/examples/complex_demo
 python main.py
 ```
 
-## Expected Flow
+Or with the wrapper (no import needed in code):
+```bash
+pfix-python main.py
+```
 
 1. First run: pfix installs pandas (if missing), detects and fixes bugs one by one
 2. With `auto_restart=true`, process restarts after each fix automatically

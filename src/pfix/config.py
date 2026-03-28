@@ -20,7 +20,7 @@ class PfixConfig:
     """Central configuration."""
 
     # LLM
-    llm_model: str = "openrouter/anthropic/claude-sonnet-4"
+    llm_model: str = "openrouter/qwen/qwen3-coder-next"
     llm_api_key: str = ""
     llm_api_base: str = "https://openrouter.ai/api/v1"
     llm_temperature: float = 0.2

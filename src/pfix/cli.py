@@ -3,6 +3,7 @@ pfix.cli — Command-line interface.
 
     pfix run script.py          # Run with global exception hook
     pfix run script.py --auto   # Auto-apply fixes
+    pfix dev script.py          # Run with dependency dev mode (fix site-packages)
     pfix check                  # Validate config
     pfix deps scan              # Scan for missing deps (pipreqs)
     pfix deps install           # Install missing deps
@@ -37,6 +38,13 @@ def main(argv: list[str] | None = None) -> int:
     run_p.add_argument("--dry-run", action="store_true")
     run_p.add_argument("--restart", action="store_true", help="Restart process after fix")
 
+    # dev (dependency development mode)
+    dev_p = sub.add_parser("dev", help="Run with dependency development mode (fixes site-packages)")
+    dev_p.add_argument("script", help="Python script path")
+    dev_p.add_argument("args", nargs="*")
+    dev_p.add_argument("--auto", action="store_true", help="Auto-apply fixes")
+    dev_p.add_argument("--dry-run", action="store_true")
+
     # check
     sub.add_parser("check", help="Validate config")
 
@@ -52,6 +60,12 @@ def main(argv: list[str] | None = None) -> int:
     srv_p.add_argument("--http", type=int, default=None, metavar="PORT", help="HTTP port (default: stdio)")
     srv_p.add_argument("--host", default="127.0.0.1")
 
+    # enable (auto-activation setup)
+    sub.add_parser("enable", help="Enable pfix auto-activation and add config to pyproject.toml")
+    
+    # disable (remove auto-activation)
+    sub.add_parser("disable", help="Disable pfix auto-activation")
+
     # version
     sub.add_parser("version", help="Show version")
 
@@ -59,8 +73,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "run":
         return cmd_run(args)
+    elif args.command == "dev":
+        return cmd_dev(args)
     elif args.command == "check":
         return cmd_check()
+    elif args.command == "enable":
+        return cmd_enable()
+    elif args.command == "disable":
+        return cmd_disable()
     elif args.command == "deps":
         return cmd_deps(args)
     elif args.command == "server":
@@ -89,6 +109,48 @@ def cmd_run(args) -> int:
         project_root=script.parent,
     )
     _install_excepthook()
+
+    sys.argv = [str(script)] + (args.args or [])
+    spec = importlib.util.spec_from_file_location("__main__", str(script))
+    if spec is None or spec.loader is None:
+        console.print(f"[red]✗ Cannot load: {script}[/]")
+        return 1
+
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["__main__"] = module
+    try:
+        spec.loader.exec_module(module)
+    except SystemExit as e:
+        return e.code if isinstance(e.code, int) else 0
+    except Exception as e:
+        console.print(f"[red]💥 Unhandled: {type(e).__name__}: {e}[/]")
+        return 1
+    return 0
+
+
+def cmd_dev(args) -> int:
+    """Run with dependency development mode active."""
+    from pfix import configure
+    from pfix.dev_mode import install_dev_mode_hook
+
+    script = Path(args.script).resolve()
+    if not script.is_file():
+        console.print(f"[red]✗ Not found: {script}[/]")
+        return 1
+
+    configure(
+        auto_apply=True,  # Dev mode always auto-applies
+        dry_run=args.dry_run,
+        auto_restart=False,  # Don't restart in dev mode
+        project_root=script.parent,
+    )
+
+    console.print("[cyan]🛠️  Development mode active - will fix site-packages errors[/]")
+    console.print("[dim]   Any errors in pandas/numpy/etc will be auto-fixed[/]")
+    console.print()
+
+    # Install dev mode hook
+    install_dev_mode_hook()
 
     sys.argv = [str(script)] + (args.args or [])
     spec = importlib.util.spec_from_file_location("__main__", str(script))
@@ -147,6 +209,51 @@ def cmd_check() -> int:
 
     console.print("\n[green]✓ Configuration valid[/]")
     return 0
+
+
+def cmd_enable() -> int:
+    """Enable pfix auto-activation for current virtual environment."""
+    import shutil
+    import site
+    
+    # Find pfix package location
+    import pfix
+    pfix_pkg = Path(pfix.__file__).parent
+    
+    # Find site-packages directory
+    site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
+    if not site_packages:
+        # Try user site
+        site_packages = Path(site.getusersitepackages())
+    
+    if not site_packages or not site_packages.exists():
+        console.print("[red]✗ Cannot find site-packages directory[/]")
+        return 1
+    
+    # Source and destination paths
+    source_file = pfix_pkg / "auto_activate.pth"
+    dest_file = site_packages / "pfix_auto.pth"
+    
+    if not source_file.exists():
+        console.print(f"[red]✗ Source file not found: {source_file}[/]")
+        return 1
+    
+    try:
+        # Copy the .pth file to site-packages
+        shutil.copy2(source_file, dest_file)
+        console.print(f"[green]✓ pfix auto-activation enabled[/]")
+        console.print(f"[dim]  Installed: {dest_file}[/]")
+        console.print()
+        console.print("[cyan]How to use:[/]")
+        console.print("  1. Add [tool.pfix] to your pyproject.toml")
+        console.print("  2. Run any Python script - pfix will auto-activate!")
+        console.print("  3. No 'import pfix' needed!")
+        console.print()
+        console.print("[dim]To disable: rm {dest_file}[/]")
+        return 0
+    except Exception as e:
+        console.print(f"[red]✗ Failed to install: {e}[/]")
+        return 1
 
 
 def cmd_deps(args) -> int:

@@ -338,7 +338,7 @@ PFIX_MAX_RETRIES=3
 PFIX_CREATE_BACKUPS=false           # Disable backups
 
 # Optional
-PFIX_MODEL=openrouter/anthropic/claude-sonnet-4
+PFIX_MODEL=openrouter/qwen/qwen3-coder-next
 PFIX_PKG_MANAGER=uv               # pip or uv
 PFIX_GIT_COMMIT=false             # Auto-commit fixes
 PFIX_GIT_PREFIX="pfix: "
@@ -352,7 +352,7 @@ Add to your `pyproject.toml`:
 
 ```toml
 [tool.pfix]
-model = "openrouter/anthropic/claude-sonnet-4"
+model = "openrouter/qwen/qwen3-coder-next"
 auto_apply = true
 auto_install_deps = true
 auto_restart = true
@@ -384,7 +384,7 @@ version = 1.0.0
 ...
 
 [pfix]
-model = openrouter/anthropic/claude-sonnet-4
+model = openrouter/qwen/qwen3-coder-next
 auto_apply = true
 auto_install_deps = true
 auto_restart = false
@@ -405,7 +405,7 @@ setup(
     # ... other setup args
     
     # pfix configuration
-    pfix_model="openrouter/anthropic/claude-sonnet-4",
+    pfix_model="openrouter/qwen/qwen3-coder-next",
     pfix_auto_apply=True,
     pfix_auto_install_deps=True,
     pfix_auto_restart=False,
@@ -427,7 +427,7 @@ from pfix import configure
 # Before importing pfix or using the hook
 configure(
     # LLM settings
-    llm_model="openrouter/anthropic/claude-sonnet-4",
+    llm_model="openrouter/qwen/qwen3-coder-next",
     llm_api_key="sk-or-v1-...",
     llm_temperature=0.2,
     llm_max_tokens=4096,
@@ -463,7 +463,7 @@ import pfix
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `OPENROUTER_API_KEY` | `str` | — | **Required** — OpenRouter API key |
-| `PFIX_MODEL` | `str` | `openrouter/anthropic/claude-sonnet-4` | LLM model to use |
+| `PFIX_MODEL` | `str` | `openrouter/qwen/qwen3-coder-next` | LLM model to use |
 | `PFIX_API_BASE` | `str` | `https://openrouter.ai/api/v1` | API base URL |
 | `PFIX_AUTO_APPLY` | `bool` | `false` | Auto-apply fixes without confirmation |
 | `PFIX_AUTO_INSTALL_DEPS` | `bool` | `true` | Auto-install missing dependencies |
@@ -490,13 +490,13 @@ OpenRouter provides access to multiple models with a single API key.
 ```bash
 # .env
 OPENROUTER_API_KEY=sk-or-v1-...
-PFIX_MODEL=openrouter/anthropic/claude-sonnet-4
+PFIX_MODEL=openrouter/qwen/qwen3-coder-next
 ```
 
 **Recommended models:**
 | Model | Description | Best For |
 |-------|-------------|----------|
-| `openrouter/anthropic/claude-sonnet-4` | Claude 4 Sonnet | Balanced quality/speed |
+| `openrouter/qwen/qwen3-coder-next` | Claude 4 Sonnet | Balanced quality/speed |
 | `openrouter/anthropic/claude-opus-4` | Claude 4 Opus | Complex fixes |
 | `openrouter/anthropic/claude-haiku-4` | Claude 4 Haiku | Fast, cheap fixes |
 | `openrouter/qwen/qwen3-235b-a22b-2507` | Qwen3 235B | Code-heavy tasks |
@@ -576,7 +576,7 @@ PFIX_MODEL=gemini/gemini-1.5-pro
 
 ### Choosing a Model
 
-**For beginners:** Start with `openrouter/anthropic/claude-sonnet-4` (good balance)
+**For beginners:** Start with `openrouter/qwen/qwen3-coder-next` (good balance)
 
 **For cost savings:** Use Ollama locally or OpenRouter free models (`:free` suffix)
 
@@ -675,6 +675,9 @@ See [`examples/`](examples/) directory for working examples:
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 

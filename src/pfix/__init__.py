@@ -11,7 +11,7 @@ Catches runtime errors and fixes source code + dependencies via LLM + MCP.
 
     # Configure
     from pfix import configure
-    configure(auto_apply=True, llm_model="openrouter/anthropic/claude-sonnet-4")
+    configure(auto_apply=True, llm_model="openrouter/qwen/qwen3-coder-next")
 
 Auto-activation via .env:
     Set PFIX_AUTO_APPLY=true in .env to enable auto-fixing on any exception
@@ -22,7 +22,7 @@ from .config import PfixConfig, configure, get_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.19"
+__version__ = "0.1.20"
 __all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig"]
 
 # ── Auto-activation on import ─────────────────────────────────────
