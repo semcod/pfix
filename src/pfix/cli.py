@@ -253,7 +253,7 @@ def cmd_enable() -> int:
             content = pyproject.read_text()
             if "[tool.pfix]" not in content:
                 # Append config to existing pyproject.toml
-                config_block = '''\n\n[tool.pfix]\nmodel = "openrouter/anthropic/claude-sonnet-4"\nauto_apply = true\nauto_install_deps = true\nauto_restart = true\nmax_retries = 3\ncreate_backups = false\n'''
+                config_block = '''\n\n[tool.pfix]\nmodel = "openrouter/qwen/qwen3-coder-next"\nauto_apply = true\nauto_install_deps = true\nauto_restart = true\nmax_retries = 3\ncreate_backups = false\n'''
                 with open(pyproject, "a") as f:
                     f.write(config_block)
                 console.print(f"[green]✓ Added [tool.pfix] to {pyproject}[/]")
@@ -265,7 +265,7 @@ def cmd_enable() -> int:
     else:
         # Create new pyproject.toml
         try:
-            config_block = '''[build-system]\nrequires = ["setuptools>=61"]\nbuild-backend = "setuptools.build_meta"\n\n[project]\nname = "my-project"\nversion = "0.1.0"\nrequires-python = ">=3.10"\n\n[tool.pfix]\nmodel = "openrouter/anthropic/claude-sonnet-4"\nauto_apply = true\nauto_install_deps = true\nauto_restart = true\nmax_retries = 3\ncreate_backups = false\n'''
+            config_block = '''[build-system]\nrequires = ["setuptools>=61"]\nbuild-backend = "setuptools.build_meta"\n\n[project]\nname = "my-project"\nversion = "0.1.0"\nrequires-python = ">=3.10"\n\n[tool.pfix]\nmodel = "openrouter/qwen/qwen3-coder-next"\nauto_apply = true\nauto_install_deps = true\nauto_restart = true\nmax_retries = 3\ncreate_backups = false\n'''
             pyproject.write_text(config_block)
             console.print(f"[green]✓ Created {pyproject} with pfix config[/]")
             config_added = True
