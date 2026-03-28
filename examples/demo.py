@@ -3,7 +3,7 @@
 
 from pfix import pfix, configure
 
-configure(dry_run=True, auto_apply=True)
+configure(dry_run=False, auto_apply=True)
 
 
 @pfix(deps=["requests"])
