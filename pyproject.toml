@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pfix"
-version = "0.1.1"
+version = "0.1.2"
 description = "Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP"
 readme = "README.md"
 license = "Apache-2.0"
@@ -28,7 +28,7 @@ dependencies = [
     "litellm>=1.40.0",
     "python-dotenv>=1.0.0",
     "rich>=13.0.0",
-    "pipreqs>=0.5.0",
+    "pipreqs>=0.4.0",
     "pathspec>=0.12.0",
 ]
 
