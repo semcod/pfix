@@ -657,3 +657,33 @@ class TestEnvDiagnostics:
         results = diag._check_api_keys_in_env()
 
         assert any(r.check_name == "api_key_placeholder" for r in results)
+
+    def test_circular_import_detection(self, tmp_path):
+        from pfix.env_diagnostics.imports import ImportDiagnostic
+
+        # Create circular import: a.py -> b.py -> a.py
+        a_file = tmp_path / "a.py"
+        b_file = tmp_path / "b.py"
+
+        a_file.write_text("from b import func_b\ndef func_a(): pass")
+        b_file.write_text("from a import func_a\ndef func_b(): pass")
+
+        diag = ImportDiagnostic()
+        results = diag._check_circular_imports(tmp_path)
+
+        assert any(r.check_name == "circular_import" for r in results)
+        circular = [r for r in results if r.check_name == "circular_import"][0]
+        assert "a" in circular.message and "b" in circular.message
+
+    def test_version_conflict_check(self, tmp_path, monkeypatch):
+        from pfix.env_diagnostics.imports import ImportDiagnostic
+        from pfix.types import DiagnosticResult
+
+        diag = ImportDiagnostic()
+        # This test may or may not find conflicts depending on env
+        # Just verify it doesn't crash
+        results = diag._check_version_conflicts()
+        assert isinstance(results, list)
+        for r in results:
+            assert r.category == "import_dependency"
+            assert r.check_name == "version_conflict"
