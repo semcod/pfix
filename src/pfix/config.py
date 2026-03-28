@@ -95,6 +95,11 @@ class PfixConfig:
             log_file=os.getenv("PFIX_LOG_FILE"),
         )
 
+        # Auto-fix model name: ensure openrouter/ prefix for OpenRouter models
+        if cfg.llm_api_base and "openrouter" in cfg.llm_api_base:
+            if "/" in cfg.llm_model and not cfg.llm_model.startswith("openrouter/"):
+                cfg.llm_model = f"openrouter/{cfg.llm_model}"
+
         # Merge pyproject.toml [tool.pfix]
         pyproject = cls._read_pyproject(cfg.project_root / "pyproject.toml")
         for key, val in pyproject.items():

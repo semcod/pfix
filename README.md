@@ -25,6 +25,8 @@
 
 ## Installation
 
+### From PyPI (Users)
+
 ```bash
 pip install pfix
 
@@ -36,6 +38,33 @@ pip install pfix[git]
 
 # Everything
 pip install pfix[all]
+```
+
+### From Source (Developers)
+
+Clone and install in editable mode:
+
+```bash
+git clone https://github.com/softreck/pfix.git
+cd pfix
+pip install -e .
+
+# Or with all optional dependencies
+pip install -e ".[all]"
+```
+
+**Editable mode** (`-e`) allows you to modify source code without reinstalling. Changes take effect immediately.
+
+### Running Examples
+
+After installation, examples can be run from any directory:
+
+```bash
+# From project root
+cd /path/to/pfix/examples
+python demo_auto.py
+
+# The .env file in project root is automatically found
 ```
 
 ## Quick Start (3 Ways)
@@ -540,6 +569,9 @@ See [`examples/`](examples/) directory for working examples:
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 

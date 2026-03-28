@@ -255,6 +255,10 @@ def install_pfix_hook(
                 os.execv(sys.executable, [sys.executable] + sys.argv)
         else:
             console.print(f"[yellow]⚠ Confidence too low ({proposal.confidence:.0%}), skipping[/]")
+            if proposal.diagnosis:
+                console.print(f"[dim]Diagnosis: {proposal.diagnosis[:200]}[/]")
+            if proposal.raw_response:
+                console.print(f"[dim]Raw: {proposal.raw_response[:200]}[/]")
         
         original_hook(exc_type, exc_value, exc_tb)
     

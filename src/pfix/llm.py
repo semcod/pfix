@@ -96,8 +96,10 @@ def request_fix(error_ctx: ErrorContext) -> FixProposal:
         raw = response.choices[0].message.content or ""
         return _parse_response(raw)
     except Exception as e:
+        import traceback
+        error_msg = f"{e}\n{traceback.format_exc()}"
         return FixProposal(
-            diagnosis=f"LLM request failed: {e}",
+            diagnosis=f"LLM request failed: {error_msg}",
             confidence=0.0,
             raw_response=str(e),
         )
@@ -119,8 +121,9 @@ def _parse_response(raw: str) -> FixProposal:
 
     try:
         data = json.loads(text)
-    except json.JSONDecodeError:
-        proposal.diagnosis = "Failed to parse LLM JSON response"
+    except json.JSONDecodeError as e:
+        proposal.diagnosis = f"Failed to parse LLM JSON response: {e}"
+        proposal.raw_response = text[:500]  # Include partial response for debugging
         return proposal
 
     proposal.diagnosis = data.get("diagnosis", "")
