@@ -1,3 +1,50 @@
+Metadata-Version: 2.4
+Name: pfix
+Version: 0.1.0
+Summary: Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP
+Project-URL: Homepage, https://github.com/softreck/pfix
+Project-URL: Repository, https://github.com/softreck/pfix
+Project-URL: Issues, https://github.com/softreck/pfix/issues
+Author-email: Tom Sapletta <tom@softreck.dev>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: auto-fix,debugging,developer-tools,llm,mcp,self-healing
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Debuggers
+Requires-Python: >=3.10
+Requires-Dist: litellm>=1.40.0
+Requires-Dist: pathspec>=0.12.0
+Requires-Dist: pipreqs>=0.5.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: rich>=13.0.0
+Provides-Extra: all
+Requires-Dist: gitpython>=3.1.0; extra == 'all'
+Requires-Dist: httpx>=0.27.0; extra == 'all'
+Requires-Dist: mcp>=1.0.0; extra == 'all'
+Requires-Dist: pytest-cov>=5.0; extra == 'all'
+Requires-Dist: pytest>=8.0; extra == 'all'
+Requires-Dist: ruff>=0.4.0; extra == 'all'
+Requires-Dist: uvicorn>=0.30.0; extra == 'all'
+Requires-Dist: watchdog>=4.0.0; extra == 'all'
+Provides-Extra: dev
+Requires-Dist: pytest-cov>=5.0; extra == 'dev'
+Requires-Dist: pytest>=8.0; extra == 'dev'
+Requires-Dist: ruff>=0.4.0; extra == 'dev'
+Provides-Extra: git
+Requires-Dist: gitpython>=3.1.0; extra == 'git'
+Provides-Extra: mcp
+Requires-Dist: httpx>=0.27.0; extra == 'mcp'
+Requires-Dist: mcp>=1.0.0; extra == 'mcp'
+Requires-Dist: uvicorn>=0.30.0; extra == 'mcp'
+Provides-Extra: watch
+Requires-Dist: watchdog>=4.0.0; extra == 'watch'
+Description-Content-Type: text/markdown
+
 # 🔧 pfix
 
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.
@@ -179,7 +226,4 @@ configure(
 
 ## License
 
-Licensed under Apache-2.0.
-
-
-Apache 2.0 — Tom Sapletta / Softreck
+MIT — Tom Sapletta / Softreck

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "pfix": {
+      "command": "python",
+      "args": ["-m", "pfix.mcp_server"],
+      "env": {
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
+      }
+    }
+  }
+}

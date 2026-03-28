@@ -1,0 +1,265 @@
+"""
+pfix.decorator — The @pfix decorator.
+
+Usage:
+    from pfix import pfix
+
+    @pfix
+    def my_function():
+        ...
+
+    @pfix(retries=3, auto_apply=True, hint="Processes CSV files")
+    def process(path):
+        ...
+
+    @pfix(deps=["pandas", "numpy"], restart=True)
+    def analyze():
+        import pandas as pd
+        ...
+"""
+
+from __future__ import annotations
+
+import functools
+import importlib
+import os
+import sys
+from typing import Any, Callable, Optional, TypeVar, overload
+
+from rich.console import Console
+
+from .analyzer import analyze_exception, classify_error
+from .config import get_config
+from .dependency import detect_missing_from_error, install_packages, resolve_package_name
+from .fixer import apply_fix
+from .llm import request_fix
+
+console = Console(stderr=True)
+F = TypeVar("F", bound=Callable)
+
+
+@overload
+def pfix(func: F) -> F: ...
+
+@overload
+def pfix(
+    *,
+    retries: Optional[int] = None,
+    auto_apply: Optional[bool] = None,
+    hint: str = "",
+    deps: Optional[list[str]] = None,
+    restart: Optional[bool] = None,
+    on_error: Optional[Callable] = None,
+    enabled: Optional[bool] = None,
+) -> Callable[[F], F]: ...
+
+
+def pfix(
+    func: Optional[F] = None,
+    *,
+    retries: Optional[int] = None,
+    auto_apply: Optional[bool] = None,
+    hint: str = "",
+    deps: Optional[list[str]] = None,
+    restart: Optional[bool] = None,
+    on_error: Optional[Callable] = None,
+    enabled: Optional[bool] = None,
+) -> Any:
+    """Self-healing decorator. Catches errors, fixes code via LLM.
+
+    Args:
+        retries: Max fix attempts (default: config.max_retries).
+        auto_apply: Apply fixes without asking (default: config.auto_apply).
+        hint: Developer hint for LLM context.
+        deps: Pre-install these packages before first run.
+        restart: Restart the process after applying fix (default: config.auto_restart).
+        on_error: Custom error handler, called before LLM analysis.
+        enabled: Override global enabled flag.
+    """
+    def decorator(fn: F) -> F:
+        @functools.wraps(fn)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            config = get_config()
+            is_enabled = enabled if enabled is not None else config.enabled
+
+            if not is_enabled:
+                return fn(*args, **kwargs)
+
+            # Pre-install declared deps
+            if deps:
+                _ensure_deps(deps)
+
+            max_retries = retries if retries is not None else config.max_retries
+            should_auto = auto_apply if auto_apply is not None else config.auto_apply
+            should_restart = restart if restart is not None else config.auto_restart
+
+            last_exc: Optional[BaseException] = None
+
+            for attempt in range(max_retries + 1):
+                try:
+                    return fn(*args, **kwargs)
+                except (KeyboardInterrupt, SystemExit):
+                    raise
+                except BaseException as exc:
+                    last_exc = exc
+
+                    if attempt >= max_retries:
+                        break
+
+                    console.print(
+                        f"\n[red]💥 pfix caught: {type(exc).__name__}: {exc}[/]"
+                        f"  [dim](attempt {attempt + 1}/{max_retries})[/]"
+                    )
+
+                    # Custom handler
+                    if on_error:
+                        try:
+                            on_error(exc)
+                        except Exception:
+                            pass
+
+                    # Quick path: missing module → pip install → retry
+                    if _try_quick_dep_fix(exc):
+                        console.print("[green]  ↻ Dependency installed, retrying...[/]")
+                        continue
+
+                    # Full LLM path
+                    hints = {"hint": hint} if hint else {}
+                    hints["args_types"] = str({
+                        f"arg{i}": type(a).__name__ for i, a in enumerate(args)
+                    })
+
+                    ctx = analyze_exception(exc, func=fn, hints=hints)
+                    error_class = classify_error(ctx)
+                    console.print(f"[blue]🔍 Analyzing ({error_class})...[/]")
+
+                    proposal = request_fix(ctx)
+
+                    if proposal.confidence < 0.1:
+                        console.print("[yellow]⚠ LLM confidence too low — skipping[/]")
+                        break
+
+                    old_auto = config.auto_apply
+                    if should_auto:
+                        config.auto_apply = True
+
+                    fixed = apply_fix(ctx, proposal, confirm=not should_auto)
+                    config.auto_apply = old_auto
+
+                    if fixed:
+                        if should_restart:
+                            console.print("[green]  🔄 Restarting process...[/]")
+                            os.execv(sys.executable, [sys.executable] + sys.argv)
+                        elif _try_reload_module(fn):
+                            console.print("[green]  ↻ Module reloaded, retrying...[/]")
+                        else:
+                            console.print("[yellow]  ⚠ Reload failed — restart needed[/]")
+                            break
+                    else:
+                        console.print("[yellow]  Fix not applied[/]")
+                        break
+
+            if last_exc is not None:
+                raise last_exc
+
+        wrapper._pfix_decorated = True  # type: ignore
+        wrapper._pfix_hint = hint  # type: ignore
+        wrapper._pfix_deps = deps  # type: ignore
+        return wrapper  # type: ignore
+
+    if func is not None:
+        return decorator(func)
+    return decorator
+
+
+# ── Async variant ───────────────────────────────────────────────────
+
+def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
+    """Async version of @pfix.
+
+    Usage:
+        @apfix
+        async def fetch():
+            ...
+    """
+    def decorator(fn: F) -> F:
+        @functools.wraps(fn)
+        async def wrapper(*args: Any, **kw: Any) -> Any:
+            config = get_config()
+            max_retries = kwargs.get("retries", config.max_retries)
+            last_exc = None
+
+            for attempt in range(max_retries + 1):
+                try:
+                    return await fn(*args, **kw)
+                except (KeyboardInterrupt, SystemExit):
+                    raise
+                except BaseException as exc:
+                    last_exc = exc
+                    if attempt >= max_retries:
+                        break
+
+                    console.print(f"\n[red]💥 apfix caught: {type(exc).__name__}: {exc}[/]")
+
+                    if _try_quick_dep_fix(exc):
+                        continue
+
+                    hints = {"hint": kwargs.get("hint", "")} if kwargs.get("hint") else {}
+                    ctx = analyze_exception(exc, func=fn, hints=hints)
+                    proposal = request_fix(ctx)
+
+                    if proposal.confidence < 0.1:
+                        break
+
+                    auto = kwargs.get("auto_apply", config.auto_apply)
+                    fixed = apply_fix(ctx, proposal, confirm=not auto)
+                    if not fixed:
+                        break
+                    _try_reload_module(fn)
+
+            if last_exc is not None:
+                raise last_exc
+
+        wrapper._pfix_decorated = True  # type: ignore
+        return wrapper  # type: ignore
+
+    if func is not None:
+        return decorator(func)
+    return decorator
+
+
+# ── Helpers ─────────────────────────────────────────────────────────
+
+def _ensure_deps(deps: list[str]):
+    missing = []
+    for dep in deps:
+        pkg = dep.split("==")[0].split(">=")[0].split("[")[0]
+        try:
+            __import__(pkg)
+        except ImportError:
+            missing.append(dep)
+    if missing:
+        console.print(f"[cyan]📦 Pre-installing: {', '.join(missing)}[/]")
+        install_packages(missing)
+
+
+def _try_quick_dep_fix(exc: BaseException) -> bool:
+    if not isinstance(exc, (ModuleNotFoundError, ImportError)):
+        return False
+    module = detect_missing_from_error(str(exc))
+    if not module:
+        return False
+    pkg = resolve_package_name(module)
+    results = install_packages([pkg])
+    return results.get(pkg, False)
+
+
+def _try_reload_module(func: Any) -> bool:
+    try:
+        module = sys.modules.get(func.__module__)
+        if module is not None:
+            importlib.reload(module)
+            return True
+    except Exception:
+        pass
+    return False

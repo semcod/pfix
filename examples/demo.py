@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""pfix demo — run with: python examples/demo.py"""
+
+from pfix import pfix, configure
+
+configure(dry_run=True, auto_apply=True)
+
+
+@pfix(deps=["requests"])
+def fetch_json(url: str) -> dict:
+    import requests
+    return requests.get(url).json()
+
+
+@pfix(hint="Calculate average of numbers list")
+def average(numbers: list[float]) -> float:
+    return sum(numbers) / len(numbers)  # ZeroDivisionError if empty
+
+
+@pfix(retries=2)
+def greet(name: str, age: int) -> str:
+    return "Hello " + name + "! Age: " + age  # TypeError: str + int
+
+
+if __name__ == "__main__":
+    print("=== pfix Demo ===\n")
+
+    print("1. fetch_json (dep management):")
+    try:
+        print(f"   {type(fetch_json('https://httpbin.org/json'))}")
+    except Exception as e:
+        print(f"   {e}\n")
+
+    print("2. average([]) (ZeroDivisionError):")
+    try:
+        print(f"   {average([])}")
+    except Exception as e:
+        print(f"   {e}\n")
+
+    print("3. greet('Alice', 30) (TypeError):")
+    try:
+        print(f"   {greet('Alice', 30)}")
+    except Exception as e:
+        print(f"   {e}\n")
