@@ -1,6 +1,12 @@
 # 🔧 pfix
 
+[![PyPI version](https://badge.fury.io/py/pfix.svg)](https://pypi.org/project/pfix/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.
+
+> 💡 **New in 0.1.5**: Zero-configuration mode! Just `import pfix` with `PFIX_AUTO_APPLY=true` in `.env` and any exception triggers automatic repair.
 
 ## Features
 
@@ -178,6 +184,9 @@ configure(
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 

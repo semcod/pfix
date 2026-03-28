@@ -13,6 +13,7 @@ The simplest way to use pfix. Just `import pfix` and it automatically:
 
 **Usage:**
 ```bash
+cd examples
 # 1. Set PFIX_AUTO_APPLY=true in your .env
 # 2. Run the script
 python demo_auto.py
