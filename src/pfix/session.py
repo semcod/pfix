@@ -198,6 +198,20 @@ def install_pfix_hook(
     config = get_config()
     original_hook = sys.excepthook
     
+    def _clear_pycache(source_file: Path):
+        """Clear __pycache__ entries for a source file to prevent stale bytecode."""
+        try:
+            pycache_dir = source_file.parent / "__pycache__"
+            if pycache_dir.exists():
+                stem = source_file.stem
+                for pyc_file in pycache_dir.glob(f"{stem}.*.pyc"):
+                    try:
+                        pyc_file.unlink()
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+    
     def hook(exc_type, exc_value, exc_tb):
         if exc_type in (KeyboardInterrupt, SystemExit):
             original_hook(exc_type, exc_value, exc_tb)
@@ -224,8 +238,15 @@ def install_pfix_hook(
         if proposal.confidence > 0.1:
             old_auto = config.auto_apply
             config.auto_apply = auto_apply
-            apply_fix(ctx, proposal, confirm=not auto_apply)
+            fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
             config.auto_apply = old_auto
+            
+            # Restart process if fix applied and auto_restart enabled
+            if fixed and config.auto_restart:
+                if ctx.source_file:
+                    _clear_pycache(Path(ctx.source_file))
+                console.print("[green]🔄 Restarting...[/]")
+                os.execv(sys.executable, [sys.executable] + sys.argv)
         
         original_hook(exc_type, exc_value, exc_tb)
     

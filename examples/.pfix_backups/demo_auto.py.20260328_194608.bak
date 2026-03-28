@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+"""pfix demo — ZERO configuration, just `import pfix`
+
+Set PFIX_AUTO_APPLY=true in .env and run:
+    python examples/demo_auto.py
+
+That's it. No decorators, no configure(), just import pfix.
+"""
+
+import pfix  # Auto-activates if PFIX_AUTO_APPLY=true in .env
+
+
+def fetch_json(url: str) -> dict:
+    """Fetch JSON — dependencies auto-installed."""
+    import requests
+    return requests.get(url).json()
+
+
+def average(numbers: list[float]) -> float:
+    """Calculate average — will auto-fix on error."""
+    return sum(numbers) / len(numbers)  # Bug: fails on empty list
+
+
+def greet(name: str, age: int) -> str:
+    """Greet user — will auto-fix on error."""
+    return "Hello " + name + "! Age: " + age  # Bug: str + int
+
+
+def main():
+    print("=== pfix Demo (zero config) ===\n")
+
+    print("1. fetch_json:")
+    result = fetch_json('https://httpbin.org/json')
+    print(f"   ✓ {type(result).__name__}")
+
+    print("\n2. average([]):")
+    result = average([])
+    print(f"   ✓ {result}")
+
+    print("\n3. greet('Alice', 30):")
+    result = greet('Alice', 30)
+    print(f"   ✓ {result}")
+
+
+if __name__ == "__main__":
+    main()  # No with block, no decorators, just import pfix
