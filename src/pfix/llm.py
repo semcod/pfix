@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import json
 import re
+import time
+from typing import Optional
 
 import litellm
 
@@ -43,9 +45,68 @@ RESPONSE JSON:
 }
 """
 
+# Default fallback chain: cheapest first
+DEFAULT_LLM_CHAIN = [
+    "ollama/codellama:7b",  # local, free
+    "openrouter/anthropic/claude-haiku-4",  # cloud, cheap
+    "openrouter/anthropic/claude-sonnet-4",  # cloud, quality
+]
+
 
 def request_fix(error_ctx: ErrorContext) -> FixProposal:
-    """Send error to LLM, get fix proposal."""
+    """Send error to LLM, get fix proposal with fallback chain support."""
+    config = get_config()
+
+    # Get chain of models to try
+    chain = getattr(config, "llm_chain", None) or DEFAULT_LLM_CHAIN
+    strategy = getattr(config, "llm_chain_strategy", "cheapest_first")
+
+    # If single model configured, use legacy behavior
+    if len(chain) == 1 or not chain:
+        return _request_single_model(error_ctx, config.llm_model)
+
+    # Try models in chain order
+    return _request_with_chain(error_ctx, chain)
+
+
+def _request_with_chain(error_ctx: ErrorContext, chain: list[str]) -> FixProposal:
+    """Try models in chain, escalating if confidence is low."""
+    last_error = None
+
+    for i, model in enumerate(chain):
+        try:
+            start_time = time.time()
+            proposal = _request_single_model(error_ctx, model)
+            duration_ms = int((time.time() - start_time) * 1000)
+
+            # Success with good confidence - use this
+            if proposal.confidence >= 0.5 and not proposal.diagnosis.startswith("LLM request failed"):
+                proposal.raw_response = f"[Model {i+1}/{len(chain)}: {model}, {duration_ms}ms]\n{proposal.raw_response}"
+                return proposal
+
+            # Low confidence - try next model
+            if i < len(chain) - 1:
+                last_error = f"Model {model} returned low confidence ({proposal.confidence:.2f}), escalating..."
+                continue
+
+            # Last model - return whatever we got
+            return proposal
+
+        except Exception as e:
+            last_error = str(e)
+            if i < len(chain) - 1:
+                continue
+
+    # All models failed
+    return FixProposal(
+        diagnosis=f"All models in chain failed. Last error: {last_error}",
+        confidence=0.0,
+        raw_response=str(last_error),
+    )
+
+
+def _request_single_model(error_ctx: ErrorContext, model: str) -> FixProposal:
+    """Send request to single LLM model."""
     config = get_config()
 
     error_class = classify_error(error_ctx)
@@ -59,7 +120,7 @@ def request_fix(error_ctx: ErrorContext) -> FixProposal:
 
     try:
         response = litellm.completion(
-            model=config.llm_model,
+            model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
@@ -67,7 +128,7 @@ def request_fix(error_ctx: ErrorContext) -> FixProposal:
             temperature=config.llm_temperature,
             max_tokens=config.llm_max_tokens,
             api_key=config.llm_api_key,
-            api_base=config.llm_api_base if "openrouter" in config.llm_model else None,
+            api_base=config.llm_api_base if "openrouter" in model else None,
         )
         raw = response.choices[0].message.content or ""
         return _parse_response(raw)

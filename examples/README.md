@@ -244,7 +244,7 @@ def process_user_input(data):
 | `PFIX_CREATE_BACKUPS` | `true` | Create `.pfix_backups/` files |
 | `PFIX_MAX_RETRIES` | `3` | Max fix attempts per error |
 | `PFIX_DRY_RUN` | `false` | Show fixes, don't apply |
-| `PFIX_MODEL` | `claude-sonnet-4` | LLM model for fixes |
+| `PFIX_MODEL` | `qwen3-coder-next` | LLM model for fixes |
 | `PFIX_GIT_COMMIT` | `false` | Auto-commit to git |
 
 ### Programmatic Configuration
