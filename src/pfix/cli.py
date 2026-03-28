@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -195,8 +196,25 @@ def _install_excepthook():
     from pfix.analyzer import analyze_exception
     from pfix.llm import request_fix
     from pfix.fixer import apply_fix
+    from pfix.config import get_config
+    from pathlib import Path
 
     original = sys.excepthook
+    config = get_config()
+
+    def _clear_pycache(source_file: Path):
+        """Clear __pycache__ entries for a source file to prevent stale bytecode."""
+        try:
+            pycache_dir = source_file.parent / "__pycache__"
+            if pycache_dir.exists():
+                stem = source_file.stem
+                for pyc_file in pycache_dir.glob(f"{stem}.*.pyc"):
+                    try:
+                        pyc_file.unlink()
+                    except Exception:
+                        pass
+        except Exception:
+            pass
 
     def hook(exc_type, exc_value, exc_tb):
         if exc_type in (KeyboardInterrupt, SystemExit):
@@ -209,7 +227,14 @@ def _install_excepthook():
         proposal = request_fix(ctx)
 
         if proposal.confidence > 0.1:
-            apply_fix(ctx, proposal, confirm=True)
+            fixed = apply_fix(ctx, proposal, confirm=True)
+            
+            # Restart process if fix applied and auto_restart enabled
+            if fixed and config.auto_restart:
+                if ctx.source_file:
+                    _clear_pycache(Path(ctx.source_file))
+                console.print("[green]🔄 Restarting...[/]")
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
         original(exc_type, exc_value, exc_tb)
 
