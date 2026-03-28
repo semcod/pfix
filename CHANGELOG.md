@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-03-28
+
+### Docs
+- Update examples/README.md
+
+### Other
+- Update examples/.pfix_backups/demo.py.20260328_192530.bak
+- Update examples/.pfix_backups/demo.py.20260328_192533.bak
+- Update examples/.pfix_backups/demo.py.20260328_193239.bak
+- Update examples/.pfix_backups/demo.py.20260328_193242.bak
+- Update examples/.pfix_backups/demo.py.20260328_194005.bak
+- Update examples/.pfix_backups/demo.py.20260328_194024.bak
+- Update examples/.pfix_backups/demo_auto.py.20260328_194144.bak
+- Update examples/.pfix_backups/demo_auto.py.20260328_194219.bak
+
 ## [0.1.5] - 2026-03-28
 
 ### Other

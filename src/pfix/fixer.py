@@ -100,8 +100,9 @@ def apply_fix(
                 console.print("[red]✗ Fixed code has syntax errors — aborting[/]")
                 return applied_any
 
-            backup = _backup(source_file)
-            console.print(f"[dim]  Backup: {backup}[/]")
+            if config.create_backups:
+                backup = _backup(source_file)
+                console.print(f"[dim]  Backup: {backup}[/]")
 
             source_file.write_text(new_content, encoding="utf-8")
             console.print(f"[green]✓ Fix applied to {source_file}[/]")

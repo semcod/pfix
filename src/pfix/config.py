@@ -46,6 +46,9 @@ class PfixConfig:
     git_auto_commit: bool = False
     git_commit_prefix: str = "pfix: "
 
+    # Backup
+    create_backups: bool = True  # Set to false to disable .pfix_backups/
+
     # Paths
     project_root: Path = field(default_factory=lambda: Path.cwd())
     log_file: Optional[str] = None
@@ -87,6 +90,7 @@ class PfixConfig:
             mcp_transport=os.getenv("PFIX_MCP_TRANSPORT", cls.mcp_transport),
             git_auto_commit=os.getenv("PFIX_GIT_COMMIT", "false").lower() in ("true", "1", "yes"),
             git_commit_prefix=os.getenv("PFIX_GIT_PREFIX", cls.git_commit_prefix),
+            create_backups=os.getenv("PFIX_CREATE_BACKUPS", "true").lower() in ("true", "1", "yes"),
             project_root=Path(os.getenv("PFIX_PROJECT_ROOT", str(Path.cwd()))),
             log_file=os.getenv("PFIX_LOG_FILE"),
         )
