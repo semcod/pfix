@@ -12,7 +12,7 @@
 
 - **Zero-config mode** — `import pfix` + `.env` = auto-healing for entire project
 - **`@pfix` decorator** — wrap any function; errors trigger automatic repair
-- **Fast dep fix** — `ModuleNotFoundError` → instant `pip`/`uv install` (no LLM call)
+- **Fast dep fix** — `ModuleNotFoundError` → instant `pip`/`uv` install (no LLM call)
 - **pipreqs scanning** — project-wide import analysis for missing dependencies
 - **LLM code repair** — sends error context to LLM (OpenRouter/LiteLLM) for intelligent fixes
 - **pip + uv** — auto-detects `uv` for faster installs, falls back to `pip`
@@ -22,6 +22,12 @@
 - **Interactive diff** — unified diff with confirmation before applying
 - **Backup system** — timestamped backups in `.pfix_backups/` (can be disabled)
 - **Async support** — `@apfix` for async functions
+- **Audit trail** — logs every fix to `.pfix/audit.jsonl` for compliance
+- **Permissions & RBAC** — block fixes in production, protect sensitive files
+- **Rollback** — undo any fix with `pfix rollback`
+- **Telemetry** — opt-in anonymous metrics (disabled by default)
+- **Dashboard** — TUI with `pfix dashboard` (requires textual)
+- **Explain mode** — educational error explanations with `pfix explain`
 
 ## Installation
 
@@ -260,13 +266,38 @@ with pfix_session(__file__):
 ## CLI
 
 ```bash
+# Run & Fix
 pfix run script.py              # Run with global exception hook
 pfix run script.py --auto       # Auto-apply fixes
 pfix run script.py --restart    # Restart process after fix
+pfix dev script.py              # Development mode (fix site-packages errors)
+
+# Setup & Configuration
+pfix init                       # Interactive setup wizard
+pfix enable                     # Enable auto-activation for this venv
+pfix disable                    # Disable auto-activation
 pfix check                      # Show config status
+
+# Dependencies
 pfix deps scan                  # Scan for missing deps (pipreqs)
 pfix deps install               # Install all missing deps
 pfix deps generate              # Generate requirements.txt
+
+# Audit & Rollback
+pfix audit                      # Show recent audit entries
+pfix audit --report             # Detailed audit report
+pfix audit --days 30           # Report for last 30 days
+pfix rollback --history         # Show fix history
+pfix rollback --last            # Rollback most recent fix
+pfix rollback --file src/x.py    # Rollback fixes for specific file
+pfix rollback --before 2026-03-01 # Rollback all fixes before date
+
+# Insights & Dashboard
+pfix explain last               # Explain the last error (educational)
+pfix explain TypeError          # Explain a specific error type
+pfix dashboard                  # TUI dashboard with statistics
+
+# MCP Server
 pfix server                     # Start MCP server (stdio)
 pfix server --http 3001         # Start MCP server (HTTP)
 ```
@@ -675,6 +706,9 @@ See [`examples/`](examples/) directory for working examples:
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 

@@ -261,3 +261,186 @@ class TestCLI:
 
         ret = main(["run", "/nonexistent.py"])
         assert ret == 1
+
+
+# ── Audit ───────────────────────────────────────────────────────────
+
+class TestAudit:
+    def test_log_and_read(self, tmp_path, monkeypatch):
+        from pfix.audit import log_fix_audit, read_audit_log, DEFAULT_AUDIT_FILE
+        from pfix.config import reset_config
+        
+        reset_config()
+        # Change to temp dir to avoid polluting project
+        monkeypatch.chdir(tmp_path)
+        
+        # Log a fix
+        log_fix_audit(
+            filepath=tmp_path / "test.py",
+            function_name="test_func",
+            error="test error",
+            error_type="ValueError",
+            fix_applied=True,
+            diff="-old\n+new",
+            model="test-model",
+            confidence=0.9,
+            approved_by="auto",
+        )
+        
+        # Read back
+        entries = read_audit_log()
+        assert len(entries) == 1
+        assert entries[0].error_type == "ValueError"
+        assert entries[0].fix_applied is True
+        assert entries[0].confidence == 0.9
+
+    def test_audit_summary(self, tmp_path, monkeypatch):
+        from pfix.audit import log_fix_audit, get_audit_summary
+        from pfix.config import reset_config
+        
+        reset_config()
+        monkeypatch.chdir(tmp_path)
+        
+        # Log multiple entries
+        for i in range(3):
+            log_fix_audit(
+                filepath=tmp_path / f"test{i}.py",
+                function_name="func",
+                error="error",
+                error_type="TypeError",
+                fix_applied=i < 2,  # 2 applied, 1 skipped
+                diff="",
+                model="test",
+                confidence=0.8,
+            )
+        
+        summary = get_audit_summary(days=7)
+        assert summary["total_fixes"] == 3
+        assert summary["fixes_applied"] == 2
+
+
+# ── Permissions ────────────────────────────────────────────────────
+
+class TestPermissions:
+    def test_check_blocked_path(self, tmp_path):
+        from pfix.permissions import check_blocked_path
+        
+        # Blocked paths
+        assert check_blocked_path(tmp_path / "migrations" / "001.py")[0] is False
+        assert check_blocked_path(tmp_path / ".env")[0] is False
+        assert check_blocked_path(tmp_path / "settings.py")[0] is False
+        
+        # Allowed paths
+        assert check_blocked_path(tmp_path / "app.py")[0] is True
+        assert check_blocked_path(tmp_path / "src" / "utils.py")[0] is True
+
+    def test_check_auto_apply_allowed_dev(self, monkeypatch):
+        from pfix.permissions import check_auto_apply_allowed
+        
+        # Should be allowed in dev by default
+        monkeypatch.setenv("ENV", "dev")
+        allowed, reason = check_auto_apply_allowed()
+        assert allowed is True
+        assert reason == ""
+
+    def test_check_auto_apply_blocked_prod(self, monkeypatch):
+        from pfix.permissions import check_auto_apply_allowed
+        
+        # Should be blocked in production
+        monkeypatch.setenv("ENV", "production")
+        allowed, reason = check_auto_apply_allowed()
+        assert allowed is False
+        assert "production" in reason.lower()
+
+    def test_check_all_permissions(self, tmp_path, monkeypatch):
+        from pfix.permissions import check_all_permissions
+        
+        monkeypatch.setenv("ENV", "dev")
+        
+        # Allowed case
+        allowed, reason = check_all_permissions(
+            filepath=tmp_path / "app.py",
+            auto_apply=True,
+        )
+        assert allowed is True
+        
+        # Blocked path
+        allowed, reason = check_all_permissions(
+            filepath=tmp_path / ".env",
+            auto_apply=True,
+        )
+        assert allowed is False
+
+
+# ── Telemetry ───────────────────────────────────────────────────────
+
+class TestTelemetry:
+    def test_record_and_summary(self, tmp_path, monkeypatch):
+        from pfix.telemetry import record_event, get_telemetry_summary
+        from pfix.config import reset_config
+        
+        reset_config()
+        monkeypatch.chdir(tmp_path)
+        
+        # Enable telemetry
+        from pfix.config import get_config
+        cfg = get_config()
+        cfg.telemetry_enabled = True
+        
+        # Record events
+        for i in range(3):
+            record_event(
+                event_type="fix_applied",
+                exception_type="TypeError",
+                confidence=0.8 + i * 0.1,
+                success=True,
+                model="test-model",
+                duration_ms=100,
+            )
+        
+        summary = get_telemetry_summary()
+        assert summary["events"] == 3
+        assert summary["success_rate"] == 1.0
+        assert summary["avg_confidence"] > 0.8
+
+    def test_telemetry_disabled_by_default(self):
+        from pfix.telemetry import is_telemetry_enabled
+        from pfix.config import reset_config
+        
+        # Reset to ensure default config
+        reset_config()
+        
+        # Should be disabled by default
+        assert is_telemetry_enabled() is False
+
+
+# ── Rollback ─────────────────────────────────────────────────────────
+
+class TestRollback:
+    def test_list_backups(self, tmp_path):
+        from pfix.rollback import list_backups, find_backup_dir
+        
+        # Create test file with backups
+        test_file = tmp_path / "test.py"
+        test_file.write_text("original")
+        
+        backup_dir = find_backup_dir(test_file)
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create backup files
+        backup1 = backup_dir / "test.py.20260101_120000.bak"
+        backup2 = backup_dir / "test.py.20260102_120000.bak"
+        backup1.write_text("backup1")
+        backup2.write_text("backup2")
+        
+        backups = list_backups(test_file)
+        assert len(backups) == 2
+
+    def test_rollback_last_no_audit(self, tmp_path, monkeypatch):
+        from pfix.rollback import rollback_last
+        
+        monkeypatch.chdir(tmp_path)
+        
+        # Should fail gracefully when no audit log
+        result = rollback_last()
+        assert result is False

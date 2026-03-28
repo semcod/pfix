@@ -8,7 +8,73 @@ eliminating circular dependency issues.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Optional
+
+
+@dataclass
+class TraceFrame:
+    """Single frame from a traceback."""
+
+    filepath: str = ""  # absolute path
+    line_number: int = 0
+    function_name: str = ""
+    code_line: str = ""  # source code at this line
+    local_vars: Optional[dict[str, str]] = None
+
+
+@dataclass
+class RuntimeIssue:
+    """A runtime error captured for TODO.md tracking."""
+
+    # Location (absolute paths)
+    abs_filepath: str = ""
+    line_number: int = 0
+    function_name: str = ""
+    module_name: str = ""
+
+    # Error
+    exception_type: str = ""
+    exception_message: str = ""
+    traceback_frames: list[TraceFrame] = field(default_factory=list)
+
+    # Context
+    timestamp: datetime = field(default_factory=datetime.utcnow)
+    occurrence_count: int = 1
+    first_seen: datetime = field(default_factory=datetime.utcnow)
+    last_seen: datetime = field(default_factory=datetime.utcnow)
+
+    # Environment
+    python_version: str = ""
+    venv_path: Optional[str] = None
+    hostname: str = ""
+    pid: int = 0
+    working_dir: str = ""
+    argv: list[str] = field(default_factory=list)
+
+    # Classification
+    category: str = ""
+    severity: str = ""  # critical | high | medium | low
+    fingerprint: str = ""  # hash for deduplication
+
+    # Optional
+    local_vars_snapshot: Optional[dict[str, str]] = None
+    related_files: list[str] = field(default_factory=list)
+
+
+@dataclass
+class DiagnosticResult:
+    """Result from an environment diagnostic check."""
+
+    category: str = ""  # "filesystem", "memory", etc.
+    check_name: str = ""  # "disk_space", "file_permissions"
+    status: str = "ok"  # "ok" | "warning" | "error" | "critical"
+    message: str = ""  # description of problem
+    details: dict = field(default_factory=dict)  # technical details
+    suggestion: str = ""  # how to fix
+    auto_fixable: bool = False  # can pfix auto-fix?
+    abs_path: Optional[str] = None  # related file path
+    line_number: Optional[int] = None
 
 
 @dataclass
