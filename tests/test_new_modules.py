@@ -687,3 +687,107 @@ class TestEnvDiagnostics:
         for r in results:
             assert r.category == "import_dependency"
             assert r.check_name == "version_conflict"
+
+
+# ── Auto-fix Tests ──────────────────────────────────────────────────
+
+class TestAutoFix:
+    def test_auto_fix_registry(self):
+        from pfix.env_diagnostics.auto_fix import _FIX_HANDLERS, can_auto_fix
+        from pfix.types import DiagnosticResult
+
+        # Verify handlers exist
+        assert "stale_bytecode" in _FIX_HANDLERS
+        assert "utf8_bom" in _FIX_HANDLERS
+        assert "missing_dotenv" in _FIX_HANDLERS
+
+        # Test can_auto_fix
+        fixable = DiagnosticResult(
+            category="filesystem",
+            check_name="stale_bytecode",
+            status="warning",
+            message="Test",
+            auto_fixable=True,
+        )
+        assert can_auto_fix(fixable)
+
+        non_fixable = DiagnosticResult(
+            category="filesystem",
+            check_name="disk_space",
+            status="error",
+            message="Test",
+            auto_fixable=False,
+        )
+        assert not can_auto_fix(non_fixable)
+
+    def test_fix_utf8_bom(self, tmp_path):
+        from pfix.env_diagnostics.auto_fix import apply_auto_fix
+        from pfix.types import DiagnosticResult
+
+        # Create file with BOM
+        test_file = tmp_path / "test.py"
+        test_file.write_bytes(b"\xef\xbb\xbf# test\nprint('hello')")
+
+        result = DiagnosticResult(
+            category="encoding",
+            check_name="utf8_bom",
+            status="warning",
+            message="UTF-8 BOM detected",
+            auto_fixable=True,
+            abs_path=str(test_file),
+        )
+
+        success, msg = apply_auto_fix(result, tmp_path)
+        assert success
+        assert "BOM" in msg
+
+        # Verify BOM removed
+        content = test_file.read_bytes()
+        assert not content.startswith(b"\xef\xbb\xbf")
+
+    def test_fix_missing_dotenv(self, tmp_path):
+        from pfix.env_diagnostics.auto_fix import apply_auto_fix
+        from pfix.types import DiagnosticResult
+
+        # Create .env.example
+        example = tmp_path / ".env.example"
+        example.write_text("KEY=value\n")
+
+        result = DiagnosticResult(
+            category="config_env",
+            check_name="missing_dotenv",
+            status="warning",
+            message=".env missing",
+            auto_fixable=True,
+        )
+
+        success, msg = apply_auto_fix(result, tmp_path)
+        assert success
+        assert ".env" in msg
+
+        # Verify .env created
+        assert (tmp_path / ".env").exists()
+
+    def test_fix_gitignore_env(self, tmp_path):
+        from pfix.env_diagnostics.auto_fix import apply_auto_fix
+        from pfix.types import DiagnosticResult
+
+        # Create .env
+        env_file = tmp_path / ".env"
+        env_file.write_text("SECRET=test\n")
+
+        result = DiagnosticResult(
+            category="config_env",
+            check_name="env_not_gitignored",
+            status="critical",
+            message=".env not in gitignore",
+            auto_fixable=True,
+        )
+
+        success, msg = apply_auto_fix(result, tmp_path)
+        assert success
+
+        # Verify .gitignore created with .env
+        gitignore = tmp_path / ".gitignore"
+        assert gitignore.exists()
+        assert ".env" in gitignore.read_text()

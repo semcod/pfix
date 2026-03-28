@@ -264,6 +264,10 @@ pfix run script.py              # Run with global exception hook
 pfix run script.py --auto       # Auto-apply fixes
 pfix run script.py --restart    # Restart process after fix
 pfix check                      # Show config status
+pfix diagnose                   # Run environment diagnostics
+pfix diagnose --category memory,filesystem  # Filter categories
+pfix diagnose --fix             # Auto-fix what can be fixed
+pfix diagnose --output TODO.md # Save to file
 pfix deps scan                  # Scan for missing deps (pipreqs)
 pfix deps install               # Install all missing deps
 pfix deps generate              # Generate requirements.txt
@@ -279,6 +283,7 @@ pfix exposes tools via FastMCP for IDE integration:
 |---|---|
 | `pfix_analyze` | Analyze error → diagnosis + fix proposal |
 | `pfix_fix` | Analyze + apply fix (with backup) |
+| `pfix_diagnose` | Run environment diagnostics |
 | `pfix_deps_scan` | Scan for missing deps |
 | `pfix_deps_install` | Install a package |
 | `pfix_deps_generate` | Generate requirements.txt |
@@ -584,6 +589,78 @@ PFIX_MODEL=gemini/gemini-1.5-pro
 
 **For speed:** Use smaller models (Haiku, GPT-4o-mini, local 7B models)
 
+## Runtime Error Tracking
+
+pfix can automatically capture runtime errors to `TODO.md` for production monitoring:
+
+```toml
+[tool.pfix.runtime_todo]
+enabled = true
+todo_file = "TODO.md"
+min_severity = "medium"
+max_entries = 500
+deduplicate = true
+include_local_vars = false
+include_traceback_depth = 5
+```
+
+**Features:**
+- **Absolute paths** — errors tracked with full file paths
+- **Deduplication** — same error 1000x = one entry with counter
+- **Full traceback** — complete call stack, not just last frame
+- **Environment context** — Python version, hostname, PID, venv path
+- **Thread-safe** — file locking for multi-worker setups (gunicorn/uvicorn)
+- **Append-only** — never loses history
+
+**Enable via environment:**
+```bash
+PFIX_RUNTIME_TODO=true
+PFIX_TODO_FILE=TODO.md
+```
+
+## Environment Diagnostics
+
+Comprehensive environment checking with 14 diagnostic categories:
+
+```bash
+pfix diagnose                    # Run all diagnostics
+pfix diagnose --category venv,memory,network
+pfix diagnose --json --check     # CI mode (exit 1 on errors)
+pfix diagnose --fix              # Auto-fix what can be fixed
+```
+
+**Categories:**
+| Category | Checks |
+|----------|--------|
+| `import_dependency` | Missing imports, circular deps, version conflicts, stdlib shadowing |
+| `filesystem` | Disk space, permissions, broken symlinks, large files |
+| `venv` | Activation, integrity, global leaks, requirements sync |
+| `python_version` | pyproject.toml requires-python, deprecated features |
+| `memory` | Available RAM, swap, recursion limit, GC pressure |
+| `network` | DNS, connectivity, SSL certs, proxy config |
+| `process` | ulimits, signals, zombie processes |
+| `encoding` | UTF-8 BOM, line endings, locale |
+| `paths` | sys.path issues, PYTHONPATH, long paths |
+| `config_env` | .env security, required vars, gitignore |
+| `concurrency` | Thread count, asyncio loop issues |
+| `serialization` | Pickle protocol, corrupt cache files |
+| `hardware` | GPU availability, CPU count, Docker limits |
+| `third_party` | API rate limits, auth expiration, schema changes |
+
+**Auto-fixable issues:**
+- Stale `.pyc` files → `find . -name '*.pyc' -delete`
+- UTF-8 BOM → remove BOM markers
+- Mixed line endings → convert to LF
+- Missing `.env` → copy from `.env.example`
+- `.env` not gitignored → add to `.gitignore`
+- Large log files → truncate to last N lines
+
+**Usage in CI/CD:**
+```yaml
+- run: pfix diagnose --check --json
+  continue-on-error: true
+```
+
 ## Advanced Usage
 
 ### Custom Error Handlers
@@ -675,6 +752,9 @@ See [`examples/`](examples/) directory for working examples:
 | `watchdog` | File change watching (optional) |
 
 ## License
+
+Licensed under Apache-2.0.
+
 
 Licensed under Apache-2.0.
 

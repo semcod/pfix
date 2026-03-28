@@ -657,11 +657,26 @@ def cmd_diagnose(args) -> int:
 
     # Auto-fix if requested
     if args.fix:
-        fixable = [r for r in results if r.auto_fixable and r.status in ("error", "warning")]
+        from .env_diagnostics.auto_fix import can_auto_fix, apply_auto_fix
+
+        fixable = [r for r in results if can_auto_fix(r)]
         if fixable:
-            console.print(f"\n[cyan]Attempting to fix {len(fixable)} issues...[/]")
-            # Implementation would go here - simplified for now
-            console.print("[dim]Auto-fix not yet implemented[/]")
+            console.print(f"\n[cyan]🔧 Attempting to fix {len(fixable)} issues...[/]")
+            fixed = 0
+            failed = 0
+
+            for r in fixable:
+                success, msg = apply_auto_fix(r, diag.project_root)
+                if success:
+                    console.print(f"  [green]✓[/] [{r.category}/{r.check_name}] {msg}")
+                    fixed += 1
+                else:
+                    console.print(f"  [yellow]⚠[/] [{r.category}/{r.check_name}] {msg}")
+                    failed += 1
+
+            console.print(f"\n[green]Fixed: {fixed}[/] | [yellow]Failed: {failed}[/]")
+        else:
+            console.print("\n[dim]No auto-fixable issues found[/]")
 
     # Determine exit code
     if args.check:
