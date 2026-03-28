@@ -6,7 +6,9 @@ from __future__ import annotations
 
 import ast
 import difflib
+import os
 import shutil
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
@@ -18,6 +20,9 @@ from rich.syntax import Syntax
 from .config import get_config
 from .dependency import install_packages, update_requirements_file
 from .types import ErrorContext, FixProposal
+from .permissions import check_all_permissions
+from .audit import log_fix_audit
+from .telemetry import record_event
 
 console = Console(stderr=True)
 
@@ -78,10 +83,31 @@ def _apply_code_fix(
     config,
 ) -> bool:
     """Apply code fix. Returns True if fix was applied."""
+    import time
+    start_time = time.time()
     source_file = Path(ctx.source_file)
 
     if not source_file.is_file():
         console.print(f"[red]✗ File not found: {source_file}[/]")
+        return False
+
+    # Check permissions before applying fix
+    allowed, reason = check_all_permissions(
+        filepath=source_file,
+        auto_apply=config.auto_apply,
+    )
+    if not allowed:
+        console.print(f"[yellow]⚠ Fix blocked: {reason}[/]")
+        # Still log the blocked attempt
+        duration_ms = int((time.time() - start_time) * 1000)
+        record_event(
+            event_type="fix_blocked",
+            exception_type=ctx.exception_type,
+            confidence=proposal.confidence,
+            success=False,
+            model=config.llm_model,
+            duration_ms=duration_ms,
+        )
         return False
 
     # Prepare fix
@@ -99,14 +125,68 @@ def _apply_code_fix(
     # Confirm
     if not _confirm_fix(config.auto_apply, confirm):
         console.print("[yellow]  Fix skipped[/]")
+        # Log skipped fix to audit
+        try:
+            log_fix_audit(
+                filepath=source_file,
+                function_name=ctx.function_name or "",
+                error=str(ctx.exception_message),
+                error_type=ctx.exception_type,
+                fix_applied=False,
+                diff="",
+                model=config.llm_model,
+                confidence=proposal.confidence,
+                approved_by="user:declined",
+            )
+        except Exception:
+            pass
         return False
 
     # Write fix
-    if not _write_fix(source_file, new_content, config.create_backups):
+    backup_path = None
+    original_content = source_file.read_text(encoding="utf-8") if source_file.exists() else None
+    
+    if config.create_backups:
+        backup_path = _backup(source_file)
+        console.print(f"[dim]  Backup: {backup_path}[/]")
+
+    if not _write_fix(source_file, new_content, create_backups=False):
         return False
 
     # Post-fix actions
     _post_fix(source_file, proposal.fix_description, config.git_auto_commit)
+
+    # Log to audit and telemetry
+    try:
+        duration_ms = int((time.time() - start_time) * 1000)
+        
+        # Audit log
+        log_fix_audit(
+            filepath=source_file,
+            function_name=ctx.function_name or "",
+            error=str(ctx.exception_message),
+            error_type=ctx.exception_type,
+            fix_applied=True,
+            diff=diff,
+            model=config.llm_model,
+            confidence=proposal.confidence,
+            approved_by="auto" if config.auto_apply else f"user:{os.getenv('USER', 'unknown')}",
+            backup_path=backup_path,
+            original_content=original_content,
+            new_content=new_content,
+        )
+        
+        # Telemetry
+        record_event(
+            event_type="fix_applied",
+            exception_type=ctx.exception_type,
+            confidence=proposal.confidence,
+            success=True,
+            model=config.llm_model,
+            duration_ms=duration_ms,
+        )
+    except Exception:
+        pass  # Never break on logging
 
     return True
 
