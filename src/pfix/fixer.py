@@ -32,26 +32,30 @@ def apply_fix(
     proposal: FixProposal,
     confirm: bool = True,
 ) -> bool:
-    """Apply a FixProposal. Returns True if anything was applied."""
+    """Apply a FixProposal. Returns True if anything was applied. CC≤5."""
     config = get_config()
-    applied_any = False
+    applied = False
 
     # 1. Dependencies
     if proposal.has_dependency_fix:
-        applied_any |= _apply_dependencies(proposal, config.dry_run)
+        applied |= _apply_dependencies(proposal, config.dry_run)
 
-    # 2. Code fix
+    # 2. Code Fix
     if proposal.has_code_fix:
-        result = _apply_code_fix(ctx, proposal, confirm, config)
-        applied_any |= result
+        source_file = Path(ctx.source_file)
+        new_content, diff = _prepare_code_change(ctx, proposal, source_file)
+        
+        if new_content and _confirm_and_validate(ctx, proposal, new_content, diff, confirm, config):
+            if _write_fix(source_file, new_content, config.create_backups):
+                _post_fix(source_file, proposal.fix_description, config.git_auto_commit)
+                _record_fix_telemetry(ctx, proposal, config, success=True)
+                applied = True
 
     # 3. Diagnosis
     if proposal.diagnosis:
-        console.print(
-            Panel(proposal.diagnosis, title="[blue]🔍 Diagnosis[/]", border_style="blue")
-        )
+        _show_diagnosis(proposal.diagnosis)
 
-    return applied_any
+    return applied
 
 
 def _apply_dependencies(proposal: FixProposal, dry_run: bool) -> bool:
@@ -76,43 +80,37 @@ def _apply_dependencies(proposal: FixProposal, dry_run: bool) -> bool:
     return False
 
 
-def _apply_code_fix(
+def _prepare_code_change(
     ctx: ErrorContext,
     proposal: FixProposal,
+    source_file: Path,
+) -> tuple[Optional[str], str]:
+    """Generate new_content and diff. CC≤4."""
+    if not source_file.is_file():
+        console.print(f"[red]✗ File not found: {source_file}[/]")
+        return None, ""
+
+    new_content, diff = _prepare_code_fix(ctx, proposal, source_file)
+    return new_content, diff
+
+
+def _confirm_and_validate(
+    ctx: ErrorContext,
+    proposal: FixProposal,
+    new_content: str,
+    diff: str,
     confirm: bool,
     config,
 ) -> bool:
-    """Apply code fix. Returns True if fix was applied."""
-    import time
-    start_time = time.time()
-    source_file = Path(ctx.source_file)
-
-    if not source_file.is_file():
-        console.print(f"[red]✗ File not found: {source_file}[/]")
-        return False
-
-    # Check permissions before applying fix
+    """Check permissions, show diff, and get user confirmation. CC≤5."""
+    # Check permissions
     allowed, reason = check_all_permissions(
-        filepath=source_file,
+        filepath=Path(ctx.source_file),
         auto_apply=config.auto_apply,
     )
     if not allowed:
         console.print(f"[yellow]⚠ Fix blocked: {reason}[/]")
-        # Still log the blocked attempt
-        duration_ms = int((time.time() - start_time) * 1000)
-        record_event(
-            event_type="fix_blocked",
-            exception_type=ctx.exception_type,
-            confidence=proposal.confidence,
-            success=False,
-            model=config.llm_model,
-            duration_ms=duration_ms,
-        )
-        return False
-
-    # Prepare fix
-    new_content, diff = _prepare_code_fix(ctx, proposal, source_file)
-    if new_content is None:
+        _record_fix_telemetry(ctx, proposal, config, success=False, reason="blocked")
         return False
 
     # Display diff
@@ -125,70 +123,49 @@ def _apply_code_fix(
     # Confirm
     if not _confirm_fix(config.auto_apply, confirm):
         console.print("[yellow]  Fix skipped[/]")
-        # Log skipped fix to audit
-        try:
-            log_fix_audit(
-                filepath=source_file,
-                function_name=ctx.function_name or "",
-                error=str(ctx.exception_message),
-                error_type=ctx.exception_type,
-                fix_applied=False,
-                diff="",
-                model=config.llm_model,
-                confidence=proposal.confidence,
-                approved_by="user:declined",
-            )
-        except Exception:
-            pass
+        _log_skipped_fix(ctx, proposal, config)
         return False
 
-    # Write fix
-    backup_path = None
-    original_content = source_file.read_text(encoding="utf-8") if source_file.exists() else None
-    
-    if config.create_backups:
-        backup_path = _backup(source_file)
-        console.print(f"[dim]  Backup: {backup_path}[/]")
+    return True
 
-    if not _write_fix(source_file, new_content, create_backups=False):
-        return False
 
-    # Post-fix actions
-    _post_fix(source_file, proposal.fix_description, config.git_auto_commit)
+def _show_diagnosis(diagnosis: str):
+    """Display diagnosis panel. CC≤2."""
+    console.print(
+        Panel(diagnosis, title="[blue]🔍 Diagnosis[/]", border_style="blue")
+    )
 
-    # Log to audit and telemetry
+
+def _log_skipped_fix(ctx, proposal, config):
+    """Log skipped fix to audit system."""
     try:
-        duration_ms = int((time.time() - start_time) * 1000)
-        
-        # Audit log
         log_fix_audit(
-            filepath=source_file,
+            filepath=Path(ctx.source_file),
             function_name=ctx.function_name or "",
             error=str(ctx.exception_message),
             error_type=ctx.exception_type,
-            fix_applied=True,
-            diff=diff,
+            fix_applied=False,
+            diff="",
             model=config.llm_model,
             confidence=proposal.confidence,
-            approved_by="auto" if config.auto_apply else f"user:{os.getenv('USER', 'unknown')}",
-            backup_path=backup_path,
-            original_content=original_content,
-            new_content=new_content,
-        )
-        
-        # Telemetry
-        record_event(
-            event_type="fix_applied",
-            exception_type=ctx.exception_type,
-            confidence=proposal.confidence,
-            success=True,
-            model=config.llm_model,
-            duration_ms=duration_ms,
+            approved_by="user:declined",
         )
     except Exception:
-        pass  # Never break on logging
+        pass
 
-    return True
+
+def _record_fix_telemetry(ctx, proposal, config, success: bool, reason: str = ""):
+    """Record fix attempt in telemetry. CC≤3."""
+    try:
+        record_event(
+            event_type="fix_applied" if success else f"fix_{reason or 'failed'}",
+            exception_type=ctx.exception_type,
+            confidence=proposal.confidence,
+            success=success,
+            model=config.llm_model,
+        )
+    except Exception:
+        pass
 
 
 def _prepare_code_fix(

@@ -72,31 +72,9 @@ class PfixConfig:
                     load_dotenv(env_file)
                     break
 
-        # Detect uv
-        pkg_manager = "uv" if shutil.which("uv") else "pip"
-
-        cfg = cls(
-            llm_model=os.getenv("PFIX_MODEL", os.getenv("LIBFIX_MODEL", cls.llm_model)),
-            llm_api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("PFIX_API_KEY", "")),
-            llm_api_base=os.getenv("PFIX_API_BASE", cls.llm_api_base),
-            llm_temperature=float(os.getenv("PFIX_TEMPERATURE", str(cls.llm_temperature))),
-            llm_max_tokens=int(os.getenv("PFIX_MAX_TOKENS", str(cls.llm_max_tokens))),
-            auto_apply=os.getenv("PFIX_AUTO_APPLY", "false").lower() in ("true", "1", "yes"),
-            auto_install_deps=os.getenv("PFIX_AUTO_INSTALL_DEPS", "true").lower() in ("true", "1", "yes"),
-            auto_restart=os.getenv("PFIX_AUTO_RESTART", "false").lower() in ("true", "1", "yes"),
-            max_retries=int(os.getenv("PFIX_MAX_RETRIES", "3")),
-            enabled=os.getenv("PFIX_ENABLED", "true").lower() in ("true", "1", "yes"),
-            dry_run=os.getenv("PFIX_DRY_RUN", "false").lower() in ("true", "1", "yes"),
-            pkg_manager=os.getenv("PFIX_PKG_MANAGER", pkg_manager),
-            mcp_enabled=os.getenv("PFIX_MCP_ENABLED", "false").lower() in ("true", "1", "yes"),
-            mcp_server_url=os.getenv("PFIX_MCP_SERVER_URL", cls.mcp_server_url),
-            mcp_transport=os.getenv("PFIX_MCP_TRANSPORT", cls.mcp_transport),
-            git_auto_commit=os.getenv("PFIX_GIT_COMMIT", "false").lower() in ("true", "1", "yes"),
-            git_commit_prefix=os.getenv("PFIX_GIT_PREFIX", cls.git_commit_prefix),
-            create_backups=os.getenv("PFIX_CREATE_BACKUPS", "true").lower() in ("true", "1", "yes"),
-            project_root=Path(os.getenv("PFIX_PROJECT_ROOT", str(Path.cwd()))),
-            log_file=os.getenv("PFIX_LOG_FILE"),
-        )
+        # Load env values via helper
+        env = _load_env_values()
+        cfg = cls(**env)
 
         # Auto-fix model name: ensure openrouter/ prefix for OpenRouter models
         if cfg.llm_api_base and "openrouter" in cfg.llm_api_base:
@@ -136,6 +114,51 @@ class PfixConfig:
         if not self.llm_api_key:
             warnings.append("No API key. Set OPENROUTER_API_KEY in .env")
         return warnings
+
+
+def _load_env_values() -> dict:
+    """Load and convert environment variables into dict for PfixConfig."""
+    def _env_bool(key: str, default: bool) -> bool:
+        val = os.getenv(key, str(default).lower())
+        return val.lower() in ("true", "1", "yes")
+
+    def _env_int(key: str, default: int) -> int:
+        try:
+            return int(os.getenv(key, str(default)))
+        except ValueError:
+            return default
+
+    def _env_float(key: str, default: float) -> float:
+        try:
+            return float(os.getenv(key, str(default)))
+        except ValueError:
+            return default
+
+    # Detect package manager
+    pkg_manager = "uv" if shutil.which("uv") else "pip"
+
+    return {
+        "llm_model": os.getenv("PFIX_MODEL", os.getenv("LIBFIX_MODEL", PfixConfig.llm_model)),
+        "llm_api_key": os.getenv("OPENROUTER_API_KEY", os.getenv("PFIX_API_KEY", "")),
+        "llm_api_base": os.getenv("PFIX_API_BASE", PfixConfig.llm_api_base),
+        "llm_temperature": _env_float("PFIX_TEMPERATURE", PfixConfig.llm_temperature),
+        "llm_max_tokens": _env_int("PFIX_MAX_TOKENS", PfixConfig.llm_max_tokens),
+        "auto_apply": _env_bool("PFIX_AUTO_APPLY", False),
+        "auto_install_deps": _env_bool("PFIX_AUTO_INSTALL_DEPS", True),
+        "auto_restart": _env_bool("PFIX_AUTO_RESTART", False),
+        "max_retries": _env_int("PFIX_MAX_RETRIES", 3),
+        "enabled": _env_bool("PFIX_ENABLED", True),
+        "dry_run": _env_bool("PFIX_DRY_RUN", False),
+        "pkg_manager": os.getenv("PFIX_PKG_MANAGER", pkg_manager),
+        "mcp_enabled": _env_bool("PFIX_MCP_ENABLED", False),
+        "mcp_server_url": os.getenv("PFIX_MCP_SERVER_URL", PfixConfig.mcp_server_url),
+        "mcp_transport": os.getenv("PFIX_MCP_TRANSPORT", PfixConfig.mcp_transport),
+        "git_auto_commit": _env_bool("PFIX_GIT_COMMIT", False),
+        "git_commit_prefix": os.getenv("PFIX_GIT_PREFIX", PfixConfig.git_commit_prefix),
+        "create_backups": _env_bool("PFIX_CREATE_BACKUPS", True),
+        "project_root": Path(os.getenv("PFIX_PROJECT_ROOT", str(Path.cwd()))),
+        "log_file": os.getenv("PFIX_LOG_FILE"),
+    }
 
 
 # ── Global singleton ────────────────────────────────────────────────

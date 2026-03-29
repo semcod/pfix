@@ -9,21 +9,7 @@ That's it. No decorators, no configure(), just import pfix.
 
 import pfix  # Auto-activates if PFIX_AUTO_APPLY=true in .env
 
-
-def fetch_json(url: str) -> dict:
-    """Fetch JSON — dependencies auto-installed."""
-    import requests
-    return requests.get(url).json()
-
-
-def average(numbers: list[float]) -> float:
-    """Calculate average — will auto-fix on error."""
-    return sum(numbers) / len(numbers)  # Bug: fails on empty list
-
-
-def greet(name: str, age: int) -> str:
-    """Greet user — will auto-fix on error."""
-    return "Hello " + name + "! Age: " + age  # Bug: str + int
+from shared import fetch_json, average, greet
 
 
 def main():

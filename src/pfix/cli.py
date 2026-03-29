@@ -27,6 +27,13 @@ console = Console()
 
 
 def main(argv: list[str] | None = None) -> int:
+    parser = _build_parser()
+    args = parser.parse_args(argv)
+    return _dispatch(args)
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    """Build and configure ArgumentParser for pfix CLI."""
     parser = argparse.ArgumentParser(prog="pfix", description="Self-healing Python — fix code & deps via LLM + MCP")
     sub = parser.add_subparsers(dest="command")
 
@@ -62,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # enable (auto-activation setup)
     sub.add_parser("enable", help="Enable pfix auto-activation and add config to pyproject.toml")
-    
+
     # disable (remove auto-activation)
     sub.add_parser("disable", help="Disable pfix auto-activation")
 
@@ -103,43 +110,39 @@ def main(argv: list[str] | None = None) -> int:
     diag_p.add_argument("--json", action="store_true", help="Output JSON format")
     diag_p.add_argument("--check", action="store_true", help="Exit with error if critical/error found")
 
-    args = parser.parse_args(argv)
+    return parser
 
-    if args.command == "run":
-        return cmd_run(args)
-    elif args.command == "dev":
-        return cmd_dev(args)
-    elif args.command == "check":
-        return cmd_check()
-    elif args.command == "enable":
-        return cmd_enable()
-    elif args.command == "disable":
-        return cmd_disable()
-    elif args.command == "deps":
-        return cmd_deps(args)
-    elif args.command == "server":
-        return cmd_server(args)
-    elif args.command == "version":
+
+def _dispatch(args: argparse.Namespace) -> int:
+    """Dispatch to command handler based on parsed args."""
+    commands: dict[str, Callable] = {
+        "run": cmd_run,
+        "dev": cmd_dev,
+        "check": cmd_check,
+        "enable": cmd_enable,
+        "disable": cmd_disable,
+        "deps": cmd_deps,
+        "server": cmd_server,
+        "status": cmd_status,
+        "rollback": cmd_rollback,
+        "audit": cmd_audit,
+        "init": cmd_init,
+        "dashboard": cmd_dashboard,
+        "explain": cmd_explain,
+        "diagnose": cmd_diagnose,
+    }
+
+    if args.command == "version":
         from pfix import __version__
         console.print(f"pfix {__version__}")
         return 0
-    elif args.command == "status":
-        return cmd_status()
-    elif args.command == "rollback":
-        return cmd_rollback(args)
-    elif args.command == "audit":
-        return cmd_audit(args)
-    elif args.command == "init":
-        return cmd_init()
-    elif args.command == "dashboard":
-        return cmd_dashboard()
-    elif args.command == "explain":
-        return cmd_explain(args)
-    elif args.command == "diagnose":
-        return cmd_diagnose(args)
-    else:
-        parser.print_help()
-        return 0
+
+    handler = commands.get(args.command)
+    if handler:
+        return handler(args)
+
+    _build_parser().print_help()
+    return 0
 
 
 def cmd_run(args) -> int:

@@ -6,24 +6,9 @@ Run with: python examples/demo.py
 
 from pfix import configure, pfix_session
 
+from shared import fetch_json, average, greet
+
 configure(auto_apply=True, dry_run=False)
-
-
-def fetch_json(url: str) -> dict:
-    """Fetch JSON from URL — dependencies auto-installed on first run."""
-    import requests  # auto-installed if missing
-    return requests.get(url).json()
-
-
-def average(numbers: list[float]) -> float:
-    """Calculate average — ZeroDivisionError will be auto-fixed."""
-    if len(numbers) == 0:
-        return float('nan')
-    return sum(numbers) / len(numbers)  # Bug: fails on empty list
-
-def greet(name: str, age: int) -> str:
-    """Greet user — TypeError will be auto-fixed."""
-    return "Hello " + name + "! Age: " + age  # Bug: str + int
 
 
 def main():

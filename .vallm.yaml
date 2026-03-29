@@ -1,0 +1,6 @@
+# vallm configuration for pfix
+ignore:
+  rules:
+    - "python.import.resolvable"
+  paths:
+    - "src/pfix/*.py"

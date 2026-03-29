@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.43] - 2026-03-29
+
+### Other
+- Update .vallm.yaml
+- Update diag_report.json
+- Update examples/demo.py
+- Update examples/demo_auto.py
+- Update examples/shared.py
+
 ## [0.1.42] - 2026-03-29
 
 ### Docs

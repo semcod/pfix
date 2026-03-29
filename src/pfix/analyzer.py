@@ -23,38 +23,53 @@ def analyze_exception(
     local_vars: Optional[dict] = None,
     hints: Optional[dict] = None,
 ) -> ErrorContext:
-    """Build ErrorContext from a caught exception."""
+    """Build ErrorContext from a caught exception. Orkiestrator — CC≤4."""
     ctx = ErrorContext()
     ctx.hints = hints or {}
     ctx.python_version = sys.version.split()[0]
+    ctx.exception_type = type(exc).__name__
+    ctx.exception_message = str(exc)
+    ctx.traceback_text = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
 
-    # 1. Extract traceback context
-    ctx.exception_type, ctx.exception_message, ctx.traceback_text = _extract_exception_info(exc)
+    _fill_traceback_context(ctx, exc, local_vars)
+    _fill_function_context(ctx, func)
+    _fill_file_context(ctx)
+    _fill_environment_context(ctx)
 
-    # 2. Extract frame context from traceback
+    return ctx
+
+
+def _fill_traceback_context(ctx: ErrorContext, exc: BaseException, local_vars: Optional[dict]):
+    """Extract frame, line_number, and local_vars from traceback. CC≤4."""
     frame_info = _extract_frame_context(exc, local_vars)
     ctx.source_file = frame_info.get("source_file", "")
     ctx.line_number = frame_info.get("line_number", 0)
     ctx.function_name = frame_info.get("function_name", "")
     ctx.local_vars = frame_info.get("local_vars", {})
 
-    # 3. Extract function source if func provided
+
+def _fill_function_context(ctx: ErrorContext, func: Optional[Any]):
+    """Extract function source and qualname. CC≤3."""
+    if func is None:
+        return
     func_info = _extract_function_source(func)
     if func_info["function_source"]:
         ctx.function_source = func_info["function_source"]
         ctx.function_name = func_info.get("function_name", ctx.function_name)
         ctx.source_file = func_info.get("source_file", ctx.source_file)
 
-    # 4. Extract file context
+
+def _fill_file_context(ctx: ErrorContext):
+    """Read source file and extract failing line. CC≤3."""
     file_info = _extract_file_context(ctx.source_file, ctx.line_number)
     ctx.source_code = file_info.get("source_code", "")
     ctx.failing_line = file_info.get("failing_line", "")
 
-    # 5. Extract environment
+
+def _fill_environment_context(ctx: ErrorContext):
+    """Extract imports and scan for missing dependencies. CC≤2."""
     ctx.imports = _extract_imports(ctx.source_code) if ctx.source_code else []
     ctx.missing_deps = _scan_missing_deps(ctx.source_file) if ctx.source_file else []
-
-    return ctx
 
 
 def _extract_exception_info(exc: BaseException) -> tuple[str, str, str]:
