@@ -6,11 +6,11 @@ HEALTH[0]: ok
 REFACTOR[0]: none needed
 
 PIPELINES[396]:
-  [1] Src [main]: main → run_git_checkout
+  [1] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
   [2] Src [main]: main → reset_examples
       PURITY: 100% pure
-  [3] Src [crash_me]: crash_me → pfix → get_config
+  [3] Src [main]: main → run_git_checkout
       PURITY: 100% pure
   [4] Src [main]: main → _build_parser
       PURITY: 100% pure

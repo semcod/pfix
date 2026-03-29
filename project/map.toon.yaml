@@ -136,6 +136,14 @@ D:
     _handle_import_error_hook(exc_value)
     _handle_generic_error_hook(exc_value;auto_apply;config)
     _restart_process(exc_value)
+  src/pfix/audit.py:
+    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
+    AuditEntry:  # Single audit entry for a fix operation...
+    _calculate_hash(content)
+    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
+    read_audit_log(since;filepath;limit)
+    get_audit_summary(days)
+    print_audit_report(days)
   src/pfix/decorator.py:
     e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_ensure_deps,_try_quick_dep_fix,_try_reload_module
     _capture_runtime_error(exc;func;hints)
@@ -149,14 +157,6 @@ D:
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
-  src/pfix/audit.py:
-    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
-    AuditEntry:  # Single audit entry for a fix operation...
-    _calculate_hash(content)
-    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
-    read_audit_log(since;filepath;limit)
-    get_audit_summary(days)
-    print_audit_report(days)
   src/pfix/env_diagnostics/third_party.py:
     e: ThirdPartyDiagnostic
     ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
@@ -209,11 +209,6 @@ D:
     build_multi_file_context(error_ctx;related_files)
     parse_multi_file_response(raw)
     apply_multi_file_fix(proposal;project_root;create_backups)
-  src/pfix/syntax_error_handler.py:
-    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
-    _build_syntax_error_context(exc)
-    _apply_syntax_fix(ctx;proposal;auto_apply;config)
-    handle_syntax_error(exc;auto_apply)
   src/pfix/rollback.py:
     e: find_backup_dir,list_backups,rollback_last,rollback_file,rollback_before,show_history,rollback_command
     find_backup_dir(filepath)
@@ -223,6 +218,11 @@ D:
     rollback_before(cutoff_date)
     show_history(limit)
     rollback_command(last;filepath;before)
+  src/pfix/syntax_error_handler.py:
+    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
+    _build_syntax_error_context(exc)
+    _apply_syntax_fix(ctx;proposal;auto_apply;config)
+    handle_syntax_error(exc;auto_apply)
   src/pfix/rules.py:
     e: ProjectRules,load_project_rules,get_rules_for_prompt
     ProjectRules: __init__(1),_load(0),get_rules_text(0),get_section(1),has_rules(0)  # Loaded project rules...
