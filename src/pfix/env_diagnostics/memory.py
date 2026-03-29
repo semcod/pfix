@@ -28,6 +28,10 @@ class MemoryDiagnostic(BaseDiagnostic):
         results.extend(self._check_recursion_limit())
         results.extend(self._check_gc_pressure())
         results.extend(self._check_object_count())
+        results.extend(self._check_swap_usage())
+        results.extend(self._check_ulimits())
+        results.extend(self._check_shm_usage())
+        results.extend(self._check_process_memory())
         return results
 
     def _check_available_memory(self) -> list["DiagnosticResult"]:
@@ -165,6 +169,100 @@ class MemoryDiagnostic(BaseDiagnostic):
         except Exception:
             pass
 
+        return results
+
+    def _check_swap_usage(self) -> list["DiagnosticResult"]:
+        """Check system swap availability."""
+        from ..types import DiagnosticResult
+        results = []
+        try:
+            import psutil
+            swap = psutil.swap_memory()
+            if swap.percent > 95:
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="low_swap",
+                    status="error",
+                    message=f"System swap nearly full: {swap.percent}%",
+                    details={"total": swap.total, "used": swap.used, "free": swap.free},
+                    suggestion="Add more swap space or reduce background load",
+                ))
+        except (ImportError, Exception):
+            pass
+        return results
+
+    def _check_ulimits(self) -> list["DiagnosticResult"]:
+        """Check for potentially restrictive memory ulimits."""
+        from ..types import DiagnosticResult
+        results = []
+        try:
+            import resource
+            # RLIMIT_AS: Max address space
+            soft_as, hard_as = resource.getrlimit(resource.RLIMIT_AS)
+            if soft_as != resource.RLIM_INFINITY and soft_as < 2 * 1024**3: # < 2GB
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="low_rlimit_as",
+                    status="warning",
+                    message=f"Low address space limit (RLIMIT_AS): {soft_as // (1024**2)} MB",
+                    suggestion="Increase ulimit -v",
+                ))
+            # RLIMIT_DATA: Max data segment size
+            soft_data, hard_data = resource.getrlimit(resource.RLIMIT_DATA)
+            if soft_data != resource.RLIM_INFINITY and soft_data < 512 * 1024**2: # < 512MB
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="low_rlimit_data",
+                    status="warning",
+                    message=f"Low data segment limit (RLIMIT_DATA): {soft_data // (1024**2)} MB",
+                    suggestion="Increase ulimit -d",
+                ))
+        except (ImportError, Exception):
+            pass
+        return results
+
+    def _check_shm_usage(self) -> list["DiagnosticResult"]:
+        """Check shared memory (/dev/shm) availability."""
+        from ..types import DiagnosticResult
+        results = []
+        if sys.platform == "linux" and os.path.exists("/dev/shm"):
+            try:
+                import shutil
+                usage = shutil.disk_usage("/dev/shm")
+                if usage.free < 10 * 1024**2: # < 10MB
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="low_shm",
+                        status="error",
+                        message=f"Shared memory (/dev/shm) nearly full: {usage.free // (1024**2)} MB free",
+                        suggestion="Clear /dev/shm or increase its size",
+                    ))
+            except Exception:
+                pass
+        return results
+
+    def _check_process_memory(self) -> list["DiagnosticResult"]:
+        """Check if current process occupies too much of system memory."""
+        from ..types import DiagnosticResult
+        results = []
+        try:
+            import psutil
+            proc = psutil.Process(os.getpid())
+            mem_info = proc.memory_info()
+            total_mem = psutil.virtual_memory().total
+            
+            percent_of_system = (mem_info.rss / total_mem) * 100
+            if percent_of_system > 50: # More than 50% of system RAM
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="high_process_rss",
+                    status="error",
+                    message=f"Process consumes {percent_of_system:.1f}% of total system RAM",
+                    details={"rss": mem_info.rss, "percent": percent_of_system},
+                    suggestion="Optimize process memory footprint or check for leaks",
+                ))
+        except (ImportError, Exception):
+            pass
         return results
 
     def diagnose_exception(

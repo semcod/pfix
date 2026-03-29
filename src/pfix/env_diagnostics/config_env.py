@@ -25,6 +25,10 @@ class ConfigEnvDiagnostic(BaseDiagnostic):
         results.extend(self._check_dotenv(project_root))
         results.extend(self._check_required_vars(project_root))
         results.extend(self._check_env_gitignore(project_root))
+        results.extend(self._check_pyproject_validity(project_root))
+        results.extend(self._check_pfix_config_missing(project_root))
+        results.extend(self._check_secret_exposure_env())
+        results.extend(self._check_conflicting_manifests(project_root))
         return results
 
     def _check_dotenv(self, project_root: Path) -> list["DiagnosticResult"]:
@@ -156,6 +160,89 @@ class ConfigEnvDiagnostic(BaseDiagnostic):
                     line_number=None,
                 ))
 
+        return results
+
+    def _check_pyproject_validity(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check if pyproject.toml is syntactically correct."""
+        from ..types import DiagnosticResult
+        results = []
+        pyproject = project_root / "pyproject.toml"
+        if pyproject.exists():
+            try:
+                import tomllib
+            except ImportError:
+                try:
+                    import tomli as tomllib
+                except ImportError:
+                    return results
+            
+            try:
+                with open(pyproject, "rb") as f:
+                    tomllib.load(f)
+            except Exception as e:
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="invalid_pyproject",
+                    status="error",
+                    message=f"Syntax error in pyproject.toml: {e}",
+                    suggestion="Fix TOML syntax in pyproject.toml",
+                    abs_path=str(pyproject),
+                ))
+        return results
+
+    def _check_pfix_config_missing(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check if [tool.pfix] section is missing in pyproject.toml."""
+        from ..types import DiagnosticResult
+        results = []
+        pyproject = project_root / "pyproject.toml"
+        if pyproject.exists():
+            try:
+                import tomllib
+                with open(pyproject, "rb") as f:
+                    data = tomllib.load(f)
+                if "tool" not in data or "pfix" not in data["tool"]:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="missing_pfix_config",
+                        status="warning",
+                        message="[tool.pfix] section is missing in pyproject.toml",
+                        suggestion="Run 'pfix init' or add [tool.pfix] manually",
+                    ))
+            except Exception:
+                pass
+        return results
+
+    def _check_secret_exposure_env(self) -> list["DiagnosticResult"]:
+        """Check for potentially sensitive data in environment variables."""
+        from ..types import DiagnosticResult
+        results = []
+        SEC_KEYWORDS = {"SECRET", "PASSWORD", "API_KEY", "AWS_ACCESS_KEY", "PRIVATE_KEY"}
+        for key in os.environ:
+            if any(kw in key.upper() for kw in SEC_KEYWORDS):
+                # We don't want to show the value, just warn about exposure risk
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="secret_in_env",
+                    status="warning",
+                    message=f"Sensitive environment variable detected: {key}",
+                    suggestion="Ensure environment variables are managed securely and not accidentally logged",
+                ))
+        return results
+
+    def _check_conflicting_manifests(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check if both requirements.txt and pyproject.toml exist (potential drift)."""
+        from ..types import DiagnosticResult
+        results = []
+        has_reqs = (project_root / "requirements.txt").exists()
+        has_pyproject = (project_root / "pyproject.toml").exists()
+        if has_reqs and has_pyproject:
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="conflicting_manifests",
+                status="low",
+                message="Both requirements.txt and pyproject.toml found",
+                suggestion="Consolidate dependencies into pyproject.toml if possible",
+            ))
         return results
 
     def diagnose_exception(

@@ -27,6 +27,10 @@ class VenvDiagnostic(BaseDiagnostic):
         results.extend(self._check_venv_integrity(project_root))
         results.extend(self._check_global_leaks())
         results.extend(self._check_requirements_sync(project_root))
+        results.extend(self._check_pythonpath())
+        results.extend(self._check_venv_stale())
+        results.extend(self._check_no_manifest(project_root))
+        results.extend(self._check_site_packages_writable())
         return results
 
     def _check_venv_active(self) -> list["DiagnosticResult"]:
@@ -155,6 +159,96 @@ class VenvDiagnostic(BaseDiagnostic):
         except Exception:
             pass
 
+        return results
+
+    def _check_pythonpath(self) -> list["DiagnosticResult"]:
+        """Check for PYTHONPATH environment variable interference."""
+        from ..types import DiagnosticResult
+        results = []
+        pythonpath = os.environ.get("PYTHONPATH")
+        if pythonpath:
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="pythonpath_set",
+                status="warning",
+                message=f"PYTHONPATH is set: {pythonpath}",
+                details={"value": pythonpath},
+                suggestion="Clear PYTHONPATH to avoid unexpected import behavior",
+                auto_fixable=False,
+            ))
+        return results
+
+    def _check_venv_stale(self) -> list["DiagnosticResult"]:
+        """Check if virtualenv Python version matches system Python (stale venv)."""
+        from ..types import DiagnosticResult
+        results = []
+        venv_path = os.environ.get("VIRTUAL_ENV")
+        if not venv_path:
+            return results
+
+        try:
+            # Check if bin/python is actually from this venv
+            # This is a bit tricky, but we can check if it works
+            import subprocess
+            res = subprocess.run(
+                [sys.executable, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if res.returncode != 0:
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="stale_venv",
+                    status="critical",
+                    message="Virtual environment Python is broken (stale)",
+                    details={"venv_path": venv_path, "error": res.stderr},
+                    suggestion="Recreate the virtual environment",
+                    auto_fixable=False,
+                ))
+        except Exception:
+            pass
+        return results
+
+    def _check_no_manifest(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check if project lacks requirements.txt and pyproject.toml."""
+        from ..types import DiagnosticResult
+        results = []
+        has_reqs = (project_root / "requirements.txt").exists()
+        has_pyproject = (project_root / "pyproject.toml").exists()
+        has_setup = (project_root / "setup.py").exists()
+
+        if not (has_reqs or has_pyproject or has_setup):
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="no_manifest",
+                status="warning",
+                message="Project lacks dependency manifest (requirements.txt or pyproject.toml)",
+                suggestion="Use 'pfix deps generate' or create a manifest",
+                auto_fixable=True,
+            ))
+        return results
+
+    def _check_site_packages_writable(self) -> list["DiagnosticResult"]:
+        """Check if venv site-packages is writable."""
+        from ..types import DiagnosticResult
+        results = []
+        import site
+        sp = site.getsitepackages()
+        if not sp:
+            return results
+
+        target = Path(sp[0])
+        if not os.access(target, os.W_OK):
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="site_packages_readonly",
+                status="error",
+                message=f"site-packages is not writable: {target}",
+                details={"path": str(target)},
+                suggestion="Check permissions or run as appropriate user",
+                auto_fixable=False,
+            ))
         return results
 
     def diagnose_exception(

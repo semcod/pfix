@@ -41,18 +41,14 @@ F = TypeVar("F", bound=Callable)
 def _capture_runtime_error(exc: BaseException, func: Any = None, hints: Optional[dict] = None):
     """Capture exception to runtime TODO.md if enabled."""
     try:
-        from .config import get_config
-        from .runtime_todo import capture_exception
-
-        config = get_config()
-        pyproject = getattr(config, '_pyproject_data', {})
-        rt_config = pyproject.get("tool", {}).get("pfix", {}).get("runtime_todo", {})
-
-        if rt_config.get("enabled", False):
+        from .runtime_todo import get_collector
+        collector = get_collector()
+        if collector:
             context = {"function": getattr(func, '__name__', None)}
             if hints:
                 context.update(hints)
-            capture_exception(exc, context)
+            collector.capture(exc, context)
+            collector.shutdown()
     except Exception:
         pass  # Never break user code for logging
 
@@ -218,6 +214,8 @@ def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
                 except BaseException as exc:
                     last_exc = exc
                     if attempt >= max_retries:
+                        # Capture final error to runtime TODO before giving up
+                        _capture_runtime_error(exc, fn, {"hint": kwargs.get("hint", "")} if kwargs.get("hint") else {})
                         break
 
                     console.print(f"\n[red]💥 apfix caught: {type(exc).__name__}: {exc}[/]")

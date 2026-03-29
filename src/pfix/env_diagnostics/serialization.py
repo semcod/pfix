@@ -23,6 +23,8 @@ class SerializationDiagnostic(BaseDiagnostic):
         results = []
         results.extend(self._check_pickle_protocol())
         results.extend(self._check_cache_files(project_root))
+        results.extend(self._check_yaml_safety(project_root))
+        results.extend(self._check_json_manifest_validity(project_root))
         return results
 
     def _check_pickle_protocol(self) -> list["DiagnosticResult"]:
@@ -78,6 +80,53 @@ class SerializationDiagnostic(BaseDiagnostic):
                     line_number=None,
                 ))
 
+        return results
+
+    def _check_yaml_safety(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check for unsafe YAML loading."""
+        from ..types import DiagnosticResult
+        import re
+        results = []
+        for pyfile in project_root.rglob("*.py"):
+            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
+                continue
+            try:
+                content = pyfile.read_text()
+                # Search for yaml.load( without SafeLoader
+                if "yaml.load(" in content and "SafeLoader" not in content and "Loader=" not in content:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="unsafe_yaml_load",
+                        status="critical",
+                        message=f"Unsafe yaml.load() detected in {pyfile.name}",
+                        suggestion="Use yaml.safe_load() or specify SafeLoader",
+                        abs_path=str(pyfile),
+                    ))
+            except Exception:
+                pass
+        return results
+
+    def _check_json_manifest_validity(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check validity of common JSON manifest files."""
+        from ..types import DiagnosticResult
+        import json
+        results = []
+        manifests = ["package.json", "composer.json", "manifest.json"]
+        for m in manifests:
+            p = project_root / m
+            if p.exists():
+                try:
+                    with open(p, "r") as f:
+                        json.load(f)
+                except Exception as e:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name=f"invalid_{m.replace('.', '_')}",
+                        status="error",
+                        message=f"JSON syntax error in {m}: {e}",
+                        suggestion=f"Fix syntax in {m}",
+                        abs_path=str(p),
+                    ))
         return results
 
     def diagnose_exception(

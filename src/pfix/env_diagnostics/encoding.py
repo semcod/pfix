@@ -25,6 +25,8 @@ class EncodingDiagnostic(BaseDiagnostic):
         results.extend(self._check_locale())
         results.extend(self._check_file_encoding(project_root))
         results.extend(self._check_line_endings(project_root))
+        results.extend(self._check_stdio_encoding())
+        results.extend(self._check_os_environ_encoding())
         return results
 
     def _check_locale(self) -> list["DiagnosticResult"]:
@@ -146,6 +148,49 @@ class EncodingDiagnostic(BaseDiagnostic):
             except Exception:
                 pass
 
+        return results
+
+    def _check_stdio_encoding(self) -> list["DiagnosticResult"]:
+        """Check if standard I/O streams are using UTF-8."""
+        from ..types import DiagnosticResult
+        results = []
+        for stream_name in ("stdout", "stderr", "stdin"):
+            stream = getattr(sys, stream_name)
+            if stream and hasattr(stream, "encoding"):
+                enc = stream.encoding
+                if enc and enc.lower() not in ("utf-8", "utf8", "utf_8"):
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name=f"non_utf8_{stream_name}",
+                        status="warning",
+                        message=f"Stream {stream_name} uses non-UTF8 encoding: {enc}",
+                        details={"stream": stream_name, "encoding": enc},
+                        suggestion="Set PYTHONIOENCODING=utf-8",
+                    ))
+        return results
+
+    def _check_os_environ_encoding(self) -> list["DiagnosticResult"]:
+        """Check for environment variables that cannot be decoded as UTF-8."""
+        from ..types import DiagnosticResult
+        import os
+        results = []
+        try:
+            # os.environ uses sys.getfilesystemencoding(), but some values might be raw bytes
+            # that were mis-decoded.
+            for key, value in os.environ.items():
+                try:
+                    key.encode('utf-8').decode('utf-8')
+                    value.encode('utf-8').decode('utf-8')
+                except UnicodeError:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="env_var_encoding_error",
+                        status="error",
+                        message=f"Environment variable '{key}' has invalid encoding",
+                        suggestion="Ensure all environment variables are valid UTF-8",
+                    ))
+        except Exception:
+            pass
         return results
 
     def diagnose_exception(

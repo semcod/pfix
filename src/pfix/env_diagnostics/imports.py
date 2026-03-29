@@ -29,6 +29,9 @@ class ImportDiagnostic(BaseDiagnostic):
         results.extend(self._check_shadow_stdlib(project_root))
         results.extend(self._check_stale_bytecode(project_root))
         results.extend(self._check_version_conflicts())
+        results.extend(self._check_missing_inits(project_root))
+        results.extend(self._check_deprecated_apis(project_root))
+        results.extend(self._check_import_source(project_root))
         return results
 
     def _check_missing_imports(self, project_root: Path) -> list["DiagnosticResult"]:
@@ -272,6 +275,103 @@ class ImportDiagnostic(BaseDiagnostic):
             # pip not available or timeout
             pass
 
+        return results
+
+    def _check_missing_inits(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Find directories containing .py files but no __init__.py."""
+        from ..types import DiagnosticResult
+
+        results = []
+        for root, dirs, files in os.walk(project_root):
+            if "__pycache__" in root or ".git" in root or ".venv" in root:
+                continue
+
+            # If there are .py files, it might be a package
+            if any(f.endswith(".py") for f in files) and "__init__.py" not in files:
+                rel_path = Path(root).relative_to(project_root)
+                if str(rel_path) == ".":
+                    continue
+
+                # Check if parent expects this to be a package
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="missing_init",
+                    status="warning",
+                    message=f"Directory '{rel_path}' contains .py files but no __init__.py",
+                    details={"path": str(rel_path)},
+                    suggestion=f"Create {rel_path}/__init__.py",
+                    auto_fixable=True,
+                    abs_path=os.path.join(root, "__init__.py"),
+                ))
+        return results
+
+    def _check_deprecated_apis(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check for use of deprecated standard library or third-party APIs."""
+        from ..types import DiagnosticResult
+        results = []
+        DEPRECATED = {
+            "distutils": "Use 'setuptools' or 'sysconfig' instead",
+            "cgi": "Deprecated in Python 3.11+",
+            "crypt": "Deprecated in Python 3.11+",
+            "pkg_resources": "Use 'importlib.metadata' or 'importlib.resources'",
+            "imp": "Use 'importlib' instead",
+            "telnetlib": "Deprecated in Python 3.11+",
+        }
+
+        for pyfile in project_root.rglob("*.py"):
+            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
+                continue
+            try:
+                content = pyfile.read_text()
+                imports = self._extract_imports(content)
+                for imp in imports:
+                    if imp in DEPRECATED:
+                        results.append(DiagnosticResult(
+                            category=self.category,
+                            check_name="deprecated_api",
+                            status="warning",
+                            message=f"Use of deprecated module '{imp}' in {pyfile.name}",
+                            details={"module": imp, "alternative": DEPRECATED[imp]},
+                            suggestion=DEPRECATED[imp],
+                            auto_fixable=False,
+                            abs_path=str(pyfile),
+                        ))
+            except Exception:
+                pass
+        return results
+
+    def _check_import_source(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check if local modules are being overshadowed by installed packages."""
+        from ..types import DiagnosticResult
+        results = []
+        # Find all local modules (top-level .py files or dirs with __init__.py)
+        local_modules = []
+        for item in project_root.iterdir():
+            if item.is_file() and item.suffix == ".py" and item.stem != "__init__":
+                local_modules.append(item.stem)
+            elif item.is_dir() and (item / "__init__.py").exists():
+                local_modules.append(item.name)
+
+        # Check if any of these are also installed in site-packages
+        try:
+            installed = {
+                pkg.metadata["Name"].lower(): pkg
+                for pkg in __import__("importlib.metadata").metadata.distributions()
+            }
+            for mod in local_modules:
+                if mod.lower() in installed:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="import_overshadow",
+                        status="warning",
+                        message=f"Local module '{mod}' has the same name as an installed package",
+                        details={"installed_version": installed[mod.lower()].version},
+                        suggestion=f"Rename local {mod} or be careful with import order",
+                        auto_fixable=False,
+                        abs_path=str(project_root / f"{mod}"),
+                    ))
+        except Exception:
+            pass
         return results
 
     def _extract_imports(self, source: str) -> set[str]:

@@ -46,6 +46,11 @@ class PythonVersionDiagnostic(BaseDiagnostic):
         results.extend(self._check_pyproject_requires(project_root))
         results.extend(self._check_version_features(project_root))
         results.extend(self._check_deprecated_imports(project_root))
+        results.extend(self._check_eol_status())
+        results.extend(self._check_32bit_python())
+        results.extend(self._check_sys_executable_mismatch())
+        results.extend(self._check_optimization_flags())
+        results.extend(self._check_gil_status())
         return results
 
     def _check_pyproject_requires(self, project_root: Path) -> list["DiagnosticResult"]:
@@ -226,6 +231,107 @@ class PythonVersionDiagnostic(BaseDiagnostic):
             if module in mods:
                 return f"3.{ver}"
         return "unknown"
+
+    def _check_eol_status(self) -> list["DiagnosticResult"]:
+        """Check if Python version is End-of-Life (EOL)."""
+        from ..types import DiagnosticResult
+        results = []
+        current = sys.version_info[:2]
+        
+        # Current EOL dates (approximate)
+        # 3.8: 2024-10
+        # 3.7: 2023-06
+        # 3.6: 2021-12
+        if current < (3, 9):
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="python_eol",
+                status="critical" if current < (3, 8) else "error",
+                message=f"Python {current[0]}.{current[1]} is End-of-Life (EOL)",
+                suggestion="Upgrade to Python 3.10+ (security risk)",
+            ))
+        elif current < (3, 10):
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="python_near_eol",
+                status="warning",
+                message=f"Python {current[0]}.{current[1]} is nearing End-of-Life",
+                suggestion="Plan upgrade to Python 3.11+",
+            ))
+        return results
+
+    def _check_32bit_python(self) -> list["DiagnosticResult"]:
+        """Check for 32-bit Python on 64-bit platform."""
+        from ..types import DiagnosticResult
+        results = []
+        import platform
+        
+        is_64bit_os = platform.machine() in ('x86_64', 'AMD64', 'arm64', 'aarch64')
+        is_32bit_py = sys.maxsize <= 2**31 - 1
+        
+        if is_64bit_os and is_32bit_py:
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="32bit_python",
+                status="warning",
+                message="Running 32-bit Python on a 64-bit OS",
+                suggestion="Switch to 64-bit Python for better performance and memory addressing",
+            ))
+        return results
+
+    def _check_sys_executable_mismatch(self) -> list["DiagnosticResult"]:
+        """Check if sys.executable matches what's in PATH."""
+        from ..types import DiagnosticResult
+        results = []
+        import shutil
+        
+        path_py = shutil.which("python") or shutil.which("python3")
+        if path_py:
+            path_py = str(Path(path_py).resolve())
+            sys_py = str(Path(sys.executable).resolve())
+            
+            if path_py != sys_py and not os.environ.get("VIRTUAL_ENV"):
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="python_path_mismatch",
+                    status="warning",
+                    message="Python executable in PATH different from sys.executable",
+                    details={"path_python": path_py, "sys_executable": sys_py},
+                    suggestion="Verify PATH order and virtualenv activation",
+                ))
+        return results
+
+    def _check_optimization_flags(self) -> list["DiagnosticResult"]:
+        """Check for Python optimization flags (-O, -OO)."""
+        from ..types import DiagnosticResult
+        results = []
+        if sys.flags.optimize > 0:
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="python_optimization_active",
+                status="warning",
+                message=f"Python optimization level {sys.flags.optimize} active",
+                details={"level": sys.flags.optimize},
+                suggestion="Avoid -O/-OO in development as it removes asserts/docstrings",
+            ))
+        return results
+
+    def _check_gil_status(self) -> list["DiagnosticResult"]:
+        """Check GIL status (relevant for Python 3.13+)."""
+        from ..types import DiagnosticResult
+        results = []
+        # Check if sys.getsizeof() etc. can tell us something or sys._is_gil_enabled() in 3.13
+        if hasattr(sys, "_is_gil_enabled"):
+            enabled = sys._is_gil_enabled()
+            if not enabled:
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="no_gil_mode",
+                    status="warning",
+                    message="Python is running in experimental No-GIL mode",
+                    suggestion="Verify thread safety of third-party extensions",
+                ))
+        return results
 
     def diagnose_exception(
         self,

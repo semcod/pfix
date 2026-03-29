@@ -28,6 +28,11 @@ class FilesystemDiagnostic(BaseDiagnostic):
         results.extend(self._check_symlinks(project_root))
         results.extend(self._check_large_files(project_root))
         results.extend(self._check_writable(project_root))
+        results.extend(self._check_inodes(project_root))
+        results.extend(self._check_permissions(project_root))
+        results.extend(self._check_filename_encoding(project_root))
+        results.extend(self._check_case_conflicts(project_root))
+        results.extend(self._check_hidden_pollution(project_root))
         return results
 
     def _check_disk_space(self, project_root: Path) -> list["DiagnosticResult"]:
@@ -147,6 +152,113 @@ class FilesystemDiagnostic(BaseDiagnostic):
                 abs_path=str(project_root),
                 line_number=None,
             ))
+        return results
+
+    def _check_inodes(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check for inode exhaustion (Linux/Unix)."""
+        from ..types import DiagnosticResult
+        results = []
+        try:
+            st = os.statvfs(project_root)
+            if st.f_files > 0:
+                free_percent = st.f_ffree / st.f_files * 100
+                if free_percent < 5:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="inode_exhaustion",
+                        status="critical" if free_percent < 1 else "error",
+                        message=f"Low inode availability: {free_percent:.1f}% free",
+                        details={"free_inodes": st.f_ffree, "total_inodes": st.f_files},
+                        suggestion="Remove many small files (e.g. caches, sessions)",
+                    ))
+        except (AttributeError, OSError):
+            pass  # Not available on all platforms
+        return results
+
+    def _check_permissions(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Perform granular permission checks for vital files."""
+        from ..types import DiagnosticResult
+        results = []
+        vital = ["pyproject.toml", "requirements.txt", "TODO.md", ".env"]
+        for name in vital:
+            p = project_root / name
+            if p.exists():
+                if not os.access(p, os.R_OK):
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="no_read_access",
+                        status="error",
+                        message=f"No read access to {name}",
+                        abs_path=str(p),
+                        suggestion=f"chmod +r {name}",
+                    ))
+                if not os.access(p, os.O_RDWR):
+                    # We don't check execute for these
+                    pass
+        return results
+
+    def _check_filename_encoding(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check for filenames that might cause issues due to encoding."""
+        from ..types import DiagnosticResult
+        results = []
+        for item in project_root.rglob("*"):
+            try:
+                item.name.encode('ascii')
+            except UnicodeEncodeError:
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="non_ascii_filename",
+                    status="warning",
+                    message=f"Non-ASCII filename detected: {item.name}",
+                    details={"path": str(item)},
+                    suggestion="Rename using ASCII characters to avoid portable issues",
+                    abs_path=str(item),
+                ))
+        return results
+
+    def _check_case_conflicts(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Check for multiple files with same name but different cases."""
+        from ..types import DiagnosticResult
+        results = []
+        for root, dirs, files in os.walk(project_root):
+            if ".git" in root or "__pycache__" in root:
+                continue
+            lower_to_orig = {}
+            for name in files + dirs:
+                lower = name.lower()
+                if lower in lower_to_orig:
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="case_conflict",
+                        status="error",
+                        message=f"Case conflict: '{name}' and '{lower_to_orig[lower]}'",
+                        details={"path": root, "conflict": [name, lower_to_orig[lower]]},
+                        suggestion="Rename one of the files to avoid issues on case-insensitive systems",
+                        abs_path=os.path.join(root, name),
+                    ))
+                else:
+                    lower_to_orig[lower] = name
+        return results
+
+    def _check_hidden_pollution(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Detect unexpected hidden files that might pollute the environment."""
+        from ..types import DiagnosticResult
+        results = []
+        POLLUTANTS = [".DS_Store", "Thumbs.db", ".directory", "*.swp", "*~"]
+        import fnmatch
+        for root, dirs, files in os.walk(project_root):
+            for name in files:
+                for pattern in POLLUTANTS:
+                    if fnmatch.fnmatch(name, pattern):
+                        results.append(DiagnosticResult(
+                            category=self.category,
+                            check_name="hidden_pollution",
+                            status="low",
+                            message=f"Environment pollutant found: {name}",
+                            suggestion=f"Remove {name} or add to .gitignore",
+                            abs_path=os.path.join(root, name),
+                            auto_fixable=True,
+                        ))
         return results
 
     def diagnose_exception(

@@ -34,6 +34,8 @@ class NetworkDiagnostic(BaseDiagnostic):
         results.extend(self._check_outbound())
         results.extend(self._check_ssl_certs())
         results.extend(self._check_proxy())
+        results.extend(self._check_latency())
+        results.extend(self._check_system_clock())
         return results
 
     def _check_dns(self) -> list["DiagnosticResult"]:
@@ -151,6 +153,50 @@ class NetworkDiagnostic(BaseDiagnostic):
                     line_number=None,
                 ))
 
+        return results
+
+    def _check_latency(self) -> list["DiagnosticResult"]:
+        """Check network latency to PyPI."""
+        from ..types import DiagnosticResult
+        import time
+
+        results = []
+        try:
+            start = time.time()
+            with socket.create_connection(("pypi.org", 443), timeout=5):
+                latency = (time.time() - start) * 1000
+
+            if latency > 500:  # > 500ms
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="high_latency",
+                    status="warning",
+                    message=f"High network latency: {latency:.1f}ms",
+                    details={"latency_ms": latency},
+                    suggestion="Check your internet connection or use a local mirror",
+                ))
+        except Exception:
+            pass
+        return results
+
+    def _check_system_clock(self) -> list["DiagnosticResult"]:
+        """Check if system clock is reasonably accurate (vital for SSL/TLS)."""
+        from ..types import DiagnosticResult
+        import time
+        from datetime import datetime
+
+        results = []
+        # We can't easily get network time without ntp lib,
+        # but we can check if it's before a 'sane' date (e.g. 2024-01-01)
+        sane_date = datetime(2024, 1, 1).timestamp()
+        if time.time() < sane_date:
+            results.append(DiagnosticResult(
+                category=self.category,
+                check_name="stale_clock",
+                status="critical",
+                message=f"System clock seems wrong: {datetime.now()}",
+                suggestion="Update system clock using NTP",
+            ))
         return results
 
     def diagnose_exception(

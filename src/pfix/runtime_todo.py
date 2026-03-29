@@ -53,15 +53,20 @@ class ErrorFingerprint:
     @staticmethod
     def _normalize_error_message(msg: str) -> str:
         """Replace variable values with placeholders."""
+        # UUIDs / GUIDs
+        msg = re.sub(r'\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b', '<uuid>', msg)
         # IP addresses
         msg = re.sub(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', '<ip>', msg)
         # Port numbers (after :)
         msg = re.sub(r':\d{2,5}\b', ':<port>', msg)
         # Long numeric IDs (10+ digits)
         msg = re.sub(r'\b\d{10,}\b', '<id>', msg)
+        # Long hex strings (8+ chars)
+        msg = re.sub(r'\b[0-9a-fA-F]{8,}\b', '<hex>', msg)
         # Long string values
-        msg = re.sub(r"'[^']{50,}'", "'<long_string>'", msg)
-        # Memory addresses
+        msg = re.sub(r"'[^']{40,}'", "'<long_string>'", msg)
+        msg = re.sub(r'"[^"]{40,}"', '"<long_string>"', msg)
+        # Memory addresses (0x...)
         msg = re.sub(r'\b0x[0-9a-fA-F]+\b', '<addr>', msg)
         # Temp files
         msg = re.sub(r'/tmp/[^\s]+', '<tmpfile>', msg)

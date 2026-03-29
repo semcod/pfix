@@ -25,6 +25,9 @@ class HardwareDiagnostic(BaseDiagnostic):
         results.extend(self._check_gpu_availability())
         results.extend(self._check_cpu_count())
         results.extend(self._check_docker_limits())
+        results.extend(self._check_thermal_throttling())
+        results.extend(self._check_battery_status())
+        results.extend(self._check_avx_support())
         return results
 
     def _check_gpu_availability(self) -> list["DiagnosticResult"]:
@@ -115,6 +118,70 @@ class HardwareDiagnostic(BaseDiagnostic):
         except Exception:
             pass
 
+        return results
+
+    def _check_thermal_throttling(self) -> list["DiagnosticResult"]:
+        """Check for CPU thermal throttling (Linux)."""
+        from ..types import DiagnosticResult
+        results = []
+        thermal_path = Path("/sys/class/thermal/")
+        if thermal_path.exists():
+            try:
+                for zone in thermal_path.glob("thermal_zone*"):
+                    temp = int((zone / "temp").read_text().strip()) / 1000
+                    if temp > 90:
+                        results.append(DiagnosticResult(
+                            category=self.category,
+                            check_name="cpu_overheating",
+                            status="critical",
+                            message=f"CPU temperature is very high: {temp}°C",
+                            suggestion="Check cooling or reduce system load",
+                        ))
+            except Exception:
+                pass
+        return results
+
+    def _check_battery_status(self) -> list["DiagnosticResult"]:
+        """Check if running on battery power (Linux)."""
+        from ..types import DiagnosticResult
+        results = []
+        power_path = Path("/sys/class/power_supply/")
+        if power_path.exists():
+            try:
+                for supply in power_path.glob("BAT*"):
+                    status = (supply / "status").read_text().strip()
+                    if status == "Discharging":
+                        capacity = int((supply / "capacity").read_text().strip())
+                        results.append(DiagnosticResult(
+                            category=self.category,
+                            check_name="battery_discharging",
+                            status="warning",
+                            message=f"Running on battery: {capacity}%",
+                            suggestion="Plug in charger for maximum performance",
+                        ))
+            except Exception:
+                pass
+        return results
+
+    def _check_avx_support(self) -> list["DiagnosticResult"]:
+        """Check for AVX/AVX2 support in CPU (vital for many native libs)."""
+        from ..types import DiagnosticResult
+        results = []
+        # Basic check via /proc/cpuinfo
+        cpuinfo = Path("/proc/cpuinfo")
+        if cpuinfo.exists():
+            try:
+                content = cpuinfo.read_text()
+                if "avx" not in content.lower():
+                    results.append(DiagnosticResult(
+                        category=self.category,
+                        check_name="no_avx_support",
+                        status="warning",
+                        message="CPU does not support AVX instructions",
+                        suggestion="Some numerical libraries may be significantly slower",
+                    ))
+            except Exception:
+                pass
         return results
 
     def diagnose_exception(
