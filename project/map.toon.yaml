@@ -287,11 +287,6 @@ Collection m...
     e: PfixSentryIntegration,init_sentry
     PfixSentryIntegration: __init__(2),setup_once(2),_process_event(2)  # Sentry integration that adds pfix diagnosis to error events...
     init_sentry(dsn;auto_analyze;min_confidence)
-  src/pfix/syntax_error_handler.py:
-    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
-    _build_syntax_error_context(exc)
-    _apply_syntax_fix(ctx;proposal;auto_apply;config)
-    handle_syntax_error(exc;auto_apply)
   src/pfix/rollback.py:
     e: find_backup_dir,list_backups,rollback_last,rollback_file,rollback_before,show_history,rollback_command
     find_backup_dir(filepath)
@@ -301,6 +296,11 @@ Collection m...
     rollback_before(cutoff_date)
     show_history(limit)
     rollback_command(last;filepath;before)
+  src/pfix/syntax_error_handler.py:
+    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
+    _build_syntax_error_context(exc)
+    _apply_syntax_fix(ctx;proposal;auto_apply;config)
+    handle_syntax_error(exc;auto_apply)
   src/pfix/rules.py:
     e: ProjectRules,load_project_rules,get_rules_for_prompt
     ProjectRules: __init__(1),_load(0),get_rules_text(0),get_section(1),has_rules(0)  # Loaded project rules...
@@ -360,12 +360,12 @@ Collection m...
   src/pfix/env_diagnostics/memory.py:
     e: MemoryDiagnostic
     MemoryDiagnostic(BaseDiagnostic): check(1),_check_available_memory(0),_check_recursion_limit(0),_check_gc_pressure(0),_check_object_count(0),_check_swap_usage(0),_check_ulimits(0),_check_shm_usage(0),_check_process_memory(0),diagnose_exception(2)  # Diagnose memory-related problems...
-  src/pfix/env_diagnostics/paths.py:
-    e: PathDiagnostic
-    PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
   src/pfix/env_diagnostics/encoding.py:
     e: EncodingDiagnostic
     EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
+  src/pfix/env_diagnostics/paths.py:
+    e: PathDiagnostic
+    PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
   src/pfix/env_diagnostics/auto_fix.py:
     e: can_auto_fix,apply_auto_fix,_fix_stale_bytecode,_fix_missing_requirement,_fix_utf8_bom,_fix_mixed_line_endings,_fix_large_log_file,_fix_api_key_placeholder,_fix_missing_dotenv,_fix_env_not_gitignored,_fix_missing_init,_fix_hidden_pollution,_fix_no_manifest
     can_auto_fix(result)

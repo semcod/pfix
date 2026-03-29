@@ -29,8 +29,8 @@ flowchart TD
     examples__filesystem ==>|5| src__pfix
     examples__network ==>|4| src__pfix
     examples__env ==>|4| src__pfix
-    examples__demo_auto -->|3| examples__demo
-    examples__demo1 -->|3| examples__demo
-    examples__demo -->|3| src__pfix
+    examples__demo1 -->|3| examples__shared
+    examples__demo_auto -->|3| examples__shared
     examples__shared -->|3| src__pfix
+    examples__demo -->|3| src__pfix
     verify_runtime -->|1| src__pfix

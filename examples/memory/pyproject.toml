@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "memory-examples"
+version = "0.1.0"
+description = "pfix Memory Examples - Recursion, Leaks & Large Allocations"
+requires-python = ">=3.10"
+dependencies = [
+    "pfix",
+]
+
+[tool.pfix]
+model = "openrouter/qwen/qwen3-coder-next"
+auto_apply = true
+auto_install_deps = true
+auto_restart = true
+max_retries = 3
+create_backups = false
+git_auto_commit = false
