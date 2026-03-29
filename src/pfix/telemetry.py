@@ -123,43 +123,53 @@ def _send_to_endpoint(event: TelemetryEvent, endpoint: str) -> None:
 
 def get_telemetry_summary() -> dict:
     """Get aggregate telemetry summary."""
+    events = _load_telemetry_events()
+    if not events:
+        return {"events": 0, "telemetry_enabled": is_telemetry_enabled()}
+
+    return _aggregate_telemetry_stats(events)
+
+
+def _load_telemetry_events() -> list[dict]:
+    """Load and parse telemetry events from file."""
     if not TELEMETRY_FILE.exists():
-        return {"events": 0}
+        return []
 
     events = []
     with open(TELEMETRY_FILE) as f:
         for line in f:
-            if line.strip():
-                try:
-                    events.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
+            if not line.strip():
+                continue
+            try:
+                events.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return events
 
-    if not events:
-        return {"events": 0}
 
+def _aggregate_telemetry_stats(events: list[dict]) -> dict:
+    """Aggregate stats from a list of events. CC≤5."""
     total = len(events)
     successes = sum(1 for e in events if e.get("success"))
     avg_confidence = sum(e.get("confidence", 0) for e in events) / total
-
-    by_model: dict[str, int] = {}
-    for e in events:
-        model = e.get("model", "unknown")
-        by_model[model] = by_model.get(model, 0) + 1
-
-    by_error: dict[str, int] = {}
-    for e in events:
-        err = e.get("exception_type", "unknown")
-        by_error[err] = by_error.get(err, 0) + 1
 
     return {
         "events": total,
         "success_rate": successes / total if total > 0 else 0,
         "avg_confidence": avg_confidence,
-        "by_model": by_model,
-        "by_error_type": by_error,
+        "by_model": _group_by_field(events, "model"),
+        "by_error_type": _group_by_field(events, "exception_type"),
         "telemetry_enabled": is_telemetry_enabled(),
     }
+
+
+def _group_by_field(events: list[dict], field_name: str) -> dict[str, int]:
+    """Count occurrences of values in a specific field."""
+    counts: dict[str, int] = {}
+    for e in events:
+        val = e.get(field_name, "unknown")
+        counts[val] = counts.get(val, 0) + 1
+    return counts
 
 
 def clear_telemetry() -> None:

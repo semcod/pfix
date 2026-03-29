@@ -77,48 +77,57 @@ def install_packages(packages: list[str], dry_run: bool = False) -> dict[str, bo
         return {pkg: False for pkg in packages}
 
     for pkg in packages:
-        if dry_run:
-            console.print(f"[dim]  DRY RUN: would install {pkg}[/]")
-            results[pkg] = True
-            continue
-
-        console.print(f"[cyan]📦 Installing {pkg} (via {config.pkg_manager})...[/]")
-        try:
-            if config.pkg_manager == "uv":
-                cmd = ["uv", "pip", "install", pkg]
-            else:
-                cmd = [sys.executable, "-m", "pip", "install", pkg, "--quiet"]
-
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-
-            if result.returncode == 0:
-                console.print(f"[green]  ✓ Installed {pkg}[/]")
-                results[pkg] = True
-            else:
-                console.print(f"[red]  ✗ Failed: {result.stderr.strip()[:200]}[/]")
-                results[pkg] = False
-        except subprocess.TimeoutExpired:
-            console.print(f"[red]  ✗ Timeout installing {pkg}[/]")
-            results[pkg] = False
-        except FileNotFoundError:
-            # uv not found, fallback to pip
-            if config.pkg_manager == "uv":
-                console.print("[yellow]  uv not found, falling back to pip[/]")
-                config.pkg_manager = "pip"
-                return install_packages([pkg], dry_run)
-            results[pkg] = False
-        except Exception as e:
-            console.print(f"[red]  ✗ Error: {e}[/]")
-            results[pkg] = False
+        results[pkg] = _install_single_package(pkg, config, dry_run)
 
     return results
 
 
-def scan_project_deps(project_dir: Optional[Path] = None) -> dict:
-    """Use pipreqs to scan project for all imports and find missing ones.
+def _install_single_package(pkg: str, config, dry_run: bool) -> bool:
+    """Helper to install a single package."""
+    if dry_run:
+        console.print(f"[dim]  DRY RUN: would install {pkg}[/]")
+        return True
 
-    Returns: {"all_imports": [...], "missing": [...], "installed": [...]}
-    """
+    console.print(f"[cyan]📦 Installing {pkg} (via {config.pkg_manager})...[/]")
+    try:
+        cmd = _get_install_command(pkg, config)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+
+        if result.returncode == 0:
+            console.print(f"[green]  ✓ Installed {pkg}[/]")
+            return True
+        
+        console.print(f"[red]  ✗ Failed: {result.stderr.strip()[:200]}[/]")
+        return False
+
+    except subprocess.TimeoutExpired:
+        console.print(f"[red]  ✗ Timeout installing {pkg}[/]")
+        return False
+    except FileNotFoundError:
+        return _handle_missing_pkg_manager(pkg, config, dry_run)
+    except Exception as e:
+        console.print(f"[red]  ✗ Error: {e}[/]")
+        return False
+
+
+def _get_install_command(pkg: str, config) -> list[str]:
+    """Build the installation command based on pkg_manager."""
+    if config.pkg_manager == "uv":
+        return ["uv", "pip", "install", pkg]
+    return [sys.executable, "-m", "pip", "install", pkg, "--quiet"]
+
+
+def _handle_missing_pkg_manager(pkg: str, config, dry_run: bool) -> bool:
+    """Handle case where uv or pip is missing."""
+    if config.pkg_manager == "uv":
+        console.print("[yellow]  uv not found, falling back to pip[/]")
+        config.pkg_manager = "pip"
+        return _install_single_package(pkg, config, dry_run)
+    return False
+
+
+def scan_project_deps(project_dir: Optional[Path] = None) -> dict:
+    """Use pipreqs to scan project for all imports and find missing ones."""
     if project_dir is None:
         project_dir = get_config().project_root
 
@@ -126,24 +135,27 @@ def scan_project_deps(project_dir: Optional[Path] = None) -> dict:
 
     try:
         from pipreqs import pipreqs
-
-        all_imports = pipreqs.get_all_imports(str(project_dir))
-        result["all_imports"] = list(all_imports)
-
-        # Check which are installed
-        stdlib = set(sys.stdlib_module_names) if hasattr(sys, "stdlib_module_names") else set()
-        for imp in all_imports:
-            top = imp.split(".")[0]
-            if top in stdlib or top in sys.builtin_module_names:
-                continue
-            if is_module_available(top):
-                result["installed"].append(top)
-            else:
-                result["missing"].append(resolve_package_name(top))
+        all_imports = list(pipreqs.get_all_imports(str(project_dir)))
+        result["all_imports"] = all_imports
+        _categorize_imports(all_imports, result)
     except Exception:
         pass
 
     return result
+
+
+def _categorize_imports(all_imports: list[str], result: dict):
+    """Categorize imports into installed and missing."""
+    stdlib = set(sys.stdlib_module_names) if hasattr(sys, "stdlib_module_names") else set()
+    for imp in all_imports:
+        top = imp.split(".")[0]
+        if top in stdlib or top in sys.builtin_module_names:
+            continue
+        
+        if is_module_available(top):
+            result["installed"].append(top)
+        else:
+            result["missing"].append(resolve_package_name(top))
 
 
 def update_requirements_file(
@@ -154,15 +166,9 @@ def update_requirements_file(
     if requirements_path is None:
         requirements_path = get_config().project_root / "requirements.txt"
 
-    existing: set[str] = set()
-    if requirements_path.exists():
-        for line in requirements_path.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#"):
-                name = re.split(r"[=<>~!]", line)[0].strip()
-                existing.add(name.lower())
-
+    existing = _get_existing_requirements(requirements_path)
     new = [p for p in packages if re.split(r"[=<>~!]", p)[0].lower() not in existing]
+    
     if not new:
         return False
 
@@ -173,6 +179,48 @@ def update_requirements_file(
 
     console.print(f"[green]📝 Updated {requirements_path}: {', '.join(new)}[/]")
     return True
+
+
+def _get_existing_requirements(path: Path) -> set[str]:
+    """Parse existing requirements from file."""
+    existing: set[str] = set()
+    if path.exists():
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                name = re.split(r"[=<>~!]", line)[0].strip()
+                existing.add(name.lower())
+    return existing
+
+
+def generate_requirements(project_dir: Optional[Path] = None) -> Path:
+    """Generate requirements.txt via pipreqs for the project."""
+    if project_dir is None:
+        project_dir = get_config().project_root
+
+    output = project_dir / "requirements.txt"
+    try:
+        from pipreqs import pipreqs
+
+        imports = pipreqs.get_all_imports(str(project_dir))
+        pkg_names = pipreqs.get_pkg_names(imports)
+        pipreqs.generate_requirements_file(output, pkg_names)
+        console.print(f"[green]📝 Generated {output}[/]")
+    except Exception as e:
+        console.print(f"[yellow]⚠ pipreqs failed: {e}[/]")
+
+    return output
+
+
+def detect_missing_from_error(exception_message: str) -> Optional[str]:
+    """Extract module name from ModuleNotFoundError/ImportError."""
+    match = re.search(r"No module named ['\"]([^'\"]+)['\"]", exception_message)
+    if match:
+        return match.group(1)
+    match = re.search(r"cannot import name .+ from ['\"]([^'\"]+)['\"]", exception_message)
+    if match:
+        return match.group(1)
+    return None
 
 
 def generate_requirements(project_dir: Optional[Path] = None) -> Path:

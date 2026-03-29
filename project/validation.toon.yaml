@@ -174,7 +174,7 @@ ERRORS[58]{path,score}:
   src/pfix/env_diagnostics/config_env.py,0.95
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'base' not found,11
-      python.import.resolvable,error,Module 'tomli' not found,175
+      python.import.resolvable,error,Module 'tomli' not found,177
   src/pfix/rollback.py,0.95
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'audit' not found,21
@@ -191,7 +191,7 @@ ERRORS[58]{path,score}:
   src/pfix/env_diagnostics/python_version.py,0.96
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'base' not found,12
-      python.import.resolvable,error,Module 'tomli' not found,70
+      python.import.resolvable,error,Module 'tomli' not found,99
   src/pfix/env_diagnostics/third_party.py,0.96
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'base' not found,16

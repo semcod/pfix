@@ -1,27 +1,27 @@
-# code2llm | 67f 12280L | python:66,shell:1 | 2026-03-29
-# CC̄=3.9 | critical:0/580 | dups:0 | cycles:0
+# code2llm | 67f 12330L | python:66,shell:1 | 2026-03-29
+# CC̄=3.8 | critical:0/603 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
-PIPELINES[383]:
-  [1] Src [crash_me]: crash_me → pfix → get_config
+PIPELINES[394]:
+  [1] Src [main]: main → run_git_checkout
       PURITY: 100% pure
-  [2] Src [main]: main → run_git_checkout
+  [2] Src [main]: main → reset_examples
       PURITY: 100% pure
-  [3] Src [main]: main → reset_examples
+  [3] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [4] Src [main]: main → _build_parser
+  [4] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
-  [5] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [5] Src [build_multi_file_context]: build_multi_file_context
       PURITY: 100% pure
 
 LAYERS:
-  src/                            CC̄=3.9    ←in:0  →out:2
-  │ imports                    486L  1C   15m  CC=12     ←0
+  src/                            CC̄=3.8    ←in:0  →out:2
+  │ imports                    486L  1C   19m  CC=11     ←0
   │ logging                    351L  5C   18m  CC=6      ←0
-  │ python_version             342L  1C   11m  CC=12     ←0
+  │ python_version             342L  1C   15m  CC=11     ←0
   │ fixer                      338L  0C   18m  CC=10     ←7
   │ production                 323L  4C   13m  CC=9      ←0
   │ filesystem                 311L  1C   12m  CC=7      ←0
@@ -34,21 +34,21 @@ LAYERS:
   │ third_party                271L  1C    6m  CC=10     ←0
   │ explain                    267L  0C    4m  CC=5      ←1
   │ diff_fixer                 258L  1C    6m  CC=12     ←0
+  │ config_env                 256L  1C   12m  CC=9      ←0
   │ network                    255L  1C    8m  CC=9      ←0
-  │ config_env                 254L  1C    9m  CC=12     ←0
-  │ multi_fix                  253L  1C    4m  CC=14     ←0
+  │ multi_fix                  252L  1C    6m  CC=8      ←0
   │ paths                      250L  1C   10m  CC=6      ←0
+  │ init_wizard                249L  0C   14m  CC=4      ←1
   │ __init__                   248L  1C    8m  CC=8      ←0
   │ analyzer                   246L  0C   14m  CC=12     ←7
   │ config                     233L  1C   12m  CC=11     ←17
   │ cache                      227L  1C   14m  CC=4      ←11
   │ types                      225L  7C    1m  CC=11     ←0
   │ rollback                   224L  0C    7m  CC=8      ←1
+  │ dashboard                  223L  0C    7m  CC=6      ←1
   │ encoding                   220L  1C    7m  CC=6      ←0
-  │ init_wizard                217L  0C    6m  CC=14     ←1
   │ auto_fix                   216L  0C   13m  CC=6      ←1
   │ web                        216L  3C   10m  CC=5      ←0
-  │ dashboard                  206L  0C    5m  CC=13     ←1
   │ dependency                 205L  0C    7m  CC=12     ←6
   │ audit                      203L  1C    5m  CC=10     ←3
   │ hardware                   193L  1C    8m  CC=5      ←0

@@ -62,33 +62,15 @@ class PfixConfig:
     @classmethod
     def from_env(cls, dotenv_path: Optional[str] = None) -> "PfixConfig":
         """Load config from .env + environment + pyproject.toml."""
-        # Find and load .env
-        if dotenv_path:
-            load_dotenv(dotenv_path)
-        else:
-            for parent in [Path.cwd(), *Path.cwd().parents]:
-                env_file = parent / ".env"
-                if env_file.exists():
-                    load_dotenv(env_file)
-                    break
+        _find_and_load_dotenv(dotenv_path)
 
-        # Load env values via helper
+        # Load initial config from environment
         env = _load_env_values()
         cfg = cls(**env)
 
-        # Auto-fix model name: ensure openrouter/ prefix for OpenRouter models
-        if cfg.llm_api_base and "openrouter" in cfg.llm_api_base:
-            if "/" in cfg.llm_model and not cfg.llm_model.startswith("openrouter/"):
-                cfg.llm_model = f"openrouter/{cfg.llm_model}"
-
-        # Merge pyproject.toml [tool.pfix]
-        pyproject_full = cls._read_pyproject_full(cfg.project_root / "pyproject.toml")
-        cfg._pyproject_data = pyproject_full
-        
-        pyproject = pyproject_full.get("tool", {}).get("pfix", {})
-        for key, val in pyproject.items():
-            if hasattr(cfg, key) and not os.getenv(f"PFIX_{key.upper()}"):
-                setattr(cfg, key, val)
+        # Normalize and merge
+        _sanitize_model_name(cfg)
+        _merge_pyproject_config(cfg)
 
         return cfg
 
@@ -114,6 +96,38 @@ class PfixConfig:
         if not self.llm_api_key:
             warnings.append("No API key. Set OPENROUTER_API_KEY in .env")
         return warnings
+
+
+def _find_and_load_dotenv(dotenv_path: Optional[str]):
+    """Find and load .env from specified path or parent directories."""
+    if dotenv_path:
+        load_dotenv(dotenv_path)
+    else:
+        for parent in [Path.cwd(), *Path.cwd().parents]:
+            env_file = parent / ".env"
+            if env_file.exists():
+                load_dotenv(env_file)
+                break
+
+
+def _sanitize_model_name(cfg: "PfixConfig"):
+    """Ensure OpenRouter models have the proper prefix."""
+    if cfg.llm_api_base and "openrouter" in cfg.llm_api_base:
+        if "/" in cfg.llm_model and not cfg.llm_model.startswith("openrouter/"):
+            cfg.llm_model = f"openrouter/{cfg.llm_model}"
+
+
+def _merge_pyproject_config(cfg: "PfixConfig"):
+    """Merge tool.pfix settings from pyproject.toml."""
+    pyproject_full = PfixConfig._read_pyproject_full(cfg.project_root / "pyproject.toml")
+    cfg._pyproject_data = pyproject_full
+    
+    pyproject = pyproject_full.get("tool", {}).get("pfix", {})
+    for key, val in pyproject.items():
+        # Only set if not already overridden by PFIX_* env var
+        env_key = f"PFIX_{key.upper()}"
+        if hasattr(cfg, key) and not os.getenv(env_key):
+            setattr(cfg, key, val)
 
 
 def _load_env_values() -> dict:

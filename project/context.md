@@ -6,12 +6,17 @@
 - **Primary Language**: python
 - **Languages**: python: 104, shell: 1
 - **Analysis Mode**: static
-- **Total Functions**: 580
+- **Total Functions**: 603
 - **Total Classes**: 55
 - **Modules**: 105
-- **Entry Points**: 402
+- **Entry Points**: 413
 
 ## Architecture by Module
+
+### src.pfix.env_diagnostics.imports
+- **Functions**: 19
+- **Classes**: 1
+- **File**: `imports.py`
 
 ### src.pfix.fixer
 - **Functions**: 18
@@ -22,14 +27,18 @@
 - **Classes**: 5
 - **File**: `logging.py`
 
-### src.pfix.env_diagnostics.imports
+### src.pfix.env_diagnostics.python_version
 - **Functions**: 15
 - **Classes**: 1
-- **File**: `imports.py`
+- **File**: `python_version.py`
 
 ### src.pfix.analyzer
 - **Functions**: 14
 - **File**: `analyzer.py`
+
+### src.pfix.init_wizard
+- **Functions**: 14
+- **File**: `init_wizard.py`
 
 ### src.pfix.cache
 - **Functions**: 14
@@ -60,6 +69,11 @@
 - **Classes**: 1
 - **File**: `config.py`
 
+### src.pfix.env_diagnostics.config_env
+- **Functions**: 12
+- **Classes**: 1
+- **File**: `config_env.py`
+
 ### src.pfix.env_diagnostics.filesystem
 - **Functions**: 12
 - **Classes**: 1
@@ -69,24 +83,19 @@
 - **Functions**: 11
 - **File**: `decorator.py`
 
-### src.pfix.env_diagnostics.python_version
-- **Functions**: 11
-- **Classes**: 1
-- **File**: `python_version.py`
-
 ### examples.production.cascading_errors
 - **Functions**: 11
 - **File**: `cascading_errors.py`
-
-### src.pfix.env_diagnostics.process
-- **Functions**: 10
-- **Classes**: 1
-- **File**: `process.py`
 
 ### src.pfix.env_diagnostics.memory
 - **Functions**: 10
 - **Classes**: 1
 - **File**: `memory.py`
+
+### src.pfix.env_diagnostics.process
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `process.py`
 
 ### src.pfix.env_diagnostics.paths
 - **Functions**: 10
@@ -97,15 +106,6 @@
 - **Functions**: 10
 - **Classes**: 3
 - **File**: `web.py`
-
-### examples.production.api_patterns
-- **Functions**: 10
-- **File**: `api_patterns.py`
-
-### src.pfix.env_diagnostics.config_env
-- **Functions**: 9
-- **Classes**: 1
-- **File**: `config_env.py`
 
 ## Key Entry Points
 
@@ -118,29 +118,8 @@ Main execution flows into the system:
 ### examples.imports.main.main
 - **Calls**: print, print, print, exec, print, print, exec, print
 
-### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_dotenv
-> Check .env file.
-- **Calls**: env_file.exists, env_example.exists, results.append, env_file.read_text, enumerate, env_file.exists, DiagnosticResult, content.splitlines
-
-### src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph
-> Build import dependency graph from project files.
-
-Returns:
-    Tuple of (module_imports, module_paths) where:
-    - module_imports: dict mapping modu
-- **Calls**: project_root.rglob, pyfile.relative_to, str, None.replace, None.replace, pyfile.read_text, ast.parse, src.pfix.cache.FixCache.set
-
 ### examples.run_all.main
 - **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args, print, print, print
-
-### src.pfix.multi_fix.find_related_files
-> Find files related to the error through imports.
-
-Args:
-    source_file: File where error occurred
-    error_ctx: Error context
-    max_depth: How man
-- **Calls**: src.pfix.cache.FixCache.set, src.pfix.cache.FixCache.set, sorted, to_process.pop, processed.add, current.exists, current.read_text, ast.parse
 
 ### src.pfix.session.PFixSession._handle_exception
 > Handle exception — analyze and fix. Returns True if fixed.
@@ -167,18 +146,6 @@ Returns:
     MultiFileFixProposal or None if parsing fails
 - **Calls**: raw.strip, re.search, m.group, json.loads, MultiFileFixProposal, text.startswith, console.print, text.find
 
-### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_pyproject_requires
-> Check pyproject.toml requires-python vs current version.
-- **Calls**: pyproject.exists, None.get, open, tomllib.load, data.get, re.search, re.search, results.append
-
-### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_version_features
-> Check for version-specific features in code.
-- **Calls**: project_root.rglob, str, pyfile.read_text, ast.parse, ast.walk, isinstance, isinstance, results.append
-
-### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports
-> Check for imports that aren't installed.
-- **Calls**: src.pfix.cache.FixCache.set, project_root.rglob, hasattr, src.pfix.cache.FixCache.set, None.lower, str, self._extract_imports, all_imports.update
-
 ### src.pfix.runtime_todo.collector.RuntimeCollector._build_issue
 > Build RuntimeIssue from exception.
 - **Calls**: self._extract_frames, RuntimeIssue, ErrorFingerprint.compute, str, datetime.now, datetime.now, datetime.now, platform.python_version
@@ -204,12 +171,12 @@ Returns:
 ### src.pfix.commands.run.cmd_run
 - **Calls**: None.resolve, src.pfix.config.configure, src.pfix.commands.run._install_excepthook, importlib.util.spec_from_file_location, importlib.util.module_from_spec, script.is_file, console.print, str
 
-### src.pfix.env_diagnostics.process.ProcessDiagnostic.check
-> Run all process/OS checks.
-- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
-
 ### src.pfix.env_diagnostics.memory.MemoryDiagnostic.check
 > Run all memory checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
+
+### src.pfix.env_diagnostics.process.ProcessDiagnostic.check
+> Run all process/OS checks.
 - **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
 ### src.pfix.env_diagnostics.EnvDiagnostics.__init__
@@ -239,6 +206,32 @@ Returns:
 > Diagnose filesystem-related exceptions.
 - **Calls**: isinstance, isinstance, isinstance, DiagnosticResult, DiagnosticResult, DiagnosticResult, str, str
 
+### src.pfix.integrations.precommit.main
+> Pre-commit hook entry point.
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.parse_args, print, Path, src.pfix.integrations.precommit.check_syntax, print
+
+### examples.reset.main
+> Reset all example directories to original buggy state.
+- **Calls**: print, print, Path.cwd, Path, os.chdir, examples.reset.run_git_checkout, os.chdir, print
+
+### src.pfix.production.PfixMonitor.handle_exception
+> Handle exception in production mode.
+
+Returns dict with diagnosis info (for logging/webhook).
+- **Calls**: src.pfix.analyzer.analyze_exception, src.pfix.cache.get_cached_fix, self.circuit_breaker.is_open, self.rate_limiter.record_call, None.isoformat, self._log_proposal, self._send_webhook, self.rate_limiter.can_call
+
+### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check
+> Run all config/env checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, self._check_dotenv
+
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_deprecated_imports
+> Check for deprecated stdlib imports.
+- **Calls**: src.pfix.cache.FixCache.set, self.DEPRECATED_MODULES.items, project_root.rglob, deprecated.update, str, pyfile.read_text, ast.parse, ast.walk
+
+### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_import_source
+> Check if local modules are being overshadowed by installed packages.
+- **Calls**: project_root.iterdir, item.is_file, local_modules.append, None.lower, item.is_dir, None.exists, local_modules.append, None.metadata.distributions
+
 ## Process Flows
 
 Key execution flows identified:
@@ -253,28 +246,7 @@ cmd_enable [src.pfix.commands.activation]
 main [examples.imports.main]
 ```
 
-### Flow 3: _check_dotenv
-```
-_check_dotenv [src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic]
-```
-
-### Flow 4: _build_import_graph
-```
-_build_import_graph [src.pfix.env_diagnostics.imports.ImportDiagnostic]
-```
-
-### Flow 5: find_related_files
-```
-find_related_files [src.pfix.multi_fix]
-  └─ →> set
-      └─ →> _make_cache_key
-      └─ →> _proposal_to_json
-  └─ →> set
-      └─ →> _make_cache_key
-      └─ →> _proposal_to_json
-```
-
-### Flow 6: _handle_exception
+### Flow 3: _handle_exception
 ```
 _handle_exception [src.pfix.session.PFixSession]
   └─ →> analyze_exception
@@ -284,34 +256,57 @@ _handle_exception [src.pfix.session.PFixSession]
   └─ →> classify_error
 ```
 
-### Flow 7: check
+### Flow 4: check
 ```
 check [src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic]
 ```
 
-### Flow 8: cmd_check
+### Flow 5: cmd_check
 ```
 cmd_check [src.pfix.commands.config]
   └─ →> get_config
 ```
 
-### Flow 9: cmd_dev
+### Flow 6: cmd_dev
 ```
 cmd_dev [src.pfix.commands.run]
   └─ →> configure
 ```
 
-### Flow 10: parse_multi_file_response
+### Flow 7: parse_multi_file_response
 ```
 parse_multi_file_response [src.pfix.multi_fix]
+```
+
+### Flow 8: _build_issue
+```
+_build_issue [src.pfix.runtime_todo.collector.RuntimeCollector]
+```
+
+### Flow 9: from_env
+```
+from_env [src.pfix.config.PfixConfig]
+  └─ →> _load_env_values
+```
+
+### Flow 10: _auto_activate_pfix
+```
+_auto_activate_pfix [src.pfix._auto_activate]
+  └─ →> get_config
 ```
 
 ## Key Classes
 
 ### src.pfix.env_diagnostics.imports.ImportDiagnostic
 > Diagnose import and dependency problems.
+- **Methods**: 19
+- **Key Methods**: src.pfix.env_diagnostics.imports.ImportDiagnostic.check, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._get_all_project_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._get_installed_packages, src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph, src.pfix.env_diagnostics.imports.ImportDiagnostic._get_module_name, src.pfix.env_diagnostics.imports.ImportDiagnostic._resolve_relative_import, src.pfix.env_diagnostics.imports.ImportDiagnostic._find_cycle_dfs, src.pfix.env_diagnostics.imports.ImportDiagnostic._create_cycle_result, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic
+> Diagnose Python version compatibility problems.
 - **Methods**: 15
-- **Key Methods**: src.pfix.env_diagnostics.imports.ImportDiagnostic.check, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph, src.pfix.env_diagnostics.imports.ImportDiagnostic._find_cycle_dfs, src.pfix.env_diagnostics.imports.ImportDiagnostic._create_cycle_result, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_shadow_stdlib, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_stale_bytecode, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_version_conflicts, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_inits
+- **Key Methods**: src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_pyproject_requires, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._get_requires_python, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._parse_version_requirement, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._create_version_error, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_version_features, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_file_features, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_deprecated_imports, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._get_deprecated_version, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_eol_status
 - **Inherits**: BaseDiagnostic
 
 ### src.pfix.runtime_todo.collector.RuntimeCollector
@@ -322,22 +317,16 @@ Collection modes:
 - **Methods**: 13
 - **Key Methods**: src.pfix.runtime_todo.collector.RuntimeCollector.__init__, src.pfix.runtime_todo.collector.RuntimeCollector.capture, src.pfix.runtime_todo.collector.RuntimeCollector._should_capture, src.pfix.runtime_todo.collector.RuntimeCollector._build_issue, src.pfix.runtime_todo.collector.RuntimeCollector._extract_frames, src.pfix.runtime_todo.collector.RuntimeCollector._should_exclude_path, src.pfix.runtime_todo.collector.RuntimeCollector._filepath_to_module, src.pfix.runtime_todo.collector.RuntimeCollector._capture_locals, src.pfix.runtime_todo.collector.RuntimeCollector._classify, src.pfix.runtime_todo.collector.RuntimeCollector._severity
 
+### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic
+> Diagnose configuration and environment variable problems.
+- **Methods**: 12
+- **Key Methods**: src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_dotenv, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._create_missing_env_result, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_secrets_in_env, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_env_whitespace, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_required_vars, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_env_gitignore, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_pyproject_validity, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_pfix_config_missing, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_secret_exposure_env
+- **Inherits**: BaseDiagnostic
+
 ### src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic
 > Diagnose filesystem-related problems.
 - **Methods**: 12
 - **Key Methods**: src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_disk_space, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_file_references, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_symlinks, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_large_files, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_writable, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_inodes, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_permissions, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_filename_encoding, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_case_conflicts
-- **Inherits**: BaseDiagnostic
-
-### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic
-> Diagnose Python version compatibility problems.
-- **Methods**: 11
-- **Key Methods**: src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_pyproject_requires, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_version_features, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_deprecated_imports, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._get_deprecated_version, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_eol_status, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_32bit_python, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_sys_executable_mismatch, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_optimization_flags, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_gil_status
-- **Inherits**: BaseDiagnostic
-
-### src.pfix.env_diagnostics.process.ProcessDiagnostic
-> Diagnose process and OS-related problems.
-- **Methods**: 10
-- **Key Methods**: src.pfix.env_diagnostics.process.ProcessDiagnostic.check, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_ulimits, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_signal_handlers, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_tmp_writable, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_zombies, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_nice_priority, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_fd_usage, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_core_dumps, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_parent_alive, src.pfix.env_diagnostics.process.ProcessDiagnostic.diagnose_exception
 - **Inherits**: BaseDiagnostic
 
 ### src.pfix.env_diagnostics.memory.MemoryDiagnostic
@@ -346,28 +335,28 @@ Collection modes:
 - **Key Methods**: src.pfix.env_diagnostics.memory.MemoryDiagnostic.check, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_available_memory, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_recursion_limit, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_gc_pressure, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_object_count, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_swap_usage, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_ulimits, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_shm_usage, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_process_memory, src.pfix.env_diagnostics.memory.MemoryDiagnostic.diagnose_exception
 - **Inherits**: BaseDiagnostic
 
+### src.pfix.env_diagnostics.process.ProcessDiagnostic
+> Diagnose process and OS-related problems.
+- **Methods**: 10
+- **Key Methods**: src.pfix.env_diagnostics.process.ProcessDiagnostic.check, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_ulimits, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_signal_handlers, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_tmp_writable, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_zombies, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_nice_priority, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_fd_usage, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_core_dumps, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_parent_alive, src.pfix.env_diagnostics.process.ProcessDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
 ### src.pfix.env_diagnostics.paths.PathDiagnostic
 > Diagnose path-related problems.
 - **Methods**: 10
 - **Key Methods**: src.pfix.env_diagnostics.paths.PathDiagnostic.check, src.pfix.env_diagnostics.paths.PathDiagnostic._check_sys_path, src.pfix.env_diagnostics.paths.PathDiagnostic._check_pythonpath, src.pfix.env_diagnostics.paths.PathDiagnostic._check_cwd_space, src.pfix.env_diagnostics.paths.PathDiagnostic._check_long_paths, src.pfix.env_diagnostics.paths.PathDiagnostic._check_cwd_deleted, src.pfix.env_diagnostics.paths.PathDiagnostic._check_root_permissions, src.pfix.env_diagnostics.paths.PathDiagnostic._check_tmp_writable, src.pfix.env_diagnostics.paths.PathDiagnostic._check_symlink_cycles, src.pfix.env_diagnostics.paths.PathDiagnostic.diagnose_exception
 - **Inherits**: BaseDiagnostic
 
-### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic
-> Diagnose configuration and environment variable problems.
-- **Methods**: 9
-- **Key Methods**: src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_dotenv, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_required_vars, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_env_gitignore, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_pyproject_validity, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_pfix_config_missing, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_secret_exposure_env, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_conflicting_manifests, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.diagnose_exception
-- **Inherits**: BaseDiagnostic
+### src.pfix.env_diagnostics.EnvDiagnostics
+> Orchestrator for all environment diagnostics.
+- **Methods**: 8
+- **Key Methods**: src.pfix.env_diagnostics.EnvDiagnostics.__init__, src.pfix.env_diagnostics.EnvDiagnostics.check_all, src.pfix.env_diagnostics.EnvDiagnostics.diagnose_exception, src.pfix.env_diagnostics.EnvDiagnostics.generate_report, src.pfix.env_diagnostics.EnvDiagnostics._format_severity_section, src.pfix.env_diagnostics.EnvDiagnostics._generate_summary_footer, src.pfix.env_diagnostics.EnvDiagnostics._format_result, src.pfix.env_diagnostics.EnvDiagnostics.to_todo_issues
 
 ### src.pfix.env_diagnostics.hardware.HardwareDiagnostic
 > Diagnose hardware-related problems.
 - **Methods**: 8
 - **Key Methods**: src.pfix.env_diagnostics.hardware.HardwareDiagnostic.check, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_gpu_availability, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_cpu_count, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_docker_limits, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_thermal_throttling, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_battery_status, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_avx_support, src.pfix.env_diagnostics.hardware.HardwareDiagnostic.diagnose_exception
 - **Inherits**: BaseDiagnostic
-
-### src.pfix.env_diagnostics.EnvDiagnostics
-> Orchestrator for all environment diagnostics.
-- **Methods**: 8
-- **Key Methods**: src.pfix.env_diagnostics.EnvDiagnostics.__init__, src.pfix.env_diagnostics.EnvDiagnostics.check_all, src.pfix.env_diagnostics.EnvDiagnostics.diagnose_exception, src.pfix.env_diagnostics.EnvDiagnostics.generate_report, src.pfix.env_diagnostics.EnvDiagnostics._format_severity_section, src.pfix.env_diagnostics.EnvDiagnostics._generate_summary_footer, src.pfix.env_diagnostics.EnvDiagnostics._format_result, src.pfix.env_diagnostics.EnvDiagnostics.to_todo_issues
 
 ### src.pfix.env_diagnostics.network.NetworkDiagnostic
 > Diagnose network-related problems.
@@ -432,9 +421,9 @@ Features:
 
 Key functions that process and transform data:
 
-### src.pfix.cli._build_parser
-> Build and configure ArgumentParser for pfix CLI.
-- **Output to**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument
+### src.pfix.dashboard._process_log_file
+> Process single log file and update stats/history.
+- **Output to**: None.strip, content.split, log_file.read_text, json.loads, src.pfix.dashboard._update_stats_from_entry
 
 ### src.pfix.multi_fix.parse_multi_file_response
 > Parse LLM response for multi-file fix.
@@ -445,6 +434,10 @@ Args:
 Returns:
     MultiFile
 - **Output to**: raw.strip, re.search, m.group, json.loads, MultiFileFixProposal
+
+### src.pfix.cli._build_parser
+> Build and configure ArgumentParser for pfix CLI.
+- **Output to**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument
 
 ### src.pfix.fixer._confirm_and_validate
 > Check permissions, show diff, and get user confirmation. CC≤5.
@@ -508,6 +501,10 @@ Args:
 > Format single result as markdown.
 - **Output to**: lines.append, lines.append, lines.append, None.join, lines.append
 
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._parse_version_requirement
+> Parse version numbers from a requirement string.
+- **Output to**: re.search, int, int
+
 ### src.pfix.integrations.sentry.PfixSentryIntegration._process_event
 > Process Sentry event to add pfix context.
 - **Output to**: hint.get, src.pfix.analyzer.analyze_exception, src.pfix.llm.request_fix, len
@@ -524,12 +521,6 @@ Args:
 - **Output to**: src.pfix.decorator.pfix, range, len, list, results.extend
 
 ### examples.production.degradation.parse_api_v2_response
-- **Output to**: src.pfix.decorator.pfix
-
-### examples.encoding.unicode_errors.process_api_response
-- **Output to**: src.pfix.decorator.pfix
-
-### examples.encoding.unicode_errors.format_price
 - **Output to**: src.pfix.decorator.pfix
 
 ### examples.production.api_patterns.validate_payload
@@ -562,13 +553,10 @@ Args:
 
 Functions exposed as public API (no underscore prefix):
 
-- `src.pfix.init_wizard.init_wizard` - 42 calls
 - `src.pfix.commands.activation.cmd_enable` - 36 calls
 - `src.pfix.dashboard.render_dashboard` - 32 calls
 - `examples.imports.main.main` - 27 calls
-- `src.pfix.dashboard.get_log_stats` - 25 calls
 - `examples.run_all.main` - 21 calls
-- `src.pfix.multi_fix.find_related_files` - 21 calls
 - `src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check` - 20 calls
 - `src.pfix.diff_fixer.parse_unified_diff` - 19 calls
 - `src.pfix.commands.config.cmd_check` - 19 calls
@@ -582,8 +570,8 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.config.PfixConfig.from_env` - 16 calls
 - `src.pfix.commands.activation.cmd_disable` - 16 calls
 - `src.pfix.commands.run.cmd_run` - 16 calls
-- `src.pfix.env_diagnostics.process.ProcessDiagnostic.check` - 16 calls
 - `src.pfix.env_diagnostics.memory.MemoryDiagnostic.check` - 16 calls
+- `src.pfix.env_diagnostics.process.ProcessDiagnostic.check` - 16 calls
 - `src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check` - 16 calls
 - `src.pfix.env_diagnostics.paths.PathDiagnostic.check` - 16 calls
 - `src.pfix.env_diagnostics.imports.ImportDiagnostic.check` - 16 calls
@@ -602,6 +590,9 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.types.ErrorContext.to_prompt` - 13 calls
 - `src.pfix.audit.log_fix_audit` - 13 calls
 - `src.pfix.env_diagnostics.EnvDiagnostics.generate_report` - 13 calls
+- `src.pfix.runtime_todo.capture_exception` - 13 calls
+- `src.pfix.dashboard.get_log_stats` - 12 calls
+- `src.pfix.explain.explain_last` - 12 calls
 
 ## System Interactions
 
@@ -613,21 +604,9 @@ graph TD
     cmd_enable --> print
     main --> print
     main --> exec
-    _check_dotenv --> exists
-    _check_dotenv --> append
-    _check_dotenv --> read_text
-    _check_dotenv --> enumerate
-    _build_import_graph --> rglob
-    _build_import_graph --> relative_to
-    _build_import_graph --> str
-    _build_import_graph --> replace
     main --> ArgumentParser
     main --> add_argument
     main --> parse_args
-    find_related_files --> set
-    find_related_files --> sorted
-    find_related_files --> pop
-    find_related_files --> add
     _handle_exception --> print
     _handle_exception --> isinstance
     _handle_exception --> analyze_exception
@@ -639,6 +618,18 @@ graph TD
     cmd_check --> add_column
     cmd_dev --> resolve
     cmd_dev --> configure
+    cmd_dev --> print
+    parse_multi_file_res --> strip
+    parse_multi_file_res --> search
+    parse_multi_file_res --> group
+    parse_multi_file_res --> loads
+    parse_multi_file_res --> MultiFileFixProposal
+    _build_issue --> _extract_frames
+    _build_issue --> RuntimeIssue
+    _build_issue --> compute
+    _build_issue --> str
+    _build_issue --> now
+    from_env --> _load_env_values
 ```
 
 ## Reverse Engineering Guidelines

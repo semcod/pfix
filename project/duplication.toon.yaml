@@ -1,12 +1,12 @@
-# redup/duplication | 11 groups | 80f 10149L | 2026-03-29
+# redup/duplication | 11 groups | 80f 10197L | 2026-03-29
 
 SUMMARY:
   files_scanned: 80
-  total_lines:   10149
+  total_lines:   10197
   dup_groups:    11
   dup_fragments: 25
   saved_lines:   149
-  scan_ms:       4769
+  scan_ms:       5208
 
 DUPLICATES[11] (ranked by impact):
   [e18ce76c91035468]   STRU  main  L=15 N=3 saved=30 sim=1.00
@@ -22,23 +22,23 @@ DUPLICATES[11] (ranked by impact):
   [ffa5a585859227c9]   EXAC  _clear_pycache  L=16 N=2 saved=16 sim=1.00
       src/pfix/session.py:0-15  (_clear_pycache)
       src/pfix/fixer.py:0-15  (_clear_pycache)
-  [05379f819265eb14]   STRU  get_priority  L=4 N=4 saved=12 sim=1.00
-      src/pfix/strategies/django.py:0-3  (get_priority)
-      src/pfix/strategies/flask.py:0-3  (get_priority)
-      src/pfix/strategies/pandas.py:0-3  (get_priority)
-      src/pfix/strategies/fastapi.py:0-3  (get_priority)
   [275db3cb0431cbce]   STRU  detect  L=12 N=2 saved=12 sim=1.00
       src/pfix/strategies/flask.py:0-11  (detect)
       src/pfix/strategies/fastapi.py:0-11  (detect)
+  [05379f819265eb14]   STRU  get_priority  L=4 N=4 saved=12 sim=1.00
+      src/pfix/strategies/flask.py:0-3  (get_priority)
+      src/pfix/strategies/fastapi.py:0-3  (get_priority)
+      src/pfix/strategies/pandas.py:0-3  (get_priority)
+      src/pfix/strategies/django.py:0-3  (get_priority)
   [8e18a9671be36cb9]   STRU  get_logger  L=9 N=2 saved=9 sim=1.00
       src/pfix/logging.py:0-8  (get_logger)
       src/pfix/cache.py:0-8  (get_cache)
   [7720aa1a49c23d3f]   STRU  is_module_available  L=9 N=2 saved=9 sim=1.00
       src/pfix/dependency.py:0-8  (is_module_available)
       src/pfix/fixer.py:0-8  (_validate_syntax)
-  [c4780630df7dd84f]   STRU  start_application  L=9 N=2 saved=9 sim=1.00
-      examples/production/cascading_errors.py:0-8  (start_application)
+  [c4780630df7dd84f]   STRU  run_etl_pipeline  L=9 N=2 saved=9 sim=1.00
       examples/production/api_patterns.py:0-8  (run_etl_pipeline)
+      examples/production/cascading_errors.py:0-8  (start_application)
   [81bc496f9f95bb78]   STRU  start_mcp_server  L=8 N=2 saved=8 sim=1.00
       examples/deps/version_conflicts.py:0-7  (start_mcp_server)
       examples/imports/platform_specific.py:0-8  (test_optional_extra)
@@ -59,19 +59,19 @@ REFACTOR[11] (ranked by priority):
   [4] ○ extract_function   → src/pfix/utils/_clear_pycache.py
       WHY: 2 occurrences of 16-line block across 2 files — saves 16 lines
       FILES: src/pfix/fixer.py, src/pfix/session.py
-  [5] ○ extract_function   → src/pfix/strategies/utils/get_priority.py
-      WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
-      FILES: src/pfix/strategies/django.py, src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py, src/pfix/strategies/pandas.py
-  [6] ○ extract_function   → src/pfix/strategies/utils/detect.py
+  [5] ○ extract_function   → src/pfix/strategies/utils/detect.py
       WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
       FILES: src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py
+  [6] ○ extract_function   → src/pfix/strategies/utils/get_priority.py
+      WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
+      FILES: src/pfix/strategies/django.py, src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py, src/pfix/strategies/pandas.py
   [7] ○ extract_function   → src/pfix/utils/get_logger.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: src/pfix/cache.py, src/pfix/logging.py
   [8] ○ extract_function   → src/pfix/utils/is_module_available.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: src/pfix/dependency.py, src/pfix/fixer.py
-  [9] ○ extract_function   → examples/production/utils/start_application.py
+  [9] ○ extract_function   → examples/production/utils/run_etl_pipeline.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: examples/production/api_patterns.py, examples/production/cascading_errors.py
   [10] ○ extract_function   → examples/utils/start_mcp_server.py

@@ -1,24 +1,24 @@
-# pfix | 443 func | 64f | 13971L | python | 2026-03-29
+# pfix | 466 func | 64f | 14021L | python | 2026-03-29
 
 HEALTH:
-  CC̄=3.9  critical=29 (limit:10)  dup=2  cycles=0
+  CC̄=3.8  critical=21 (limit:10)  dup=2  cycles=0
 
 ALERTS[20]:
-  !!  high_fan_out     get_log_stats = 18 (limit:10)
-  !!  high_fan_out     init_wizard = 17 (limit:10)
-  !!  high_fan_out     find_related_files = 16 (limit:10)
   !!  high_fan_out     update_requirements_file = 16 (limit:10)
   !!  high_fan_out     EnvDiagnostics.__init__ = 16 (limit:10)
-  !!  high_fan_out     ImportDiagnostic._build_import_graph = 15 (limit:10)
   !!  high_fan_out     RuntimeCollector._build_issue = 15 (limit:10)
   !   high_fan_out     PfixConfig.from_env = 14 (limit:10)
   !   high_fan_out     FixCache.set = 14 (limit:10)
-  !   high_fan_out     ConfigEnvDiagnostic._check_dotenv = 14 (limit:10)
+  !   high_fan_out     render_dashboard = 13 (limit:10)
+  !   high_fan_out     parse_multi_file_response = 13 (limit:10)
+  !   high_fan_out     _replace_function = 13 (limit:10)
+  !   high_fan_out     PfixMonitor.handle_exception = 13 (limit:10)
+  !   high_fan_out     _handle_syntax_error = 13 (limit:10)
 
 MODULES[67] (top by size):
-  M[src/pfix/env_diagnostics/imports.py] 486L C:1 F:15 CC↑12 D:0 (python)
+  M[src/pfix/env_diagnostics/imports.py] 486L C:1 F:19 CC↑11 D:0 (python)
   M[src/pfix/logging.py] 351L C:5 F:18 CC↑6 D:0 (python)
-  M[src/pfix/env_diagnostics/python_version.py] 342L C:1 F:11 CC↑12 D:0 (python)
+  M[src/pfix/env_diagnostics/python_version.py] 342L C:1 F:15 CC↑11 D:0 (python)
   M[src/pfix/fixer.py] 338L C:0 F:18 CC↑10 D:7 (python)
   M[src/pfix/production.py] 323L C:4 F:13 CC↑9 D:0 (python)
   M[src/pfix/env_diagnostics/filesystem.py] 311L C:1 F:12 CC↑7 D:0 (python)
@@ -34,19 +34,16 @@ MODULES[67] (top by size):
   LANGS: python:66/shell:1
 
 HOTSPOTS[10]:
-  ★ get_log_stats fan=18  // Calculate statistics from log files.
-  ★ init_wizard fan=17  // Run the interactive setup wizard.
-  ★ find_related_files fan=16  // Find files related to the error through imports.
-
-Args:
-    source_file: File wh
   ★ update_requirements_file fan=16  // Append packages to requirements.txt.
   ★ EnvDiagnostics.__init__ fan=16  // Orchestrates 16 calls
+  ★ RuntimeCollector._build_issue fan=15  // Build RuntimeIssue from exception.
+  ★ PfixConfig.from_env fan=14  // Load config from .env + environment + pyproject.toml.
+  ★ FixCache.set fan=14  // Cache fix proposal for error context.
 
 REFACTOR[3]:
-  [1] M/M Reduce get_log_stats fan-out (currently 18)
-  [2] M/M Reduce init_wizard fan-out (currently 17)
-  [3] M/M Reduce find_related_files fan-out (currently 16)
+  [1] M/M Reduce update_requirements_file fan-out (currently 16)
+  [2] M/M Reduce EnvDiagnostics.__init__ fan-out (currently 16)
+  [3] M/M Reduce RuntimeCollector._build_issue fan-out (currently 15)
 
 EVOLUTION:
-  2026-03-29 CC̄=3.9 crit=29 13971L // Automated analysis
+  2026-03-29 CC̄=3.8 crit=21 14021L // Automated analysis

@@ -84,36 +84,35 @@ def _extract_frame_context(
     exc: BaseException,
     local_vars: Optional[dict] = None,
 ) -> dict:
-    """Extract context from innermost traceback frame."""
-    result = {
-        "source_file": "",
-        "line_number": 0,
-        "function_name": "",
-        "local_vars": {},
-    }
-
+    """Extract context from innermost traceback frame. CC≤4."""
     tb = exc.__traceback__
     if tb is None:
-        return result
+        return {"source_file": "", "line_number": 0, "function_name": "", "local_vars": {}}
 
-    # Walk to innermost user-code frame
+    # Find the deepest frame
     while tb.tb_next is not None:
         tb = tb.tb_next
 
     frame = tb.tb_frame
-    result["line_number"] = tb.tb_lineno
-    result["source_file"] = frame.f_code.co_filename
-    result["function_name"] = frame.f_code.co_name
-
     if local_vars is None:
         local_vars = frame.f_locals
 
-    result["local_vars"] = {
-        k: _safe_repr(v) for k, v in (local_vars or {}).items()
-        if not k.startswith("__")
+    return {
+        "line_number": tb.tb_lineno,
+        "source_file": frame.f_code.co_filename,
+        "function_name": frame.f_code.co_name,
+        "local_vars": _format_local_vars(local_vars),
     }
 
-    return result
+
+def _format_local_vars(local_vars: Optional[dict]) -> dict[str, str]:
+    """Anonymize and repr local variables."""
+    if not local_vars:
+        return {}
+    return {
+        k: _safe_repr(v) for k, v in local_vars.items()
+        if not k.startswith("__")
+    }
 
 
 def _extract_function_source(func: Optional[Any]) -> dict:

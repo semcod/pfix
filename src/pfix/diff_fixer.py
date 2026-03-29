@@ -24,7 +24,6 @@ class DiffParseError(Exception):
 def parse_unified_diff(diff_text: str) -> list[tuple[str, str, list[str]]]:
     """
     Parse unified diff text into hunks.
-
     Returns list of (old_path, new_path, hunk_lines).
     """
     hunks = []
@@ -32,45 +31,53 @@ def parse_unified_diff(diff_text: str) -> list[tuple[str, str, list[str]]]:
     i = 0
 
     while i < len(lines):
-        line = lines[i]
-
-        # Look for diff header
-        if line.startswith("--- "):
-            old_path = line[4:].split("\t")[0].strip()
-            i += 1
-            if i >= len(lines):
-                raise DiffParseError("Unexpected end of diff after ---")
-
-            new_line = lines[i]
-            if not new_line.startswith("+++ "):
-                raise DiffParseError(f"Expected +++ after ---, got: {new_line[:20]}")
-            new_path = new_line[4:].split("\t")[0].strip()
-            i += 1
-
-            # Collect hunk lines
-            hunk_lines = []
-            while i < len(lines):
-                line = lines[i]
-                if line.startswith("--- "):
-                    # Next file
-                    break
-                if line.startswith("@@") or line.startswith("+") or line.startswith("-") or line.startswith(" ") or line == "":
-                    hunk_lines.append(line)
-                    i += 1
-                else:
-                    break
-
+        if lines[i].startswith("--- "):
+            old_path, new_path, next_i = _parse_file_header(lines, i)
+            hunk_lines, next_i = _collect_hunk_lines(lines, next_i)
             hunks.append((old_path, new_path, hunk_lines))
+            i = next_i
         else:
             i += 1
 
     return hunks
 
 
+def _parse_file_header(lines: list[str], i: int) -> tuple[str, str, int]:
+    """Parse --- and +++ lines."""
+    old_line = lines[i]
+    old_path = old_line[4:].split("\t")[0].strip()
+    
+    i += 1
+    if i >= len(lines):
+        raise DiffParseError("Unexpected end of diff after ---")
+
+    new_line = lines[i]
+    if not new_line.startswith("+++ "):
+        raise DiffParseError(f"Expected +++ after ---, got: {new_line[:20]}")
+    
+    new_path = new_line[4:].split("\t")[0].strip()
+    return old_path, new_path, i + 1
+
+
+def _collect_hunk_lines(lines: list[str], i: int) -> tuple[list[str], int]:
+    """Collect lines belonging to a hunk until next file or end."""
+    hunk_lines = []
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("--- "):
+            break
+        
+        if any(line.startswith(p) for p in ("@@", "+", "-", " ")) or line == "":
+            hunk_lines.append(line)
+            i += 1
+        else:
+            break
+    return hunk_lines, i
+
+
 def parse_hunk_header(line: str) -> tuple[int, int, int, int]:
     """
     Parse hunk header like @@ -1,5 +1,7 @@.
-
     Returns (old_start, old_count, new_start, new_count).
     """
     match = re.match(r"@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", line)
@@ -92,56 +99,41 @@ def apply_hunk(
 ) -> list[str]:
     """
     Apply a single hunk to old_lines.
-
-    Args:
-        old_lines: Original file lines
-        hunk_lines: Diff hunk lines (starting with @@)
-        old_start: 1-based starting line in old file
-
-    Returns:
-        New lines with hunk applied
+    Returns New lines with hunk applied.
     """
     if not hunk_lines:
         return old_lines[:]
 
-    # Parse hunk header
     header = hunk_lines[0]
     if not header.startswith("@@"):
         raise DiffParseError(f"Hunk must start with @@, got: {header[:20]}")
 
     _, old_count, _, _ = parse_hunk_header(header)
-
-    # Convert to 0-based index
     start_idx = old_start - 1
+    
+    processed_lines, lines_consumed = _process_hunk_body(hunk_lines[1:], old_lines[start_idx:])
+    
+    return old_lines[:start_idx] + processed_lines + old_lines[start_idx + old_count:]
 
-    # Collect context and changes
-    old_idx = start_idx
-    new_lines = old_lines[:start_idx]  # Lines before hunk
 
-    # Process each line in hunk
-    for line in hunk_lines[1:]:
-        if not line:
-            continue
-
+def _process_hunk_body(hunk_lines: list[str], old_lines_from_start: list[str]) -> tuple[list[str], int]:
+    """Process lines within a hunk body and return new lines and count of old lines consumed."""
+    new_lines = []
+    old_ptr = 0
+    
+    for line in hunk_lines:
+        if not line: continue
+        
         if line.startswith("-"):
-            # Removed line - skip from old
-            old_idx += 1
+            old_ptr += 1
         elif line.startswith("+"):
-            # Added line
             new_lines.append(line[1:])
         elif line.startswith(" "):
-            # Context line - copy from old
-            if old_idx < len(old_lines):
-                new_lines.append(old_lines[old_idx])
-            old_idx += 1
-        # Skip other lines (like \\ No newline at end of file)
-
-    # Add remaining lines after hunk
-    # We consumed old_count lines from old
-    end_idx = start_idx + old_count
-    new_lines.extend(old_lines[end_idx:])
-
-    return new_lines
+            if old_ptr < len(old_lines_from_start):
+                new_lines.append(old_lines_from_start[old_ptr])
+            old_ptr += 1
+            
+    return new_lines, old_ptr
 
 
 def apply_diff(
@@ -150,43 +142,29 @@ def apply_diff(
 ) -> str:
     """
     Apply unified diff to original content.
-
-    Args:
-        original_content: Original file content
-        diff_text: Unified diff
-
-    Returns:
-        New content with diff applied
+    Returns New content with diff applied.
     """
     hunks = parse_unified_diff(diff_text)
 
     if not hunks:
         raise DiffParseError("No hunks found in diff")
 
-    # For now, only support single-file diffs
     if len(hunks) > 1:
-        # Multiple files - just apply first hunk
         console.print("[yellow]⚠ Multi-file diff detected, using first hunk[/]")
 
     old_path, new_path, hunk_lines = hunks[0]
 
-    # Parse hunk header for line numbers
     if not hunk_lines or not hunk_lines[0].startswith("@@"):
         raise DiffParseError("Hunk missing @@ header")
 
     header = hunk_lines[0]
     old_start, _, _, _ = parse_hunk_header(header)
 
-    # Apply to content
     old_lines = original_content.splitlines(keepends=True)
-
-    # Normalize line endings
     if not any(line.endswith("\n") for line in old_lines if line):
-        old_lines = original_content.splitlines()
-        old_lines = [line + "\n" for line in old_lines]
+        old_lines = [line + "\n" for line in original_content.splitlines()]
 
     new_lines = apply_hunk(old_lines, hunk_lines, old_start)
-
     return "".join(new_lines)
 
 

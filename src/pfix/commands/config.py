@@ -81,17 +81,27 @@ def cmd_status(args=None) -> int:
 
 
 def _get_installation_status_table(config) -> tuple[Table, Path | None]:
-    """Build the installation status table. Returns (table, pth_file)."""
-    import site
-
+    """Build the installation status table. Returns (table, pth_file). CC≤4."""
     table = Table(title="Installation Status", show_header=False)
     table.add_column("Item", style="cyan")
     table.add_column("Status")
 
-    # Check if pfix is importable
+    _check_package_status(table)
+    pth_file = _check_activation_status(table)
+    _check_pyproject_status(table)
+    _check_env_status(table)
+
+    return table, pth_file
+
+
+def _check_package_status(table: Table):
+    """Check if pfix package is importable."""
     table.add_row("pfix package", "[green]✓ installed[/]")
 
-    # Check auto-activation .pth file
+
+def _check_activation_status(table: Table) -> Path | None:
+    """Check auto-activation .pth file status."""
+    import site
     site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
     if not site_packages:
         site_packages = Path(site.getusersitepackages()) if site.getusersitepackages() else None
@@ -101,11 +111,14 @@ def _get_installation_status_table(config) -> tuple[Table, Path | None]:
         table.add_row("Auto-activation", f"[green]✓ enabled[/] ([dim]{pth_file}[/dim])")
     else:
         table.add_row("Auto-activation", "[yellow]⚠ disabled[/] ([dim]run: pfix enable[/dim])")
+    return pth_file
 
-    # Check pyproject.toml
+
+def _check_pyproject_status(table: Table):
+    """Check pyproject.toml and pfix section."""
     pyproject = Path.cwd() / "pyproject.toml"
     if pyproject.exists():
-        content = pyproject.read_text()
+        content = path_read_safe(pyproject)
         if "[tool.pfix]" in content:
             table.add_row("Configuration", f"[green]✓ found[/] ([dim]{pyproject}[/dim])")
         else:
@@ -113,7 +126,9 @@ def _get_installation_status_table(config) -> tuple[Table, Path | None]:
     else:
         table.add_row("Configuration", "[yellow]⚠ no pyproject.toml[/]")
 
-    # Check .env file
+
+def _check_env_status(table: Table):
+    """Check for .env file presence."""
     env_file = None
     for parent in [Path.cwd(), *Path.cwd().parents]:
         e = parent / ".env"
@@ -125,7 +140,13 @@ def _get_installation_status_table(config) -> tuple[Table, Path | None]:
     else:
         table.add_row("Environment", "[yellow]⚠ no .env file[/]")
 
-    return table, pth_file
+
+def path_read_safe(path: Path) -> str:
+    """Safely read file content."""
+    try:
+        return path.read_text()
+    except Exception:
+        return ""
 
 
 def _get_config_table(config) -> Table:
