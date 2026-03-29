@@ -1,7 +1,7 @@
 # pfix | 67f 12405L | python:66,shell:1 | 2026-03-29
 # stats: 496 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
 # alerts[5]: fan-out EnvDiagnostics.__init__=16; fan-out RuntimeCollector._build_issue=15; fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13
-# hotspots[5]: EnvDiagnostics.__init__ fan=16; RuntimeCollector._build_issue fan=15; FixCache.set fan=14; render_dashboard fan=13; parse_multi_file_response fan=13
+# hotspots[5]: EnvDiagnostics.__init__ fan=16; RuntimeCollector._build_issue fan=15; FixCache.set fan=14; parse_multi_file_response fan=13; render_dashboard fan=13
 # evolution: CC̄ 3.6→3.6 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[67]:
@@ -136,14 +136,6 @@ D:
     _handle_import_error_hook(exc_value)
     _handle_generic_error_hook(exc_value;auto_apply;config)
     _restart_process(exc_value)
-  src/pfix/audit.py:
-    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
-    AuditEntry:  # Single audit entry for a fix operation...
-    _calculate_hash(content)
-    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
-    read_audit_log(since;filepath;limit)
-    get_audit_summary(days)
-    print_audit_report(days)
   src/pfix/decorator.py:
     e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_ensure_deps,_try_quick_dep_fix,_try_reload_module
     _capture_runtime_error(exc;func;hints)
@@ -157,6 +149,14 @@ D:
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
+  src/pfix/audit.py:
+    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
+    AuditEntry:  # Single audit entry for a fix operation...
+    _calculate_hash(content)
+    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
+    read_audit_log(since;filepath;limit)
+    get_audit_summary(days)
+    print_audit_report(days)
   src/pfix/env_diagnostics/third_party.py:
     e: ThirdPartyDiagnostic
     ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
@@ -214,6 +214,11 @@ Collection m...
     build_multi_file_context(error_ctx;related_files)
     parse_multi_file_response(raw)
     apply_multi_file_fix(proposal;project_root;create_backups)
+  src/pfix/syntax_error_handler.py:
+    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
+    _build_syntax_error_context(exc)
+    _apply_syntax_fix(ctx;proposal;auto_apply;config)
+    handle_syntax_error(exc;auto_apply)
   src/pfix/rollback.py:
     e: find_backup_dir,list_backups,rollback_last,rollback_file,rollback_before,show_history,rollback_command
     find_backup_dir(filepath)
@@ -223,11 +228,6 @@ Collection m...
     rollback_before(cutoff_date)
     show_history(limit)
     rollback_command(last;filepath;before)
-  src/pfix/syntax_error_handler.py:
-    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
-    _build_syntax_error_context(exc)
-    _apply_syntax_fix(ctx;proposal;auto_apply;config)
-    handle_syntax_error(exc;auto_apply)
   src/pfix/rules.py:
     e: ProjectRules,load_project_rules,get_rules_for_prompt
     ProjectRules: __init__(1),_load(0),get_rules_text(0),get_section(1),has_rules(0)  # Loaded project rules...
@@ -306,6 +306,13 @@ Collection m...
     render_dashboard()
     run_console_dashboard()
     run_dashboard()
+  src/pfix/validation.py:
+    e: ValidationResult,run_tests,validate_fix,quick_validate_syntax,validate_with_fallback
+    ValidationResult:  # Result of test validation...
+    run_tests(command;timeout;cwd)
+    validate_fix(source_file;proposal;backup_path;command)
+    quick_validate_syntax(filepath)
+    validate_with_fallback(ctx;proposal;backup_path)
   src/pfix/logging.py:
     e: FixEvent,JsonLinesLogger,SQLiteLogger,SentryIntegration,Logger,get_logger,log_fix
     FixEvent: to_dict(0),to_json(0)  # Structured log event for each fix operation...
@@ -315,13 +322,6 @@ Collection m...
     Logger: __init__(3),log(6),get_stats(0)  # Main logger combining multiple backends...
     get_logger()
     log_fix(ctx;proposal;fix_applied;duration_ms)
-  src/pfix/validation.py:
-    e: ValidationResult,run_tests,validate_fix,quick_validate_syntax,validate_with_fallback
-    ValidationResult:  # Result of test validation...
-    run_tests(command;timeout;cwd)
-    validate_fix(source_file;proposal;backup_path;command)
-    quick_validate_syntax(filepath)
-    validate_with_fallback(ctx;proposal;backup_path)
   src/pfix/permissions.py:
     e: get_environment,check_auto_apply_allowed,check_complexity_approval,check_blocked_path,check_all_permissions,get_permissions_summary
     get_environment()

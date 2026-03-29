@@ -1,4 +1,4 @@
-# pfix | 496 func | 64f | 14096L | python | 2026-03-29
+# pfix | 496 func | 64f | 14106L | python | 2026-03-29
 
 HEALTH:
   CC̄=3.6  critical=12 (limit:10)  dup=2  cycles=0
@@ -7,8 +7,8 @@ ALERTS[20]:
   !!  high_fan_out     EnvDiagnostics.__init__ = 16 (limit:10)
   !!  high_fan_out     RuntimeCollector._build_issue = 15 (limit:10)
   !   high_fan_out     FixCache.set = 14 (limit:10)
-  !   high_fan_out     render_dashboard = 13 (limit:10)
   !   high_fan_out     parse_multi_file_response = 13 (limit:10)
+  !   high_fan_out     render_dashboard = 13 (limit:10)
   !   high_fan_out     _replace_function = 13 (limit:10)
   !   high_fan_out     PfixMonitor.handle_exception = 13 (limit:10)
   !   high_fan_out     cmd_run = 13 (limit:10)
@@ -30,24 +30,24 @@ MODULES[67] (top by size):
   M[src/pfix/decorator.py] 278L C:0 F:9 CC↑10 D:25 (python)
   M[src/pfix/env_diagnostics/third_party.py] 271L C:1 F:6 CC↑10 D:0 (python)
   M[src/pfix/explain.py] 267L C:0 F:4 CC↑5 D:1 (python)
-  M[src/pfix/env_diagnostics/config_env.py] 256L C:1 F:12 CC↑9 D:0 (python)
+  M[src/pfix/env_diagnostics/__init__.py] 258L C:1 F:8 CC↑8 D:0 (python)
   LANGS: python:66/shell:1
 
 HOTSPOTS[10]:
   ★ EnvDiagnostics.__init__ fan=16  // Orchestrates 16 calls
   ★ RuntimeCollector._build_issue fan=15  // Build RuntimeIssue from exception.
   ★ FixCache.set fan=14  // Cache fix proposal for error context.
-  ★ render_dashboard fan=13  // Render rich console dashboard.
   ★ parse_multi_file_response fan=13  // Parse LLM response for multi-file fix.
 
 Args:
     raw: Raw LLM response text
 
 Re
+  ★ render_dashboard fan=13  // Render rich console dashboard.
 
 REFACTOR[2]:
   [1] M/M Reduce EnvDiagnostics.__init__ fan-out (currently 16)
   [2] M/M Reduce RuntimeCollector._build_issue fan-out (currently 15)
 
 EVOLUTION:
-  2026-03-29 CC̄=3.6 crit=12 14096L // Automated analysis
+  2026-03-29 CC̄=3.6 crit=12 14106L // Automated analysis

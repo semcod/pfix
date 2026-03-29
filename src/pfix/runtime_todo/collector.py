@@ -94,27 +94,22 @@ class RuntimeCollector:
         """Build RuntimeIssue from exception."""
         frames = self._extract_frames(exc)
         top_frame = frames[0] if frames else None
-
         ctx = context or {}
 
+        # Extract location info from top frame
+        location = self._get_location_info(top_frame)
+
+        # Build issue with grouped field extraction
         issue = RuntimeIssue(
-            abs_filepath=top_frame.filepath if top_frame else "<unknown>",
-            line_number=top_frame.line_number if top_frame else 0,
-            function_name=top_frame.function_name if top_frame else "<unknown>",
+            abs_filepath=location["filepath"],
+            line_number=location["line_number"],
+            function_name=location["function_name"],
             module_name=self._filepath_to_module(top_frame.filepath) if top_frame else "",
             exception_type=type(exc).__name__,
             exception_message=str(exc),
             traceback_frames=frames,
-            timestamp=datetime.now(timezone.utc),
-            occurrence_count=1,
-            first_seen=datetime.now(timezone.utc),
-            last_seen=datetime.now(timezone.utc),
-            python_version=platform.python_version(),
-            venv_path=os.environ.get("VIRTUAL_ENV"),
-            hostname=platform.node(),
-            pid=os.getpid(),
-            working_dir=os.getcwd(),
-            argv=sys.argv[:],
+            **self._get_system_info(),  # Grouped system fields
+            **self._get_timestamps(),   # Grouped timestamp fields
             category=self._classify(exc),
             severity=self._severity(exc),
             fingerprint="",  # computed below
@@ -123,6 +118,37 @@ class RuntimeCollector:
         )
         issue.fingerprint = ErrorFingerprint.compute(issue)
         return issue
+
+    def _get_location_info(self, top_frame: Optional[TraceFrame]) -> dict[str, str | int]:
+        """Extract location information from top frame."""
+        if top_frame:
+            return {
+                "filepath": top_frame.filepath,
+                "line_number": top_frame.line_number,
+                "function_name": top_frame.function_name,
+            }
+        return {"filepath": "<unknown>", "line_number": 0, "function_name": "<unknown>"}
+
+    def _get_system_info(self) -> dict[str, str | int | list[str]]:
+        """Get system information fields."""
+        return {
+            "python_version": platform.python_version(),
+            "venv_path": os.environ.get("VIRTUAL_ENV"),
+            "hostname": platform.node(),
+            "pid": os.getpid(),
+            "working_dir": os.getcwd(),
+            "argv": sys.argv[:],
+        }
+
+    def _get_timestamps(self) -> dict[str, datetime]:
+        """Get timestamp fields (all set to same value)."""
+        now = datetime.now(timezone.utc)
+        return {
+            "timestamp": now,
+            "first_seen": now,
+            "last_seen": now,
+            "occurrence_count": 1,
+        }
 
     def _extract_frames(self, exc: BaseException) -> list[TraceFrame]:
         """Extract frames from traceback. Absolute paths only."""

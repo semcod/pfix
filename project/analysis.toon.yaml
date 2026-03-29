@@ -6,15 +6,15 @@ HEALTH[0]: ok
 REFACTOR[0]: none needed
 
 PIPELINES[394]:
-  [1] Src [main]: main → run_git_checkout
+  [1] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [2] Src [main]: main → reset_examples
+  [2] Src [main]: main → run_git_checkout
       PURITY: 100% pure
-  [3] Src [crash_me]: crash_me → pfix → get_config
+  [3] Src [main]: main → reset_examples
       PURITY: 100% pure
-  [4] Src [main]: main → _build_parser
+  [4] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
-  [5] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [5] Src [build_multi_file_context]: build_multi_file_context
       PURITY: 100% pure
 
 LAYERS:

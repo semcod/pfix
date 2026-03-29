@@ -45,24 +45,34 @@ from .venv import VenvDiagnostic
 class EnvDiagnostics:
     """Orchestrator for all environment diagnostics."""
 
+    # Registry of diagnostic classes - centralized definition
+    _DIAGNOSTIC_CLASSES: list[type[BaseDiagnostic]] = [
+        ImportDiagnostic,
+        FilesystemDiagnostic,
+        VenvDiagnostic,
+        PythonVersionDiagnostic,
+        MemoryDiagnostic,
+        NetworkDiagnostic,
+        ProcessDiagnostic,
+        EncodingDiagnostic,
+        PathDiagnostic,
+        ConfigEnvDiagnostic,
+        ConcurrencyDiagnostic,
+        SerializationDiagnostic,
+        HardwareDiagnostic,
+        ThirdPartyDiagnostic,
+    ]
+
     def __init__(self, project_root: Path | None = None):
         self.project_root = Path(project_root or ".").resolve()
-        self.diagnostics: list[BaseDiagnostic] = [
-            ImportDiagnostic(),
-            FilesystemDiagnostic(),
-            VenvDiagnostic(),
-            PythonVersionDiagnostic(),
-            MemoryDiagnostic(),
-            NetworkDiagnostic(),
-            ProcessDiagnostic(),
-            EncodingDiagnostic(),
-            PathDiagnostic(),
-            ConfigEnvDiagnostic(),
-            ConcurrencyDiagnostic(),
-            SerializationDiagnostic(),
-            HardwareDiagnostic(),
-            ThirdPartyDiagnostic(),
-        ]
+        self._diagnostics: list[BaseDiagnostic] | None = None  # Lazy initialization
+
+    @property
+    def diagnostics(self) -> list[BaseDiagnostic]:
+        """Lazy initialization of diagnostic instances."""
+        if self._diagnostics is None:
+            self._diagnostics = [cls() for cls in self._DIAGNOSTIC_CLASSES]
+        return self._diagnostics
 
     def check_all(self, categories: list[str] | None = None) -> list["DiagnosticResult"]:
         """Run all or selected proactive diagnostics.
