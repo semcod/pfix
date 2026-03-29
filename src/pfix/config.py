@@ -56,6 +56,9 @@ class PfixConfig:
     # Extra context for LLM
     extra_context: dict = field(default_factory=dict)
 
+    # Internal cache for pyproject.toml data
+    _pyproject_data: dict = field(default_factory=dict, repr=False)
+
     @classmethod
     def from_env(cls, dotenv_path: Optional[str] = None) -> "PfixConfig":
         """Load config from .env + environment + pyproject.toml."""
@@ -101,7 +104,10 @@ class PfixConfig:
                 cfg.llm_model = f"openrouter/{cfg.llm_model}"
 
         # Merge pyproject.toml [tool.pfix]
-        pyproject = cls._read_pyproject(cfg.project_root / "pyproject.toml")
+        pyproject_full = cls._read_pyproject_full(cfg.project_root / "pyproject.toml")
+        cfg._pyproject_data = pyproject_full
+        
+        pyproject = pyproject_full.get("tool", {}).get("pfix", {})
         for key, val in pyproject.items():
             if hasattr(cfg, key) and not os.getenv(f"PFIX_{key.upper()}"):
                 setattr(cfg, key, val)
@@ -109,7 +115,7 @@ class PfixConfig:
         return cfg
 
     @staticmethod
-    def _read_pyproject(path: Path) -> dict:
+    def _read_pyproject_full(path: Path) -> dict:
         if not path.exists():
             return {}
         try:
@@ -119,9 +125,11 @@ class PfixConfig:
                 import tomli as tomllib  # type: ignore
             except ImportError:
                 return {}
-        with open(path, "rb") as f:
-            data = tomllib.load(f)
-        return data.get("tool", {}).get("pfix", {})
+        try:
+            with open(path, "rb") as f:
+                return tomllib.load(f)
+        except Exception:
+            return {}
 
     def validate(self) -> list[str]:
         warnings = []

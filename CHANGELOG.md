@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.42] - 2026-03-29
+
+### Docs
+- Update TODO.md
+
+### Other
+- Update diag_report.json
+- Update verify_runtime.py
+
 ## [0.1.41] - 2026-03-29
 
 ### Other

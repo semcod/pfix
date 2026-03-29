@@ -18,12 +18,12 @@ Auto-activation via .env:
     without any code changes (just import pfix).
 """
 
-from .config import PfixConfig, configure, get_config
+from .config import PfixConfig, configure, get_config, reset_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.41"
-__all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig"]
+__version__ = "0.1.42"
+__all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig", "reset_config"]
 
 # ── Auto-activation on import ─────────────────────────────────────
 # If PFIX_AUTO_APPLY=true in .env, automatically install global exception hook
@@ -64,13 +64,24 @@ def _auto_activate():
         
         install_pfix_hook(caller_file, auto_apply=True)
 
-    # Check for runtime_todo auto-activation
-    runtime_todo_enabled = os.getenv("PFIX_RUNTIME_TODO", "false").lower() in ("true", "1", "yes")
+    # Check for runtime_todo auto-activation (via env or pyproject)
+    from .config import get_config
+    config = get_config()
+    pyproject = getattr(config, "_pyproject_data", {})
+    rt_config = pyproject.get("tool", {}).get("pfix", {}).get("runtime_todo", {})
+    
+    runtime_todo_enabled = os.getenv("PFIX_RUNTIME_TODO", str(rt_config.get("enabled", "false"))).lower() in ("true", "1", "yes")
     if runtime_todo_enabled:
         try:
             from .runtime_todo import RuntimeCollector, TodoFile
-            todo = TodoFile(os.getenv("PFIX_TODO_FILE", "TODO.md"))
-            collector = RuntimeCollector(todo, enabled=True)
+            todo_path = os.getenv("PFIX_TODO_FILE", rt_config.get("todo_file", "TODO.md"))
+            todo = TodoFile(todo_path)
+            collector = RuntimeCollector(
+                todo, 
+                enabled=True,
+                min_severity=rt_config.get("min_severity", "low"),
+                deduplicate=rt_config.get("deduplicate", True),
+            )
             collector.install_excepthook()
         except Exception:
             pass  # Never break user code
