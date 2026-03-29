@@ -4,7 +4,10 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/pfix.svg)](https://pypi.org/project/pfix/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Examples: 56](https://img.shields.io/badge/examples-56-blue)](examples/)
+[![Ruff](https://img.shields.io/badge/linter-ruff-purple.svg)](https://github.com/astral-sh/ruff)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen.svg)](https://pre-commit.com/)
+[![Tests: 56 examples](https://img.shields.io/badge/tests-56%20examples-blue)](examples/)
+[![Docs](https://img.shields.io/badge/docs-available-brightgreen.svg)](docs/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.

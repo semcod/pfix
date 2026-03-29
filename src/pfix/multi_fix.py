@@ -35,68 +35,67 @@ def find_related_files(
     error_ctx: ErrorContext,
     max_depth: int = 2,
 ) -> list[Path]:
-    """
-    Find files related to the error through imports.
-
-    Args:
-        source_file: File where error occurred
-        error_ctx: Error context
-        max_depth: How many levels of imports to follow
-
-    Returns:
-        List of related file paths
-    """
+    """Find files related to the error through imports."""
     related = set()
     to_process = [(source_file, 0)]
     processed = set()
-
     project_root = source_file.parent
 
     while to_process:
         current, depth = to_process.pop(0)
 
-        if current in processed or depth > max_depth:
+        if current in processed or depth > max_depth or not current.exists():
             continue
         processed.add(current)
 
-        if not current.exists():
-            continue
-
-        try:
-            content = current.read_text(encoding="utf-8")
-            tree = ast.parse(content)
-
-            for node in ast.walk(tree):
-                if isinstance(node, ast.ImportFrom):
-                    module = node.module or ""
-                    # Try to resolve relative imports
-                    if module.startswith("."):
-                        # Relative import
-                        base = current.parent
-                    else:
-                        # Absolute import - look in project
-                        base = project_root
-
-                    parts = module.split(".")
-                    candidate = base / "/".join(parts) + ".py"
-
-                    if candidate.exists():
-                        related.add(candidate)
-                        to_process.append((candidate, depth + 1))
-
-                elif isinstance(node, ast.Import):
-                    for alias in node.names:
-                        name = alias.name.split(".")[0]
-                        # Look for local module
-                        candidate = project_root / f"{name}.py"
-                        if candidate.exists():
-                            related.add(candidate)
-                            to_process.append((candidate, depth + 1))
-
-        except (SyntaxError, UnicodeDecodeError):
-            continue
+        for module_name, is_relative in _extract_imports_from_file(current):
+            candidate = _resolve_import_path(module_name, current, project_root, is_relative)
+            if candidate and candidate.exists():
+                related.add(candidate)
+                to_process.append((candidate, depth + 1))
 
     return sorted(related)
+
+
+def _extract_imports_from_file(filepath: Path) -> list[tuple[str, bool]]:
+    """Extract list of (module_name, is_relative) from a Python file."""
+    imports = []
+    try:
+        content = filepath.read_text(encoding="utf-8")
+        tree = ast.parse(content)
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                if node.module:
+                    imports.append((node.module, node.level > 0 or node.module.startswith(".")))
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    imports.append((alias.name.split(".")[0], False))
+    except (SyntaxError, UnicodeDecodeError):
+        pass
+    return imports
+
+
+def _resolve_import_path(module_name: str, current_file: Path, project_root: Path, is_relative: bool) -> Optional[Path]:
+    """Resolve a module name to a filesystem path."""
+    if is_relative:
+        base = current_file.parent
+    else:
+        base = project_root
+
+    parts = module_name.split(".")
+    candidate = base / "/".join(parts)
+    
+    # Try .py and /__init__.py
+    py_file = candidate.with_suffix(".py")
+    if py_file.exists():
+        return py_file
+    
+    init_file = candidate / "__init__.py"
+    if init_file.exists():
+        return init_file
+        
+    return None
 
 
 def build_multi_file_context(

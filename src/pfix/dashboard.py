@@ -35,10 +35,9 @@ except ImportError:
 def get_log_stats(log_dir: Path = Path(".pfix_logs")) -> dict[str, Any]:
     """Calculate statistics from log files."""
     if not log_dir.exists():
-        return {"total_events": 0, "fixes_applied": 0, "avg_confidence": 0.0}
+        return {"total_events": 0, "fixes_applied": 0, "avg_confidence": 0.0, "recent_errors": []}
 
-    total = 0
-    fixes = 0
+    stats = {"total": 0, "fixes": 0}
     confidences = []
     recent_errors = []
 
@@ -48,37 +47,55 @@ def get_log_stats(log_dir: Path = Path(".pfix_logs")) -> dict[str, Any]:
         log_file = log_dir / f"pfix_{date}.jsonl"
         if not log_file.exists():
             continue
+        
+        _process_log_file(log_file, stats, confidences, recent_errors)
 
-        for line in log_file.read_text().strip().split("\n"):
+    return {
+        "total_events": stats["total"],
+        "fixes_applied": stats["fixes"],
+        "fix_rate": stats["fixes"] / stats["total"] if stats["total"] > 0 else 0,
+        "avg_confidence": sum(confidences) / len(confidences) if confidences else 0,
+        "recent_errors": list(reversed(recent_errors)),
+    }
+
+
+def _process_log_file(log_file: Path, stats: dict, confidences: list, recent_errors: list):
+    """Process single log file and update stats/history."""
+    try:
+        content = log_file.read_text(encoding="utf-8").strip()
+        if not content:
+            return
+
+        for line in content.split("\n"):
             if not line:
                 continue
             try:
                 entry = json.loads(line)
-                total += 1
-                if entry.get("fix_applied"):
-                    fixes += 1
-                conf = entry.get("confidence", 0)
-                if conf:
-                    confidences.append(conf)
-
-                # Collect recent errors
-                if len(recent_errors) < 10:
-                    recent_errors.append({
-                        "time": entry.get("timestamp", "?")[11:19] if entry.get("timestamp") else "?",
-                        "type": entry.get("exception_type", "Unknown"),
-                        "file": entry.get("source_file", "?").split("/")[-1],
-                        "confidence": conf,
-                    })
+                _update_stats_from_entry(entry, stats, confidences, recent_errors)
             except json.JSONDecodeError:
                 continue
+    except Exception:
+        pass
 
-    return {
-        "total_events": total,
-        "fixes_applied": fixes,
-        "fix_rate": fixes / total if total > 0 else 0,
-        "avg_confidence": sum(confidences) / len(confidences) if confidences else 0,
-        "recent_errors": list(reversed(recent_errors)),
-    }
+
+def _update_stats_from_entry(entry: dict, stats: dict, confidences: list, recent_errors: list):
+    """Update stats and recent errors from a single log entry."""
+    stats["total"] += 1
+    if entry.get("fix_applied"):
+        stats["fixes"] += 1
+    
+    conf = entry.get("confidence", 0)
+    if conf:
+        confidences.append(conf)
+
+    # Collect recent errors (limited to 10)
+    if len(recent_errors) < 10:
+        recent_errors.append({
+            "time": entry.get("timestamp", "?")[11:19] if entry.get("timestamp") else "?",
+            "type": entry.get("exception_type", "Unknown"),
+            "file": entry.get("source_file", "?").split("/")[-1],
+            "confidence": conf,
+        })
 
 
 def get_cache_stats(cache_dir: Path = Path(".pfix_cache")) -> dict[str, Any]:

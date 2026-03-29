@@ -1,51 +1,24 @@
-# redup/duplication | 22 groups | 75f 10422L | 2026-03-29
+# redup/duplication | 11 groups | 80f 10149L | 2026-03-29
 
 SUMMARY:
-  files_scanned: 75
-  total_lines:   10422
-  dup_groups:    22
-  dup_fragments: 47
-  saved_lines:   517
-  scan_ms:       4808
+  files_scanned: 80
+  total_lines:   10149
+  dup_groups:    11
+  dup_fragments: 25
+  saved_lines:   149
+  scan_ms:       4769
 
-DUPLICATES[22] (ranked by impact):
-  [258c7a2aafb85e06] ! STRU  cmd_enable  L=78 N=2 saved=78 sim=1.00
-      src/pfix/commands/activation.py:0-77  (cmd_enable)
-      src/pfix/cli.py:0-78  (cmd_enable)
-  [0b0bd9f92c24550b] ! EXAC  _get_installation_status_table  L=49 N=2 saved=49 sim=1.00
-      src/pfix/commands/config.py:0-48  (_get_installation_status_table)
-      src/pfix/cli.py:0-48  (_get_installation_status_table)
-  [07a2e361f8cb0d7d] ! EXAC  cmd_dev  L=48 N=2 saved=48 sim=1.00
-      src/pfix/commands/run.py:0-47  (cmd_dev)
-      src/pfix/cli.py:0-47  (cmd_dev)
-  [cd56b8f725c0db3a] ! EXAC  cmd_check  L=42 N=2 saved=42 sim=1.00
-      src/pfix/commands/config.py:0-41  (cmd_check)
-      src/pfix/cli.py:0-41  (cmd_check)
-  [ccfbc48e9fcff455] ! EXAC  cmd_run  L=40 N=2 saved=40 sim=1.00
-      src/pfix/commands/run.py:0-39  (cmd_run)
-      src/pfix/cli.py:0-39  (cmd_run)
-  [2f2975b7c20677dd] ! EXAC  cmd_disable  L=34 N=2 saved=34 sim=1.00
-      src/pfix/commands/activation.py:0-33  (cmd_disable)
-      src/pfix/cli.py:0-33  (cmd_disable)
-  [c2debad7d28c12d3] ! EXAC  cmd_status  L=31 N=2 saved=31 sim=1.00
-      src/pfix/commands/config.py:0-30  (cmd_status)
-      src/pfix/cli.py:0-30  (cmd_status)
+DUPLICATES[11] (ranked by impact):
   [e18ce76c91035468]   STRU  main  L=15 N=3 saved=30 sim=1.00
       examples/encoding/main.py:0-14  (main)
       examples/deps/main.py:0-14  (main)
       examples/concurrency/main.py:0-14  (main)
-  [8734d3814efd6f6b]   EXAC  _print_status_summary  L=18 N=2 saved=18 sim=1.00
-      src/pfix/commands/config.py:0-17  (_print_status_summary)
-      src/pfix/cli.py:0-17  (_print_status_summary)
+  [d0123b0b1205b064]   STRU  main  L=19 N=2 saved=19 sim=1.00
+      examples/production/main.py:0-18  (main)
+      examples/edge_cases/main.py:0-18  (main)
   [515a2e8ed570ff0f]   STRU  enhance_prompt  L=18 N=2 saved=18 sim=1.00
       src/pfix/strategies/flask.py:0-17  (enhance_prompt)
       src/pfix/strategies/fastapi.py:0-17  (enhance_prompt)
-  [f418c9199b147ebd]   STRU  main  L=17 N=2 saved=17 sim=1.00
-      examples/demo_auto.py:0-16  (main)
-      examples/demo1.py:0-16  (main)
-  [95a2a94e6a92d203]   STRU  _get_config_table  L=17 N=2 saved=17 sim=1.00
-      src/pfix/commands/config.py:0-16  (_get_config_table)
-      src/pfix/cli.py:0-18  (_get_config_table)
   [ffa5a585859227c9]   EXAC  _clear_pycache  L=16 N=2 saved=16 sim=1.00
       src/pfix/session.py:0-15  (_clear_pycache)
       src/pfix/fixer.py:0-15  (_clear_pycache)
@@ -57,96 +30,57 @@ DUPLICATES[22] (ranked by impact):
   [275db3cb0431cbce]   STRU  detect  L=12 N=2 saved=12 sim=1.00
       src/pfix/strategies/flask.py:0-11  (detect)
       src/pfix/strategies/fastapi.py:0-11  (detect)
-  [7720aa1a49c23d3f]   STRU  _validate_syntax  L=9 N=2 saved=9 sim=1.00
-      src/pfix/fixer.py:0-8  (_validate_syntax)
-      src/pfix/dependency.py:0-8  (is_module_available)
   [8e18a9671be36cb9]   STRU  get_logger  L=9 N=2 saved=9 sim=1.00
       src/pfix/logging.py:0-8  (get_logger)
       src/pfix/cache.py:0-8  (get_cache)
+  [7720aa1a49c23d3f]   STRU  is_module_available  L=9 N=2 saved=9 sim=1.00
+      src/pfix/dependency.py:0-8  (is_module_available)
+      src/pfix/fixer.py:0-8  (_validate_syntax)
   [c4780630df7dd84f]   STRU  start_application  L=9 N=2 saved=9 sim=1.00
       examples/production/cascading_errors.py:0-8  (start_application)
       examples/production/api_patterns.py:0-8  (run_etl_pipeline)
   [81bc496f9f95bb78]   STRU  start_mcp_server  L=8 N=2 saved=8 sim=1.00
       examples/deps/version_conflicts.py:0-7  (start_mcp_server)
       examples/imports/platform_specific.py:0-8  (test_optional_extra)
-  [8c95d0660859a94a]   EXAC  fetch_json  L=7 N=2 saved=7 sim=1.00
-      examples/demo.py:0-6  (fetch_json)
-      examples/shared.py:0-7  (fetch_json)
   [3ae3e21e9019f83e]   STRU  legacy_json_parse  L=7 N=2 saved=7 sim=1.00
       examples/deps/version_conflicts.py:0-6  (legacy_json_parse)
       examples/imports/shadowing.py:0-5  (parse_json_string)
-  [ade7488f8057b5e9]   EXAC  greet  L=6 N=2 saved=6 sim=1.00
-      examples/demo.py:0-5  (greet)
-      examples/shared.py:0-6  (greet)
 
-REFACTOR[22] (ranked by priority):
-  [1] ◐ extract_module     → src/pfix/utils/cmd_enable.py
-      WHY: 2 occurrences of 78-line block across 2 files — saves 78 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/activation.py
-  [2] ◐ extract_function   → src/pfix/utils/_get_installation_status_table.py
-      WHY: 2 occurrences of 49-line block across 2 files — saves 49 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/config.py
-  [3] ◐ extract_function   → src/pfix/utils/cmd_dev.py
-      WHY: 2 occurrences of 48-line block across 2 files — saves 48 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/run.py
-  [4] ◐ extract_function   → src/pfix/utils/cmd_check.py
-      WHY: 2 occurrences of 42-line block across 2 files — saves 42 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/config.py
-  [5] ◐ extract_function   → src/pfix/utils/cmd_run.py
-      WHY: 2 occurrences of 40-line block across 2 files — saves 40 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/run.py
-  [6] ◐ extract_function   → src/pfix/utils/cmd_disable.py
-      WHY: 2 occurrences of 34-line block across 2 files — saves 34 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/activation.py
-  [7] ◐ extract_function   → src/pfix/utils/cmd_status.py
-      WHY: 2 occurrences of 31-line block across 2 files — saves 31 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/config.py
-  [8] ○ extract_function   → examples/utils/main.py
+REFACTOR[11] (ranked by priority):
+  [1] ○ extract_function   → examples/utils/main.py
       WHY: 3 occurrences of 15-line block across 3 files — saves 30 lines
       FILES: examples/concurrency/main.py, examples/deps/main.py, examples/encoding/main.py
-  [9] ○ extract_function   → src/pfix/utils/_print_status_summary.py
-      WHY: 2 occurrences of 18-line block across 2 files — saves 18 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/config.py
-  [10] ○ extract_function   → src/pfix/strategies/utils/enhance_prompt.py
+  [2] ○ extract_function   → examples/utils/main.py
+      WHY: 2 occurrences of 19-line block across 2 files — saves 19 lines
+      FILES: examples/edge_cases/main.py, examples/production/main.py
+  [3] ○ extract_function   → src/pfix/strategies/utils/enhance_prompt.py
       WHY: 2 occurrences of 18-line block across 2 files — saves 18 lines
       FILES: src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py
-  [11] ○ extract_function   → examples/utils/main.py
-      WHY: 2 occurrences of 17-line block across 2 files — saves 17 lines
-      FILES: examples/demo1.py, examples/demo_auto.py
-  [12] ○ extract_function   → src/pfix/utils/_get_config_table.py
-      WHY: 2 occurrences of 17-line block across 2 files — saves 17 lines
-      FILES: src/pfix/cli.py, src/pfix/commands/config.py
-  [13] ○ extract_function   → src/pfix/utils/_clear_pycache.py
+  [4] ○ extract_function   → src/pfix/utils/_clear_pycache.py
       WHY: 2 occurrences of 16-line block across 2 files — saves 16 lines
       FILES: src/pfix/fixer.py, src/pfix/session.py
-  [14] ○ extract_function   → src/pfix/strategies/utils/get_priority.py
+  [5] ○ extract_function   → src/pfix/strategies/utils/get_priority.py
       WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
       FILES: src/pfix/strategies/django.py, src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py, src/pfix/strategies/pandas.py
-  [15] ○ extract_function   → src/pfix/strategies/utils/detect.py
+  [6] ○ extract_function   → src/pfix/strategies/utils/detect.py
       WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
       FILES: src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py
-  [16] ○ extract_function   → src/pfix/utils/_validate_syntax.py
-      WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
-      FILES: src/pfix/dependency.py, src/pfix/fixer.py
-  [17] ○ extract_function   → src/pfix/utils/get_logger.py
+  [7] ○ extract_function   → src/pfix/utils/get_logger.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: src/pfix/cache.py, src/pfix/logging.py
-  [18] ○ extract_function   → examples/production/utils/start_application.py
+  [8] ○ extract_function   → src/pfix/utils/is_module_available.py
+      WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
+      FILES: src/pfix/dependency.py, src/pfix/fixer.py
+  [9] ○ extract_function   → examples/production/utils/start_application.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: examples/production/api_patterns.py, examples/production/cascading_errors.py
-  [19] ○ extract_function   → examples/utils/start_mcp_server.py
+  [10] ○ extract_function   → examples/utils/start_mcp_server.py
       WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
       FILES: examples/deps/version_conflicts.py, examples/imports/platform_specific.py
-  [20] ○ extract_function   → examples/utils/fetch_json.py
-      WHY: 2 occurrences of 7-line block across 2 files — saves 7 lines
-      FILES: examples/demo.py, examples/shared.py
-  [21] ○ extract_function   → examples/utils/legacy_json_parse.py
+  [11] ○ extract_function   → examples/utils/legacy_json_parse.py
       WHY: 2 occurrences of 7-line block across 2 files — saves 7 lines
       FILES: examples/deps/version_conflicts.py, examples/imports/shadowing.py
-  [22] ○ extract_function   → examples/utils/greet.py
-      WHY: 2 occurrences of 6-line block across 2 files — saves 6 lines
-      FILES: examples/demo.py, examples/shared.py
 
 METRICS-TARGET:
-  dup_groups:  22 → 0
-  saved_lines: 517 lines recoverable
+  dup_groups:  11 → 0
+  saved_lines: 149 lines recoverable

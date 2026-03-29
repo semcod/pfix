@@ -32,68 +32,70 @@ class ConfigEnvDiagnostic(BaseDiagnostic):
         return results
 
     def _check_dotenv(self, project_root: Path) -> list["DiagnosticResult"]:
-        """Check .env file."""
-        from ..types import DiagnosticResult
-
+        """Check .env file for various issues."""
         results = []
-
         env_file = project_root / ".env"
         env_example = project_root / ".env.example"
 
         if env_example.exists() and not env_file.exists():
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="missing_dotenv",
-                status="warning",
-                message=".env.example exists but .env is missing",
-                details={"example": str(env_example)},
-                suggestion="Copy .env.example to .env and configure",
-                auto_fixable=True,
-                abs_path=str(env_example),
-                line_number=None,
-            ))
+            results.append(self._create_missing_env_result(env_example))
 
         if env_file.exists():
-            # Check for secrets
             content = env_file.read_text()
-            risky_patterns = ["SECRET", "PASSWORD", "KEY", "TOKEN", "API_KEY"]
+            results.extend(self._check_secrets_in_env(content, project_root, env_file))
+            results.extend(self._check_env_whitespace(content, env_file))
 
-            for pattern in risky_patterns:
-                if pattern in content.upper():
-                    # Check if in gitignore
-                    gitignore = project_root / ".gitignore"
-                    if gitignore.exists():
-                        gi_content = gitignore.read_text()
-                        if ".env" not in gi_content:
-                            results.append(DiagnosticResult(
-                                category=self.category,
-                                check_name="env_not_gitignored",
-                                status="critical",
-                                message=".env file may contain secrets but is not in .gitignore!",
-                                details={"env_file": str(env_file)},
-                                suggestion="Add .env to .gitignore immediately!",
-                                auto_fixable=True,
-                                abs_path=str(env_file),
-                                line_number=None,
-                            ))
-                            break
+        return results
 
-            # Check for trailing whitespace in values
-            for i, line in enumerate(content.splitlines(), 1):
-                if line.strip() and not line.startswith("#"):
-                    if line.rstrip() != line:
-                        results.append(DiagnosticResult(
-                            category=self.category,
-                            check_name="env_trailing_whitespace",
-                            status="warning",
-                            message=f".env line {i} has trailing whitespace",
-                            details={"line": i, "content": line[:50]},
-                            suggestion="Remove trailing whitespace from .env values",
-                            auto_fixable=True,
-                            abs_path=str(env_file),
-                            line_number=i,
-                        ))
+    def _create_missing_env_result(self, env_example: Path) -> "DiagnosticResult":
+        from ..types import DiagnosticResult
+        return DiagnosticResult(
+            category=self.category,
+            check_name="missing_dotenv",
+            status="warning",
+            message=".env.example exists but .env is missing",
+            details={"example": str(env_example)},
+            suggestion="Copy .env.example to .env and configure",
+            auto_fixable=True,
+            abs_path=str(env_example),
+        )
 
+    def _check_secrets_in_env(self, content: str, project_root: Path, env_file: Path) -> list["DiagnosticResult"]:
+        from ..types import DiagnosticResult
+        results = []
+        risky_patterns = ["SECRET", "PASSWORD", "KEY", "TOKEN", "API_KEY"]
+        
+        if any(p in content.upper() for p in risky_patterns):
+            gitignore = project_root / ".gitignore"
+            if gitignore.exists() and ".env" not in gitignore.read_text():
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="env_not_gitignored",
+                    status="critical",
+                    message=".env file may contain secrets but is not in .gitignore!",
+                    details={"env_file": str(env_file)},
+                    suggestion="Add .env to .gitignore immediately!",
+                    auto_fixable=True,
+                    abs_path=str(env_file),
+                ))
+        return results
+
+    def _check_env_whitespace(self, content: str, env_file: Path) -> list["DiagnosticResult"]:
+        from ..types import DiagnosticResult
+        results = []
+        for i, line in enumerate(content.splitlines(), 1):
+            if line.strip() and not line.startswith("#") and line.rstrip() != line:
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="env_trailing_whitespace",
+                    status="warning",
+                    message=f".env line {i} has trailing whitespace",
+                    details={"line": i},
+                    suggestion="Remove trailing whitespace from .env values",
+                    auto_fixable=True,
+                    abs_path=str(env_file),
+                    line_number=i,
+                ))
         return results
 
     def _check_required_vars(self, project_root: Path) -> list["DiagnosticResult"]:

@@ -42,26 +42,10 @@ class ImportDiagnostic(BaseDiagnostic):
 
         try:
             # Get all imports from project
-            all_imports = set()
-            for pyfile in project_root.rglob("*.py"):
-                if "__pycache__" in str(pyfile):
-                    continue
-                try:
-                    imports = self._extract_imports(pyfile.read_text())
-                    all_imports.update(imports)
-                except Exception:
-                    pass
+            all_imports = self._get_all_project_imports(project_root)
 
             # Check which are installed
-            try:
-                installed = {
-                    pkg.metadata["Name"].lower()
-                    for pkg in __import__("importlib.metadata").metadata.distributions()
-                }
-            except Exception:
-                installed = set()
-
-            # Check stdlib
+            installed = self._get_installed_packages()
             stdlib = sys.stdlib_module_names if hasattr(sys, 'stdlib_module_names') else set()
 
             for imp in all_imports:
@@ -79,63 +63,79 @@ class ImportDiagnostic(BaseDiagnostic):
                         line_number=None,
                     ))
 
-        except Exception as e:
+        except Exception:
             pass
 
         return results
 
+    def _get_all_project_imports(self, project_root: Path) -> set[str]:
+        """Collect all imports from Python files in the project."""
+        all_imports = set()
+        for pyfile in project_root.rglob("*.py"):
+            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
+                continue
+            try:
+                imports = self._extract_imports(pyfile.read_text())
+                all_imports.update(imports)
+            except Exception:
+                pass
+        return all_imports
+
+    def _get_installed_packages(self) -> set[str]:
+        """Get lowercase names of currently installed packages."""
+        try:
+            return {
+                pkg.metadata["Name"].lower()
+                for pkg in __import__("importlib.metadata").metadata.distributions()
+            }
+        except Exception:
+            return set()
+
     def _build_import_graph(
         self, project_root: Path
     ) -> tuple[dict[str, set[str]], dict[str, Path]]:
-        """Build import dependency graph from project files.
-
-        Returns:
-            Tuple of (module_imports, module_paths) where:
-            - module_imports: dict mapping module name to set of imported modules
-            - module_paths: dict mapping module name to file path
-        """
+        """Build import dependency graph from project files."""
         module_imports: dict[str, set[str]] = {}
         module_paths: dict[str, Path] = {}
 
         for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile):
+            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
                 continue
 
-            # Convert file path to module name
-            rel_path = pyfile.relative_to(project_root)
-            if pyfile.name == "__init__.py":
-                module_name = str(rel_path.parent).replace("/", ".").replace("\\", ".")
-            else:
-                module_name = str(rel_path.with_suffix("")).replace("/", ".").replace("\\", ".")
-
+            module_name = self._get_module_name(pyfile, project_root)
             module_paths[module_name] = pyfile
 
             try:
-                content = pyfile.read_text()
-                tree = ast.parse(content)
+                tree = ast.parse(pyfile.read_text())
                 imports = set()
 
                 for node in ast.walk(tree):
-                    if isinstance(node, ast.ImportFrom):
-                        if node.module:
-                            # Handle relative imports
-                            if node.level > 0:
-                                # Convert relative to absolute
-                                parts = module_name.split(".")
-                                base = parts[:-node.level] if node.level <= len(parts) else []
-                                if node.module:
-                                    target = ".".join(base + [node.module])
-                                else:
-                                    target = ".".join(base)
-                                imports.add(target)
-                            else:
-                                imports.add(node.module.split(".")[0])
+                    if isinstance(node, ast.ImportFrom) and node.module:
+                        if node.level > 0:
+                            imports.add(self._resolve_relative_import(node, module_name))
+                        else:
+                            imports.add(node.module.split(".")[0])
 
                 module_imports[module_name] = imports
             except (SyntaxError, UnicodeDecodeError):
                 pass
 
         return module_imports, module_paths
+
+    def _get_module_name(self, pyfile: Path, project_root: Path) -> str:
+        """Convert a file path to a module name."""
+        rel_path = pyfile.relative_to(project_root)
+        if pyfile.name == "__init__.py":
+            return str(rel_path.parent).replace(os.sep, ".")
+        return str(rel_path.with_suffix("")).replace(os.sep, ".")
+
+    def _resolve_relative_import(self, node: ast.ImportFrom, module_name: str) -> str:
+        """Convert a relative import to an absolute module name."""
+        parts = module_name.split(".")
+        base = parts[:-node.level] if node.level <= len(parts) else []
+        if node.module:
+            return ".".join(base + [node.module])
+        return ".".join(base)
 
     def _find_cycle_dfs(
         self, start: str, visited: set[str], path: list[str], module_imports: dict[str, set[str]]

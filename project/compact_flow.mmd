@@ -1,36 +1,30 @@
 flowchart TD
-    examples__concurrency["examples.concurrency<br/>8 funcs"]
-    examples__data["examples.data<br/>11 funcs"]
-    examples__demo["examples.demo<br/>3 funcs"]
-    examples__demo1["examples.demo1<br/>1 funcs"]
-    examples__demo_auto["examples.demo_auto<br/>1 funcs"]
-    examples__deps["examples.deps<br/>8 funcs"]
-    examples__edge_cases["examples.edge_cases<br/>15 funcs"]
-    examples__encoding["examples.encoding<br/>8 funcs"]
-    examples__env["examples.env<br/>4 funcs"]
-    examples__filesystem["examples.filesystem<br/>5 funcs"]
-    examples__imports["examples.imports<br/>18 funcs"]
-    examples__memory["examples.memory<br/>8 funcs"]
+    examples__concurrency["examples.concurrency<br/>9 funcs"]
+    examples__data["examples.data<br/>12 funcs"]
+    examples__deps["examples.deps<br/>9 funcs"]
+    examples__edge_cases["examples.edge_cases<br/>16 funcs"]
+    examples__encoding["examples.encoding<br/>9 funcs"]
+    examples__environment["examples.environment<br/>5 funcs"]
+    examples__filesystem["examples.filesystem<br/>6 funcs"]
+    examples__getting_started["examples.getting_started<br/>1 funcs"]
+    examples__imports["examples.imports<br/>19 funcs"]
+    examples__memory["examples.memory<br/>4 funcs"]
     examples__network["examples.network<br/>4 funcs"]
-    examples__production["examples.production<br/>28 funcs"]
+    examples__production["examples.production<br/>29 funcs"]
     examples__shared["examples.shared<br/>3 funcs"]
-    examples__types["examples.types<br/>20 funcs"]
-    src__pfix["src.pfix<br/>437 funcs"]
+    src__pfix["src.pfix<br/>442 funcs"]
     verify_runtime["verify_runtime<br/>1 funcs"]
-    examples__types ==>|18| src__pfix
     examples__imports ==>|18| src__pfix
     examples__edge_cases ==>|14| src__pfix
     examples__production ==>|11| src__pfix
     examples__data ==>|11| src__pfix
-    examples__memory ==>|8| src__pfix
     examples__encoding ==>|8| src__pfix
     examples__deps ==>|8| src__pfix
     examples__concurrency ==>|8| src__pfix
     examples__filesystem ==>|5| src__pfix
     examples__network ==>|4| src__pfix
-    examples__env ==>|4| src__pfix
-    examples__demo1 -->|3| examples__shared
-    examples__demo_auto -->|3| examples__shared
+    examples__memory ==>|4| src__pfix
+    examples__environment ==>|4| src__pfix
     examples__shared -->|3| src__pfix
-    examples__demo -->|3| src__pfix
+    examples__getting_started -->|3| examples__shared
     verify_runtime -->|1| src__pfix

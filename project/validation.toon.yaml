@@ -1,9 +1,12 @@
-# vallm batch | 143f | 57✓ 0⚠ 56✗ | 2026-03-29
+# vallm batch | 167f | 72✓ 0⚠ 58✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 143  passed: 57 (39.9%)  warnings: 0  errors: 56  unsupported: 30
+  scanned: 167  passed: 72 (43.1%)  warnings: 0  errors: 58  unsupported: 37
 
-ERRORS[56]{path,score}:
+ERRORS[58]{path,score}:
+  src/pfix/runtime_todo.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'runtime_todo' not found,7
   src/pfix/strategies/django.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,5
@@ -43,6 +46,13 @@ ERRORS[56]{path,score}:
       python.import.resolvable,error,Module 'python_version' not found,39
       python.import.resolvable,error,Module 'serialization' not found,40
       python.import.resolvable,error,Module 'third_party' not found,41
+  src/pfix/runtime_todo/__init__.py,0.73
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fingerprint' not found,6
+      python.import.resolvable,error,Module 'todo_file' not found,7
+      python.import.resolvable,error,Module 'collector' not found,8
+      python.import.resolvable,error,Module 'config' not found,42
+      python.import.resolvable,error,Module 'config' not found,16
   src/pfix/mcp_server.py,0.74
     issues[9]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'mcp.server.fastmcp' not found,34
@@ -57,23 +67,20 @@ ERRORS[56]{path,score}:
   examples/complex_demo/main.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pandas' not found,11
-  examples/demo1.py,0.79
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'shared' not found,9
-  examples/demo_auto.py,0.79
+  examples/getting_started/main.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'shared' not found,12
   examples/imports/circular.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'examples.imports._circular_helper' not found,17
-  src/pfix/__init__.py,0.79
+  src/pfix/__init__.py,0.80
     issues[6]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,21
       python.import.resolvable,error,Module 'decorator' not found,22
       python.import.resolvable,error,Module 'session' not found,23
-      python.import.resolvable,error,Module 'config' not found,68
-      python.import.resolvable,error,Module 'session' not found,54
-      python.import.resolvable,error,Module 'runtime_todo' not found,76
+      python.import.resolvable,error,Module 'config' not found,76
+      python.import.resolvable,error,Module 'session' not found,43
+      python.import.resolvable,error,Module 'runtime_todo' not found,84
   src/pfix/decorator.py,0.80
     issues[6]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,31
@@ -152,6 +159,9 @@ ERRORS[56]{path,score}:
   src/pfix/permissions.py,0.93
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,17
+  src/pfix/commands/diagnose.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'env_diagnostics.auto_fix' not found,71
   src/pfix/integrations/web.py,0.94
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'werkzeug' not found,139
@@ -168,10 +178,10 @@ ERRORS[56]{path,score}:
   src/pfix/rollback.py,0.95
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'audit' not found,21
-  src/pfix/runtime_todo.py,0.95
+  src/pfix/runtime_todo/collector.py,0.95
     issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,550
-      python.import.resolvable,error,Module 'config' not found,524
+      python.import.resolvable,error,Module 'fingerprint' not found,18
+      python.import.resolvable,error,Module 'todo_file' not found,15
   src/pfix/telemetry.py,0.95
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,24
@@ -235,6 +245,6 @@ ERRORS[56]{path,score}:
       python.import.resolvable,error,Module 'pytest' not found,6
 
 UNSUPPORTED[3]{bucket,count}:
-  *.md,16
+  *.md,22
   *.txt,2
-  other,12
+  other,13

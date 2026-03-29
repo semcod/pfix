@@ -44,6 +44,31 @@ def find_pyproject() -> Optional[Path]:
 
 def init_wizard() -> None:
     """Run the interactive setup wizard."""
+    _show_welcome()
+
+    # 1. Select model
+    selected_model = _step_select_model()
+
+    # 2. Auto-apply mode
+    auto_apply = _step_auto_apply()
+
+    # 3. Create .env
+    _step_create_env(selected_model, auto_apply)
+
+    # 4. Update pyproject.toml
+    _step_update_pyproject(selected_model, auto_apply)
+
+    # 5. Update .gitignore
+    _step_update_gitignore()
+
+    # 6. Enable auto-activation
+    _step_auto_activation()
+
+    # Summary
+    _show_summary(selected_model, auto_apply)
+
+
+def _show_welcome():
     console.print(Panel(
         "Welcome to pfix setup!\n"
         "This wizard will configure pfix for your project.",
@@ -51,7 +76,8 @@ def init_wizard() -> None:
         border_style="green",
     ))
 
-    # 1. Select model
+
+def _step_select_model() -> str:
     console.print("\n[bold]Step 1: Select LLM Model[/]")
     for i, (model, desc) in enumerate(DEFAULT_MODELS, 1):
         console.print(f"  {i}. {desc}")
@@ -62,16 +88,18 @@ def init_wizard() -> None:
         choices=[str(i) for i in range(1, len(DEFAULT_MODELS) + 1)],
         default="2",
     )
-    selected_model = DEFAULT_MODELS[int(choice) - 1][0]
+    return DEFAULT_MODELS[int(choice) - 1][0]
 
-    # 2. Auto-apply mode
+
+def _step_auto_apply() -> bool:
     console.print("\n[bold]Step 2: Auto-Apply Mode[/]")
-    auto_apply = Confirm.ask(
+    return Confirm.ask(
         "Enable auto-apply? (fixes will be applied without confirmation)",
         default=False,
     )
 
-    # 3. Create .env
+
+def _step_create_env(selected_model: str, auto_apply: bool):
     console.print("\n[bold]Step 3: Environment Configuration[/]")
     create_env = Confirm.ask("Create .env file?", default=True)
 
@@ -89,7 +117,8 @@ PFIX_MODEL={selected_model}
         env_path.write_text(env_content)
         console.print(f"[green]✓ Created {env_path}[/]")
 
-    # 4. Update pyproject.toml
+
+def _step_update_pyproject(selected_model: str, auto_apply: bool):
     console.print("\n[bold]Step 4: Project Configuration[/]")
     pyproject = find_pyproject()
 
@@ -103,7 +132,8 @@ PFIX_MODEL={selected_model}
     else:
         console.print("[yellow]No pyproject.toml found. Skipping.[/]")
 
-    # 5. Update .gitignore
+
+def _step_update_gitignore():
     console.print("\n[bold]Step 5: Git Configuration[/]")
     gitignore = Path.cwd() / ".gitignore"
 
@@ -118,7 +148,8 @@ PFIX_MODEL={selected_model}
             gitignore.write_text(get_gitignore_content())
             console.print(f"[green]✓ Created {gitignore}[/]")
 
-    # 6. Enable auto-activation
+
+def _step_auto_activation():
     console.print("\n[bold]Step 6: Auto-Activation[/]")
     console.print("pfix can auto-activate when you import it.")
     console.print("This requires no code changes to use pfix.")
@@ -127,7 +158,8 @@ PFIX_MODEL={selected_model}
     if enable_auto:
         console.print("[green]✓ Auto-activation enabled via .env[/]")
 
-    # Summary
+
+def _show_summary(selected_model: str, auto_apply: bool):
     console.print(Panel(
         f"[bold]Setup Complete![/]\n\n"
         f"Model: {selected_model}\n"

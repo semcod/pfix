@@ -1,24 +1,30 @@
-# pfix | 58f 12218L | python:57,shell:1 | 2026-03-29
-# stats: 438 func | 0 cls | 58 mod | CC̄=3.9 | critical:1 | cycles:0
-# alerts[5]: CC EnvDiagnostics.generate_report=19; fan-out get_log_stats=18; fan-out _auto_activate=17; fan-out init_wizard=17; fan-out EnvDiagnostics.__init__=16
-# hotspots[5]: get_log_stats fan=18; _auto_activate fan=17; init_wizard fan=17; find_related_files fan=16; update_requirements_file fan=16
+# pfix | 67f 12280L | python:66,shell:1 | 2026-03-29
+# stats: 443 func | 0 cls | 67 mod | CC̄=3.9 | critical:0 | cycles:0
+# alerts[5]: fan-out get_log_stats=18; fan-out init_wizard=17; fan-out EnvDiagnostics.__init__=16; fan-out find_related_files=16; fan-out update_requirements_file=16
+# hotspots[5]: get_log_stats fan=18; init_wizard fan=17; find_related_files fan=16; update_requirements_file fan=16; EnvDiagnostics.__init__ fan=16
 # evolution: CC̄ 3.9→3.9 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[58]:
+M[67]:
   project.sh,24
-  src/pfix/__init__.py,98
+  src/pfix/__init__.py,105
   src/pfix/_auto_activate.py,161
   src/pfix/analyzer.py,246
   src/pfix/audit.py,203
   src/pfix/cache.py,227
-  src/pfix/cli.py,744
+  src/pfix/cli.py,157
+  src/pfix/commands/__init__.py,0
+  src/pfix/commands/activation.py,118
+  src/pfix/commands/config.py,161
+  src/pfix/commands/diagnose.py,101
+  src/pfix/commands/others.py,99
+  src/pfix/commands/run.py,151
   src/pfix/config.py,233
   src/pfix/dashboard.py,206
   src/pfix/decorator.py,278
   src/pfix/dependency.py,205
   src/pfix/dev_mode.py,158
   src/pfix/diff_fixer.py,258
-  src/pfix/env_diagnostics/__init__.py,238
+  src/pfix/env_diagnostics/__init__.py,248
   src/pfix/env_diagnostics/auto_fix.py,216
   src/pfix/env_diagnostics/base.py,43
   src/pfix/env_diagnostics/concurrency.py,143
@@ -51,7 +57,10 @@ M[58]:
   src/pfix/production.py,323
   src/pfix/rollback.py,224
   src/pfix/rules.py,104
-  src/pfix/runtime_todo.py,567
+  src/pfix/runtime_todo/__init__.py,59
+  src/pfix/runtime_todo/collector.py,288
+  src/pfix/runtime_todo/fingerprint.py,48
+  src/pfix/runtime_todo/todo_file.py,174
   src/pfix/session.py,308
   src/pfix/strategies/__init__.py,75
   src/pfix/strategies/django.py,55
@@ -64,9 +73,6 @@ M[58]:
   src/pfix/validation.py,192
   verify_runtime.py,55
 D:
-  src/pfix/env_diagnostics/__init__.py:
-    e: EnvDiagnostics
-    EnvDiagnostics: __init__(1),check_all(1),diagnose_exception(2),generate_report(1),_format_result(1),to_todo_issues(1)  # Orchestrator for all environment diagnostics...
   src/pfix/multi_fix.py:
     e: MultiFileFixProposal,find_related_files,build_multi_file_context,parse_multi_file_response,apply_multi_file_fix
     MultiFileFixProposal:  # Fix proposal affecting multiple files...
@@ -94,34 +100,6 @@ D:
     render_dashboard()
     run_console_dashboard()
     run_dashboard()
-  src/pfix/cli.py:
-    e: main,_build_parser,_dispatch,cmd_run,cmd_dev,cmd_check,cmd_enable,cmd_disable,_get_installation_status_table,_get_config_table,_print_status_summary,cmd_status,cmd_deps,cmd_server,_install_excepthook,_create_excepthook,cmd_rollback,cmd_audit,cmd_init,cmd_dashboard,cmd_explain,_format_diagnostic_results,_output_diagnostic_results,_apply_diagnostic_fixes,_get_diagnose_exit_code,cmd_diagnose
-    main(argv)
-    _build_parser()
-    _dispatch(args)
-    cmd_run(args)
-    cmd_dev(args)
-    cmd_check(args)
-    cmd_enable()
-    cmd_disable()
-    _get_installation_status_table(config)
-    _get_config_table(config)
-    _print_status_summary(warnings;pth_file;config)
-    cmd_status()
-    cmd_deps(args)
-    cmd_server(args)
-    _install_excepthook()
-    _create_excepthook(original_hook;config)
-    cmd_rollback(args)
-    cmd_audit(args)
-    cmd_init()
-    cmd_dashboard()
-    cmd_explain(args)
-    _format_diagnostic_results(results;diag;json_output)
-    _output_diagnostic_results(output;output_path)
-    _apply_diagnostic_fixes(results;project_root)
-    _get_diagnose_exit_code(results;check_mode)
-    cmd_diagnose(args)
   src/pfix/diff_fixer.py:
     e: DiffParseError,parse_unified_diff,parse_hunk_header,apply_hunk,apply_diff,apply_diff_to_file,create_unified_diff
     DiffParseError(Exception):  # Raised when diff parsing fails...
@@ -166,6 +144,17 @@ D:
     update_requirements_file(packages;requirements_path)
     generate_requirements(project_dir)
     detect_missing_from_error(exception_message)
+  src/pfix/commands/activation.py:
+    e: cmd_enable,cmd_disable
+    cmd_enable(args)
+    cmd_disable(args)
+  src/pfix/commands/config.py:
+    e: cmd_check,cmd_status,_get_installation_status_table,_get_config_table,_print_status_summary
+    cmd_check(args)
+    cmd_status(args)
+    _get_installation_status_table(config)
+    _get_config_table(config)
+    _print_status_summary(warnings;pth_file;config)
   src/pfix/env_diagnostics/config_env.py:
     e: ConfigEnvDiagnostic
     ConfigEnvDiagnostic(BaseDiagnostic): check(1),_check_dotenv(1),_check_required_vars(1),_check_env_gitignore(1),_check_pyproject_validity(1),_check_pfix_config_missing(1),_check_secret_exposure_env(0),_check_conflicting_manifests(1),diagnose_exception(2)  # Diagnose configuration and environment variable problems...
@@ -216,9 +205,6 @@ D:
     _backup(filepath)
     _clear_pycache(source_file)
     _git_commit(filepath;message)
-  src/pfix/__init__.py:
-    e: _auto_activate
-    _auto_activate()
   src/pfix/session.py:
     e: PFixSession,_clear_pycache,pfix_session,auto_pfix,install_pfix_hook,_handle_syntax_error_hook,_handle_import_error_hook,_handle_generic_error_hook,_restart_process
     PFixSession: __init__(1),__enter__(0),__exit__(3),__call__(1),_handle_exception(3)  # Session context that catches and auto-fixes exceptions...
@@ -230,6 +216,14 @@ D:
     _handle_import_error_hook(exc_value)
     _handle_generic_error_hook(exc_value;auto_apply;config)
     _restart_process(exc_value)
+  src/pfix/audit.py:
+    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
+    AuditEntry:  # Single audit entry for a fix operation...
+    _calculate_hash(content)
+    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
+    read_audit_log(since;filepath;limit)
+    get_audit_summary(days)
+    print_audit_report(days)
   src/pfix/decorator.py:
     e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_ensure_deps,_try_quick_dep_fix,_try_reload_module
     _capture_runtime_error(exc;func;hints)
@@ -243,14 +237,6 @@ D:
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
-  src/pfix/audit.py:
-    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
-    AuditEntry:  # Single audit entry for a fix operation...
-    _calculate_hash(content)
-    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
-    read_audit_log(since;filepath;limit)
-    get_audit_summary(days)
-    print_audit_report(days)
   src/pfix/env_diagnostics/third_party.py:
     e: ThirdPartyDiagnostic
     ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
@@ -259,20 +245,6 @@ D:
     check_syntax(filepath)
     check_imports(filepath)
     main(argv)
-  src/pfix/runtime_todo.py:
-    e: ErrorFingerprint,TodoFile,RuntimeCollector,get_collector,capture_exception
-    ErrorFingerprint: compute(0),_normalize_error_message(0)  # Generates stable hash for error deduplication.
-
-Same error =...
-    TodoFile: __init__(1),append_issue(1),_file_lock(0),_load_existing_fingerprints(0),_increment_counter(2),_append_new_entry(1),_format_entry(1),get_section_content(0)  # Thread-safe, append-only manager for TODO.md.
-
-Features:
-- F...
-    RuntimeCollector: __init__(9),capture(2),_should_capture(1),_build_issue(2),_extract_frames(1),_should_exclude_path(1),_filepath_to_module(1),_capture_locals(1),_classify(1),_severity(1),_flush(0),install_excepthook(0),shutdown(0)  # Captures runtime errors and writes to TODO.md.
-
-Collection m...
-    get_collector(config)
-    capture_exception(exc;context)
   src/pfix/production.py:
     e: CircuitBreaker,RateLimiter,ProductionConfig,PfixMonitor,monitor
     CircuitBreaker: record_success(0),record_failure(0),is_open(0)  # Circuit breaker pattern for LLM calls...
@@ -280,6 +252,12 @@ Collection m...
     ProductionConfig:  # Configuration for production mode...
     PfixMonitor: __init__(6),watch(1),handle_exception(3),_log_proposal(2),_send_webhook(1),get_stats(0)  # Production-safe error monitor. Never modifies code...
     monitor(webhook_url;rate_limit)
+  src/pfix/commands/run.py:
+    e: cmd_run,cmd_dev,_install_excepthook,_create_excepthook
+    cmd_run(args)
+    cmd_dev(args)
+    _install_excepthook()
+    _create_excepthook(original_hook;config)
   src/pfix/env_diagnostics/network.py:
     e: NetworkDiagnostic
     NetworkDiagnostic(BaseDiagnostic): check(1),_check_dns(0),_check_outbound(0),_check_ssl_certs(0),_check_proxy(0),_check_latency(0),_check_system_clock(0),diagnose_exception(2)  # Diagnose network-related problems...
@@ -287,6 +265,11 @@ Collection m...
     e: PfixSentryIntegration,init_sentry
     PfixSentryIntegration: __init__(2),setup_once(2),_process_event(2)  # Sentry integration that adds pfix diagnosis to error events...
     init_sentry(dsn;auto_analyze;min_confidence)
+  src/pfix/runtime_todo/collector.py:
+    e: RuntimeCollector
+    RuntimeCollector: __init__(9),capture(2),_should_capture(1),_build_issue(2),_extract_frames(1),_should_exclude_path(1),_filepath_to_module(1),_capture_locals(1),_classify(1),_severity(1),_flush(0),install_excepthook(0),shutdown(0)  # Captures runtime errors and writes to TODO.md.
+
+Collection m...
   src/pfix/rollback.py:
     e: find_backup_dir,list_backups,rollback_last,rollback_file,rollback_before,show_history,rollback_command
     find_backup_dir(filepath)
@@ -309,9 +292,21 @@ Collection m...
   src/pfix/env_diagnostics/process.py:
     e: ProcessDiagnostic
     ProcessDiagnostic(BaseDiagnostic): check(1),_check_ulimits(0),_check_signal_handlers(0),_check_tmp_writable(0),_check_zombies(0),_check_nice_priority(0),_check_fd_usage(0),_check_core_dumps(0),_check_parent_alive(0),diagnose_exception(2)  # Diagnose process and OS-related problems...
+  src/pfix/env_diagnostics/__init__.py:
+    e: EnvDiagnostics
+    EnvDiagnostics: __init__(1),check_all(1),diagnose_exception(2),generate_report(1),_format_severity_section(3),_generate_summary_footer(1),_format_result(1),to_todo_issues(1)  # Orchestrator for all environment diagnostics...
   src/pfix/env_diagnostics/serialization.py:
     e: SerializationDiagnostic
     SerializationDiagnostic(BaseDiagnostic): check(1),_check_pickle_protocol(0),_check_cache_files(1),_check_yaml_safety(1),_check_json_manifest_validity(1),diagnose_exception(2)  # Diagnose serialization-related problems...
+  src/pfix/commands/others.py:
+    e: cmd_deps,cmd_server,cmd_rollback,cmd_audit,cmd_init,cmd_dashboard,cmd_explain
+    cmd_deps(args)
+    cmd_server(args)
+    cmd_rollback(args)
+    cmd_audit(args)
+    cmd_init(args)
+    cmd_dashboard(args)
+    cmd_explain(args)
   src/pfix/env_diagnostics/filesystem.py:
     e: FilesystemDiagnostic
     FilesystemDiagnostic(BaseDiagnostic): check(1),_check_disk_space(1),_check_file_references(1),_check_symlinks(1),_check_large_files(1),_check_writable(1),_check_inodes(1),_check_permissions(1),_check_filename_encoding(1),_check_case_conflicts(1),_check_hidden_pollution(1),diagnose_exception(2)  # Diagnose filesystem-related problems...
@@ -327,13 +322,6 @@ Collection m...
     _request_with_chain(error_ctx;chain)
     _request_single_model(error_ctx;model)
     _parse_response(raw)
-  src/pfix/validation.py:
-    e: ValidationResult,run_tests,validate_fix,quick_validate_syntax,validate_with_fallback
-    ValidationResult:  # Result of test validation...
-    run_tests(command;timeout;cwd)
-    validate_fix(source_file;proposal;backup_path;command)
-    quick_validate_syntax(filepath)
-    validate_with_fallback(ctx;proposal;backup_path)
   src/pfix/logging.py:
     e: FixEvent,JsonLinesLogger,SQLiteLogger,SentryIntegration,Logger,get_logger,log_fix
     FixEvent: to_dict(0),to_json(0)  # Structured log event for each fix operation...
@@ -343,6 +331,13 @@ Collection m...
     Logger: __init__(3),log(6),get_stats(0)  # Main logger combining multiple backends...
     get_logger()
     log_fix(ctx;proposal;fix_applied;duration_ms)
+  src/pfix/validation.py:
+    e: ValidationResult,run_tests,validate_fix,quick_validate_syntax,validate_with_fallback
+    ValidationResult:  # Result of test validation...
+    run_tests(command;timeout;cwd)
+    validate_fix(source_file;proposal;backup_path;command)
+    quick_validate_syntax(filepath)
+    validate_with_fallback(ctx;proposal;backup_path)
   src/pfix/permissions.py:
     e: get_environment,check_auto_apply_allowed,check_complexity_approval,check_blocked_path,check_all_permissions,get_permissions_summary
     get_environment()
@@ -357,15 +352,22 @@ Collection m...
     wrap_module_functions(module)
     _create_wrapper(func;module_name)
     install_dev_mode_hook()
+  src/pfix/commands/diagnose.py:
+    e: cmd_diagnose,_format_diagnostic_results,_output_diagnostic_results,_apply_diagnostic_fixes,_get_diagnose_exit_code
+    cmd_diagnose(args)
+    _format_diagnostic_results(results;diag;json_output)
+    _output_diagnostic_results(output;output_path)
+    _apply_diagnostic_fixes(results;project_root)
+    _get_diagnose_exit_code(results;check_mode)
   src/pfix/env_diagnostics/memory.py:
     e: MemoryDiagnostic
     MemoryDiagnostic(BaseDiagnostic): check(1),_check_available_memory(0),_check_recursion_limit(0),_check_gc_pressure(0),_check_object_count(0),_check_swap_usage(0),_check_ulimits(0),_check_shm_usage(0),_check_process_memory(0),diagnose_exception(2)  # Diagnose memory-related problems...
-  src/pfix/env_diagnostics/encoding.py:
-    e: EncodingDiagnostic
-    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/env_diagnostics/paths.py:
     e: PathDiagnostic
     PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
+  src/pfix/env_diagnostics/encoding.py:
+    e: EncodingDiagnostic
+    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/env_diagnostics/auto_fix.py:
     e: can_auto_fix,apply_auto_fix,_fix_stale_bytecode,_fix_missing_requirement,_fix_utf8_bom,_fix_mixed_line_endings,_fix_large_log_file,_fix_api_key_placeholder,_fix_missing_dotenv,_fix_env_not_gitignored,_fix_missing_init,_fix_hidden_pollution,_fix_no_manifest
     can_auto_fix(result)
@@ -406,6 +408,12 @@ Collection m...
   src/pfix/strategies/fastapi.py:
     e: FastAPIFixStrategy
     FastAPIFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for FastAPI framework errors...
+  src/pfix/runtime_todo/todo_file.py:
+    e: TodoFile
+    TodoFile: __init__(1),append_issue(1),_file_lock(0),_load_existing_fingerprints(0),_increment_counter(2),_append_new_entry(1),_format_entry(1),get_section_content(0)  # Thread-safe, append-only manager for TODO.md.
+
+Features:
+- F...
   src/pfix/integrations/web.py:
     e: PfixMiddleware,PfixFlaskExtension,PfixDjangoMiddleware,create_error_handler
     PfixMiddleware: __init__(4),__call__(3),_handle_exception(2)  # ASGI middleware for FastAPI/Starlette that captures and anal...
@@ -416,6 +424,12 @@ Collection m...
     e: MCPResult,MCPClient
     MCPResult:
     MCPClient: __init__(1),connect(0),disconnect(0),call_tool(2),edit_file(2),run_command(1)  # Client for MCP servers (filesystem, editor tools)...
+  src/pfix/__init__.py:
+    e: _auto_activate,_load_env,_get_caller_file,_setup_runtime_todo
+    _auto_activate()
+    _load_env()
+    _get_caller_file()
+    _setup_runtime_todo()
   src/pfix/cache.py:
     e: FixCache,_get_cache_path,_init_sqlite_db,_make_cache_key,_proposal_to_json,_json_to_proposal,get_cache,get_cached_fix,cache_fix
     FixCache: __init__(2),get(1),set(2),clear(0),stats(0),close(0)  # Cache for fix proposals to avoid redundant LLM calls...
@@ -435,6 +449,15 @@ Collection m...
     FixStrategy(ABC): detect(1),enhance_prompt(1),get_priority(0)  # Base class for framework-specific fix strategies...
     StrategyRegistry: register(1),get_matching(1),enhance_prompt(1)  # Registry of fix strategies...
     get_strategy_context(ctx)
+  src/pfix/cli.py:
+    e: main,_build_parser,_dispatch
+    main(argv)
+    _build_parser()
+    _dispatch(args)
+  src/pfix/runtime_todo/__init__.py:
+    e: get_collector,capture_exception
+    get_collector(config)
+    capture_exception(exc;context)
   src/pfix/pfix_python.py:
     e: main
     main()
@@ -446,5 +469,11 @@ Collection m...
     BaseDiagnostic(ABC): check(1),diagnose_exception(2),can_auto_fix(1)  # Base class for all environment diagnostics.
 
 Each diagnostic...
+  src/pfix/runtime_todo/fingerprint.py:
+    e: ErrorFingerprint
+    ErrorFingerprint: compute(0),_normalize_error_message(0)  # Generates stable hash for error deduplication.
+
+Same error =...
+  src/pfix/commands/__init__.py:
   src/pfix/integrations/__init__.py:
   project.sh:

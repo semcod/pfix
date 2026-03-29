@@ -64,118 +64,118 @@ class PythonVersionDiagnostic(BaseDiagnostic):
             return results
 
         try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli as tomllib
-            except ImportError:
+            requires = self._get_requires_python(pyproject)
+            if not requires:
                 return results
 
-        try:
-            with open(pyproject, "rb") as f:
-                data = tomllib.load(f)
+            current = sys.version_info[:2]
+            min_ver = self._parse_version_requirement(r">=\s*(\d+)\.(\d+)", requires)
+            max_ver = self._parse_version_requirement(r"<\s*(\d+)\.(\d+)", requires)
 
-            requires = data.get("project", {}).get("requires-python", "")
-            if requires:
-                # Simple version check
-                current = sys.version_info[:2]
-                # Parse requires like ">=3.10,<3.13"
-                import re
-                min_ver = None
-                max_ver = None
+            if min_ver and current < min_ver:
+                results.append(self._create_version_error(
+                    "python_version_too_low",
+                    f"Python {current[0]}.{current[1]} < required {min_ver[0]}.{min_ver[1]}",
+                    requires, str(pyproject)
+                ))
 
-                if match := re.search(r">=\s*(\d+)\.(\d+)", requires):
-                    min_ver = (int(match[1]), int(match[2]))
-                if match := re.search(r"<\s*(\d+)\.(\d+)", requires):
-                    max_ver = (int(match[1]), int(match[2]))
-
-                if min_ver and current < min_ver:
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name="python_version_too_low",
-                        status="error",
-                        message=f"Python {current[0]}.{current[1]} < required {min_ver[0]}.{min_ver[1]}",
-                        details={
-                            "current": f"{current[0]}.{current[1]}",
-                            "required": requires,
-                        },
-                        suggestion=f"Upgrade Python to {min_ver[0]}.{min_ver[1]}+",
-                        auto_fixable=False,
-                        abs_path=str(pyproject),
-                        line_number=None,
-                    ))
-
-                if max_ver and current >= max_ver:
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name="python_version_too_high",
-                        status="warning",
-                        message=f"Python {current[0]}.{current[1]} >= max {max_ver[0]}.{max_ver[1]}",
-                        details={
-                            "current": f"{current[0]}.{current[1]}",
-                            "max": f"{max_ver[0]}.{max_ver[1]}",
-                        },
-                        suggestion="Verify compatibility with newer Python",
-                        auto_fixable=False,
-                        abs_path=str(pyproject),
-                        line_number=None,
-                    ))
+            if max_ver and current >= max_ver:
+                results.append(self._create_version_error(
+                    "python_version_too_high",
+                    f"Python {current[0]}.{current[1]} >= max {max_ver[0]}.{max_ver[1]}",
+                    requires, str(pyproject), status="warning"
+                ))
         except Exception:
             pass
 
         return results
 
+    def _get_requires_python(self, pyproject_path: Path) -> str:
+        """Extract requires-python from pyproject.toml."""
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli as tomllib
+            except ImportError:
+                return ""
+
+        try:
+            with open(pyproject_path, "rb") as f:
+                data = tomllib.load(f)
+            return data.get("project", {}).get("requires-python", "")
+        except Exception:
+            return ""
+
+    def _parse_version_requirement(self, pattern: str, requires: str) -> Optional[tuple[int, int]]:
+        """Parse version numbers from a requirement string."""
+        import re
+        if match := re.search(pattern, requires):
+            return (int(match[1]), int(match[2]))
+        return None
+
+    def _create_version_error(self, name: str, msg: str, requires: str, path: str, status: str = "error") -> "DiagnosticResult":
+        """Create a version-related DiagnosticResult."""
+        from ..types import DiagnosticResult
+        return DiagnosticResult(
+            category=self.category,
+            check_name=name,
+            status=status,
+            message=msg,
+            details={"required": requires},
+            suggestion=f"Adjust Python version or requirements",
+            auto_fixable=False,
+            abs_path=path,
+        )
+
     def _check_version_features(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for version-specific features in code."""
-        from ..types import DiagnosticResult
-
         results = []
         current = sys.version_info[:2]
 
         for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile):
+            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
                 continue
 
             try:
                 source = pyfile.read_text()
                 tree = ast.parse(source)
-
-                for node in ast.walk(tree):
-                    # Check match statements (Python 3.10+)
-                    if isinstance(node, ast.Match):
-                        if current < (3, 10):
-                            results.append(DiagnosticResult(
-                                category=self.category,
-                                check_name="match_requires_py310",
-                                status="error",
-                                message=f"match/case requires Python 3.10+, have {current[0]}.{current[1]}",
-                                details={"feature": "match/case", "file": str(pyfile)},
-                                suggestion="Upgrade Python or avoid match/case",
-                                auto_fixable=False,
-                                abs_path=str(pyfile),
-                                line_number=getattr(node, 'lineno', None),
-                            ))
-
-                    # Check walrus operator (Python 3.8+)
-                    if isinstance(node, ast.NamedExpr):
-                        if current < (3, 8):
-                            results.append(DiagnosticResult(
-                                category=self.category,
-                                check_name="walrus_requires_py38",
-                                status="error",
-                                message=f"Walrus operator requires Python 3.8+, have {current[0]}.{current[1]}",
-                                details={"feature": "walrus :=", "file": str(pyfile)},
-                                suggestion="Upgrade Python or use traditional assignment",
-                                auto_fixable=False,
-                                abs_path=str(pyfile),
-                                line_number=getattr(node, 'lineno', None),
-                            ))
-
-            except SyntaxError:
-                pass  # Let syntax check handle this
-            except Exception:
+                results.extend(self._check_file_features(tree, current, str(pyfile)))
+            except (SyntaxError, Exception):
                 pass
 
+        return results
+
+    def _check_file_features(self, tree: ast.AST, current_ver: tuple[int, int], path: str) -> list["DiagnosticResult"]:
+        """Check an AST for version-specific features."""
+        from ..types import DiagnosticResult
+        results = []
+        for node in ast.walk(tree):
+            # Check match statements (Python 3.10+)
+            if isinstance(node, ast.Match) and current_ver < (3, 10):
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="match_requires_py310",
+                    status="error",
+                    message=f"match/case requires Python 3.10+, have {current_ver[0]}.{current_ver[1]}",
+                    details={"feature": "match/case", "file": path},
+                    suggestion="Upgrade Python or avoid match/case",
+                    abs_path=path,
+                    line_number=getattr(node, 'lineno', None),
+                ))
+
+            # Check walrus operator (Python 3.8+)
+            if isinstance(node, ast.NamedExpr) and current_ver < (3, 8):
+                results.append(DiagnosticResult(
+                    category=self.category,
+                    check_name="walrus_requires_py38",
+                    status="error",
+                    message=f"Walrus operator requires Python 3.8+, have {current_ver[0]}.{current_ver[1]}",
+                    details={"feature": "walrus :=", "file": path},
+                    suggestion="Upgrade Python or use traditional assignment",
+                    abs_path=path,
+                    line_number=getattr(node, 'lineno', None),
+                ))
         return results
 
     def _check_deprecated_imports(self, project_root: Path) -> list["DiagnosticResult"]:
