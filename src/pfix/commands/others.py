@@ -81,13 +81,13 @@ def cmd_audit(args) -> int:
     return 0
 
 
-def cmd_init() -> int:
+def cmd_init(args=None) -> int:
     from pfix.init_wizard import init_wizard
     init_wizard()
     return 0
 
 
-def cmd_dashboard() -> int:
+def cmd_dashboard(args=None) -> int:
     from pfix.dashboard import run_dashboard
     run_dashboard()
     return 0

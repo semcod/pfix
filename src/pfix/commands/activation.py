@@ -8,7 +8,7 @@ from rich.console import Console
 console = Console()
 
 
-def cmd_enable() -> int:
+def cmd_enable(args=None) -> int:
     """Enable pfix auto-activation and add config to pyproject.toml."""
     import site
 
@@ -85,7 +85,7 @@ def cmd_enable() -> int:
     return 0
 
 
-def cmd_disable() -> int:
+def cmd_disable(args=None) -> int:
     """Disable pfix auto-activation."""
     import site
 
