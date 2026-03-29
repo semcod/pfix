@@ -1,4 +1,4 @@
-# pfix | 439 func | 56f | 13894L | python | 2026-03-29
+# pfix | 438 func | 56f | 13894L | python | 2026-03-29
 
 HEALTH:
   CC̄=3.9  critical=31 (limit:10)  dup=2  cycles=0
@@ -11,9 +11,9 @@ ALERTS[20]:
   !!  high_fan_out     update_requirements_file = 16 (limit:10)
   !!  high_fan_out     EnvDiagnostics.__init__ = 16 (limit:10)
   !!  high_fan_out     RuntimeCollector._build_issue = 15 (limit:10)
-  !!  high_fan_out     pfix = 15 (limit:10)
   !!  high_fan_out     ImportDiagnostic._build_import_graph = 15 (limit:10)
   !   cc_exceeded      EnvDiagnostics.generate_report = 19 (limit:15)
+  !   high_fan_out     PfixConfig.from_env = 14 (limit:10)
 
 MODULES[58] (top by size):
   M[src/pfix/cli.py] 744L C:0 F:26 CC↑12 D:0 (python)
@@ -28,7 +28,7 @@ MODULES[58] (top by size):
   M[src/pfix/env_diagnostics/memory.py] 305L C:1 F:10 CC↑6 D:0 (python)
   M[src/pfix/mcp_server.py] 292L C:0 F:8 CC↑5 D:1 (python)
   M[src/pfix/env_diagnostics/process.py] 280L C:1 F:10 CC↑8 D:0 (python)
-  M[src/pfix/decorator.py] 278L C:0 F:10 CC↑10 D:2 (python)
+  M[src/pfix/decorator.py] 278L C:0 F:9 CC↑10 D:30 (python)
   M[src/pfix/env_diagnostics/third_party.py] 271L C:1 F:6 CC↑10 D:0 (python)
   M[src/pfix/explain.py] 267L C:0 F:4 CC↑5 D:1 (python)
   LANGS: python:57/shell:1
