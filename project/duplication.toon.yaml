@@ -1,37 +1,37 @@
-# redup/duplication | 7 groups | 44f 8382L | 2026-03-29
+# redup/duplication | 7 groups | 44f 8347L | 2026-03-29
 
 SUMMARY:
   files_scanned: 44
-  total_lines:   8382
+  total_lines:   8347
   dup_groups:    7
   dup_fragments: 16
   saved_lines:   93
-  scan_ms:       5900
+  scan_ms:       5161
 
 DUPLICATES[7] (ranked by impact):
   [e0c7bb1e3ea7f94e]   STRU  enhance_prompt  L=18 N=2 saved=18 sim=1.00
-      src/pfix/strategies/flask.py:0-17  (enhance_prompt)
       src/pfix/strategies/fastapi.py:0-17  (enhance_prompt)
+      src/pfix/strategies/flask.py:0-17  (enhance_prompt)
   [940940da23619197]   STRU  main  L=17 N=2 saved=17 sim=1.00
-      examples/demo.py:0-16  (main)
       examples/demo_auto.py:0-16  (main)
+      examples/demo.py:0-16  (main)
   [f8fe97d750af0c62]   EXAC  _clear_pycache  L=16 N=2 saved=16 sim=1.00
-      src/pfix/fixer.py:0-15  (_clear_pycache)
       src/pfix/session.py:0-15  (_clear_pycache)
+      src/pfix/fixer.py:0-15  (_clear_pycache)
   [0af64590cbacd99d]   STRU  get_priority  L=4 N=4 saved=12 sim=1.00
-      src/pfix/strategies/pandas.py:0-3  (get_priority)
-      src/pfix/strategies/flask.py:0-3  (get_priority)
       src/pfix/strategies/django.py:0-3  (get_priority)
+      src/pfix/strategies/pandas.py:0-3  (get_priority)
       src/pfix/strategies/fastapi.py:0-3  (get_priority)
+      src/pfix/strategies/flask.py:0-3  (get_priority)
   [909e0eb4f805f5c5]   STRU  detect  L=12 N=2 saved=12 sim=1.00
-      src/pfix/strategies/flask.py:0-11  (detect)
       src/pfix/strategies/fastapi.py:0-11  (detect)
-  [6387f76d828d7346]   STRU  _validate_syntax  L=9 N=2 saved=9 sim=1.00
-      src/pfix/fixer.py:0-8  (_validate_syntax)
-      src/pfix/dependency.py:0-8  (is_module_available)
+      src/pfix/strategies/flask.py:0-11  (detect)
   [e04424c9f5b1d2e6]   STRU  get_logger  L=9 N=2 saved=9 sim=1.00
       src/pfix/logging.py:0-8  (get_logger)
       src/pfix/cache.py:0-8  (get_cache)
+  [6387f76d828d7346]   STRU  is_module_available  L=9 N=2 saved=9 sim=1.00
+      src/pfix/dependency.py:0-8  (is_module_available)
+      src/pfix/fixer.py:0-8  (_validate_syntax)
 
 REFACTOR[7] (ranked by priority):
   [1] ○ extract_function   → src/pfix/strategies/utils/enhance_prompt.py
@@ -49,12 +49,12 @@ REFACTOR[7] (ranked by priority):
   [5] ○ extract_function   → src/pfix/strategies/utils/detect.py
       WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
       FILES: src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py
-  [6] ○ extract_function   → src/pfix/utils/_validate_syntax.py
-      WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
-      FILES: src/pfix/dependency.py, src/pfix/fixer.py
-  [7] ○ extract_function   → src/pfix/utils/get_logger.py
+  [6] ○ extract_function   → src/pfix/utils/get_logger.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: src/pfix/cache.py, src/pfix/logging.py
+  [7] ○ extract_function   → src/pfix/utils/is_module_available.py
+      WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
+      FILES: src/pfix/dependency.py, src/pfix/fixer.py
 
 METRICS-TARGET:
   dup_groups:  7 → 0

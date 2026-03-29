@@ -6,21 +6,21 @@
 - **Primary Language**: python
 - **Languages**: python: 61, shell: 1
 - **Analysis Mode**: static
-- **Total Functions**: 433
+- **Total Functions**: 447
 - **Total Classes**: 55
 - **Modules**: 62
-- **Entry Points**: 287
+- **Entry Points**: 291
 
 ## Architecture by Module
+
+### src.pfix.cli
+- **Functions**: 26
+- **File**: `cli.py`
 
 ### src.pfix.runtime_todo
 - **Functions**: 25
 - **Classes**: 3
 - **File**: `runtime_todo.py`
-
-### src.pfix.cli
-- **Functions**: 19
-- **File**: `cli.py`
 
 ### src.pfix.fixer
 - **Functions**: 18
@@ -30,6 +30,11 @@
 - **Functions**: 18
 - **Classes**: 5
 - **File**: `logging.py`
+
+### src.pfix.env_diagnostics.imports
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `imports.py`
 
 ### src.pfix.analyzer
 - **Functions**: 14
@@ -67,11 +72,6 @@
 - **Functions**: 12
 - **Classes**: 1
 - **File**: `filesystem.py`
-
-### src.pfix.env_diagnostics.imports
-- **Functions**: 12
-- **Classes**: 1
-- **File**: `imports.py`
 
 ### src.pfix.env_diagnostics.python_version
 - **Functions**: 11
@@ -111,14 +111,6 @@
 
 Main execution flows into the system:
 
-### src.pfix.cli.cmd_status
-> Show diagnostic status of pfix.
-- **Calls**: src.pfix.config.get_config, config.validate, console.print, console.print, Table, table.add_column, table.add_column, table.add_row
-
-### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports
-> Detect circular import patterns using module dependency graph.
-- **Calls**: project_root.rglob, src.pfix.cache.FixCache.set, pyfile.relative_to, visited.add, module_imports.get, str, None.replace, None.replace
-
 ### src.pfix.cli.cmd_enable
 > Enable pfix auto-activation and add config to pyproject.toml.
 - **Calls**: source_file.exists, pyproject.exists, console.print, console.print, console.print, console.print, console.print, console.print
@@ -127,10 +119,6 @@ Main execution flows into the system:
 > Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true.
 - **Calls**: src.pfix.config.get_config, getattr, None.get, Path.cwd, env_file.exists, None.lower, None.lower, inspect.currentframe
 
-### src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic._check_api_client_configs
-> Check API client configurations in code.
-- **Calls**: project_root.rglob, str, pyfile.read_text, ast.parse, ast.walk, isinstance, isinstance, isinstance
-
 ### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_dotenv
 > Check .env file.
 - **Calls**: env_file.exists, env_example.exists, results.append, env_file.read_text, enumerate, env_file.exists, DiagnosticResult, content.splitlines
@@ -138,6 +126,14 @@ Main execution flows into the system:
 ### src.pfix.env_diagnostics.EnvDiagnostics.generate_report
 > Generate formatted text report from results.
 - **Calls**: lines.append, None.join, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append
+
+### src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph
+> Build import dependency graph from project files.
+
+Returns:
+    Tuple of (module_imports, module_paths) where:
+    - module_imports: dict mapping modu
+- **Calls**: project_root.rglob, pyfile.relative_to, str, None.replace, None.replace, pyfile.read_text, ast.parse, src.pfix.cache.FixCache.set
 
 ### src.pfix.multi_fix.find_related_files
 > Find files related to the error through imports.
@@ -182,10 +178,6 @@ Returns:
     MultiFileFixProposal or None if parsing fails
 - **Calls**: raw.strip, re.search, m.group, json.loads, MultiFileFixProposal, text.startswith, console.print, text.find
 
-### src.pfix.cli.cmd_diagnose
-> Run environment diagnostics.
-- **Calls**: EnvDiagnostics, diag.check_all, json.dumps, diag.generate_report, None.write_text, console.print, console.print, c.strip
-
 ### src.pfix.runtime_todo.RuntimeCollector._build_issue
 > Build RuntimeIssue from exception.
 - **Calls**: self._extract_frames, RuntimeIssue, ErrorFingerprint.compute, str, datetime.now, datetime.now, datetime.now, platform.python_version
@@ -197,10 +189,6 @@ Returns:
 ### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_version_features
 > Check for version-specific features in code.
 - **Calls**: project_root.rglob, str, pyfile.read_text, ast.parse, ast.walk, isinstance, isinstance, results.append
-
-### src.pfix.decorator._handle_decorator_exception
-> Handle a single exception in the decorator loop. Returns True to retry. CC≤7.
-- **Calls**: console.print, src.pfix.decorator._try_quick_dep_fix, str, src.pfix.analyzer.analyze_exception, console.print, src.pfix.llm.request_fix, src.pfix.decorator._apply_decorator_fix, console.print
 
 ### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports
 > Check for imports that aren't installed.
@@ -244,51 +232,53 @@ Returns:
 > Run all import/dependency checks.
 - **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
+### src.pfix.telemetry.get_telemetry_summary
+> Get aggregate telemetry summary.
+- **Calls**: len, sum, TELEMETRY_FILE.exists, open, sum, e.get, e.get, src.pfix.telemetry.is_telemetry_enabled
+
+### src.pfix.env_diagnostics.encoding.EncodingDiagnostic._check_file_encoding
+> Check Python files for encoding issues.
+- **Calls**: project_root.rglob, str, content.startswith, open, f.read, results.append, content.decode, DiagnosticResult
+
+### src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.diagnose_exception
+> Diagnose filesystem-related exceptions.
+- **Calls**: isinstance, isinstance, isinstance, DiagnosticResult, DiagnosticResult, DiagnosticResult, str, str
+
+### src.pfix.integrations.precommit.main
+> Pre-commit hook entry point.
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.parse_args, print, Path, src.pfix.integrations.precommit.check_syntax, print
+
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: cmd_status
-```
-cmd_status [src.pfix.cli]
-  └─ →> get_config
-```
-
-### Flow 2: _check_circular_imports
-```
-_check_circular_imports [src.pfix.env_diagnostics.imports.ImportDiagnostic]
-  └─ →> set
-      └─ →> _make_cache_key
-      └─ →> _proposal_to_json
-```
-
-### Flow 3: cmd_enable
+### Flow 1: cmd_enable
 ```
 cmd_enable [src.pfix.cli]
 ```
 
-### Flow 4: _auto_activate
+### Flow 2: _auto_activate
 ```
 _auto_activate [src.pfix]
   └─ →> get_config
 ```
 
-### Flow 5: _check_api_client_configs
-```
-_check_api_client_configs [src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic]
-```
-
-### Flow 6: _check_dotenv
+### Flow 3: _check_dotenv
 ```
 _check_dotenv [src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic]
 ```
 
-### Flow 7: generate_report
+### Flow 4: generate_report
 ```
 generate_report [src.pfix.env_diagnostics.EnvDiagnostics]
 ```
 
-### Flow 8: find_related_files
+### Flow 5: _build_import_graph
+```
+_build_import_graph [src.pfix.env_diagnostics.imports.ImportDiagnostic]
+```
+
+### Flow 6: find_related_files
 ```
 find_related_files [src.pfix.multi_fix]
   └─ →> set
@@ -299,7 +289,7 @@ find_related_files [src.pfix.multi_fix]
       └─ →> _proposal_to_json
 ```
 
-### Flow 9: _handle_exception
+### Flow 7: _handle_exception
 ```
 _handle_exception [src.pfix.session.PFixSession]
   └─ →> analyze_exception
@@ -309,12 +299,30 @@ _handle_exception [src.pfix.session.PFixSession]
   └─ →> classify_error
 ```
 
-### Flow 10: check
+### Flow 8: check
 ```
 check [src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic]
 ```
 
+### Flow 9: cmd_dev
+```
+cmd_dev [src.pfix.cli]
+  └─ →> configure
+```
+
+### Flow 10: cmd_check
+```
+cmd_check [src.pfix.cli]
+  └─ →> get_config
+```
+
 ## Key Classes
+
+### src.pfix.env_diagnostics.imports.ImportDiagnostic
+> Diagnose import and dependency problems.
+- **Methods**: 15
+- **Key Methods**: src.pfix.env_diagnostics.imports.ImportDiagnostic.check, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph, src.pfix.env_diagnostics.imports.ImportDiagnostic._find_cycle_dfs, src.pfix.env_diagnostics.imports.ImportDiagnostic._create_cycle_result, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_shadow_stdlib, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_stale_bytecode, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_version_conflicts, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_inits
+- **Inherits**: BaseDiagnostic
 
 ### src.pfix.runtime_todo.RuntimeCollector
 > Captures runtime errors and writes to TODO.md.
@@ -328,12 +336,6 @@ Collection modes:
 > Diagnose filesystem-related problems.
 - **Methods**: 12
 - **Key Methods**: src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_disk_space, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_file_references, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_symlinks, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_large_files, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_writable, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_inodes, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_permissions, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_filename_encoding, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_case_conflicts
-- **Inherits**: BaseDiagnostic
-
-### src.pfix.env_diagnostics.imports.ImportDiagnostic
-> Diagnose import and dependency problems.
-- **Methods**: 12
-- **Key Methods**: src.pfix.env_diagnostics.imports.ImportDiagnostic.check, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_shadow_stdlib, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_stale_bytecode, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_version_conflicts, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_inits, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_deprecated_apis, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_import_source, src.pfix.env_diagnostics.imports.ImportDiagnostic._extract_imports
 - **Inherits**: BaseDiagnostic
 
 ### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic
@@ -419,6 +421,12 @@ Features:
 - **Key Methods**: src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic.check, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_thread_count, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_asyncio_loop, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_thread_hangs, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_async_lag, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic.diagnose_exception
 - **Inherits**: BaseDiagnostic
 
+### src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic
+> Diagnose third-party API-related problems.
+- **Methods**: 6
+- **Key Methods**: src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic.check, src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic._check_api_keys_in_env, src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic._check_hardcoded_key, src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic._check_missing_timeout, src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic._check_api_client_configs, src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
 ### src.pfix.env_diagnostics.serialization.SerializationDiagnostic
 > Diagnose serialization-related problems.
 - **Methods**: 6
@@ -429,11 +437,6 @@ Features:
 > Session context that catches and auto-fixes exceptions.
 - **Methods**: 5
 - **Key Methods**: src.pfix.session.PFixSession.__init__, src.pfix.session.PFixSession.__enter__, src.pfix.session.PFixSession.__exit__, src.pfix.session.PFixSession.__call__, src.pfix.session.PFixSession._handle_exception
-
-### src.pfix.logging.SQLiteLogger
-> SQLite-based logger for FixEvents with querying capabilities.
-- **Methods**: 5
-- **Key Methods**: src.pfix.logging.SQLiteLogger.__init__, src.pfix.logging.SQLiteLogger._init_db, src.pfix.logging.SQLiteLogger.log, src.pfix.logging.SQLiteLogger.query, src.pfix.logging.SQLiteLogger.get_stats
 
 ## Data Transformation Functions
 
@@ -452,6 +455,10 @@ Returns:
 ### src.pfix.cli._build_parser
 > Build and configure ArgumentParser for pfix CLI.
 - **Output to**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument
+
+### src.pfix.cli._format_diagnostic_results
+> Format diagnostic results for output (JSON or text).
+- **Output to**: json.dumps, diag.generate_report
 
 ### src.pfix.config.PfixConfig.validate
 - **Output to**: warnings.append
@@ -544,12 +551,10 @@ Args:
 
 Functions exposed as public API (no underscore prefix):
 
-- `src.pfix.cli.cmd_status` - 54 calls
 - `src.pfix.init_wizard.init_wizard` - 42 calls
 - `src.pfix.cli.cmd_enable` - 36 calls
 - `src.pfix.dashboard.render_dashboard` - 32 calls
 - `src.pfix.dashboard.get_log_stats` - 25 calls
-- `src.pfix.syntax_error_handler.handle_syntax_error` - 22 calls
 - `src.pfix.env_diagnostics.EnvDiagnostics.generate_report` - 22 calls
 - `src.pfix.multi_fix.find_related_files` - 21 calls
 - `src.pfix.decorator.pfix` - 21 calls
@@ -559,7 +564,6 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.diff_fixer.parse_unified_diff` - 19 calls
 - `src.pfix.decorator.apfix` - 19 calls
 - `src.pfix.multi_fix.parse_multi_file_response` - 18 calls
-- `src.pfix.cli.cmd_diagnose` - 18 calls
 - `src.pfix.rollback.rollback_file` - 18 calls
 - `src.pfix.dependency.update_requirements_file` - 18 calls
 - `src.pfix.audit.print_audit_report` - 18 calls
@@ -584,6 +588,9 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.diff_fixer.apply_diff` - 13 calls
 - `src.pfix.runtime_todo.capture_exception` - 13 calls
 - `src.pfix.types.ErrorContext.to_prompt` - 13 calls
+- `src.pfix.audit.log_fix_audit` - 13 calls
+- `src.pfix.explain.explain_last` - 12 calls
+- `src.pfix.cli.cmd_status` - 12 calls
 
 ## System Interactions
 
@@ -591,15 +598,6 @@ How components interact:
 
 ```mermaid
 graph TD
-    cmd_status --> get_config
-    cmd_status --> validate
-    cmd_status --> print
-    cmd_status --> Table
-    _check_circular_impo --> rglob
-    _check_circular_impo --> set
-    _check_circular_impo --> relative_to
-    _check_circular_impo --> add
-    _check_circular_impo --> get
     cmd_enable --> exists
     cmd_enable --> print
     _auto_activate --> get_config
@@ -607,20 +605,29 @@ graph TD
     _auto_activate --> get
     _auto_activate --> cwd
     _auto_activate --> exists
-    _check_api_client_co --> rglob
-    _check_api_client_co --> str
-    _check_api_client_co --> read_text
-    _check_api_client_co --> parse
-    _check_api_client_co --> walk
     _check_dotenv --> exists
     _check_dotenv --> append
     _check_dotenv --> read_text
     _check_dotenv --> enumerate
     generate_report --> append
     generate_report --> join
+    _build_import_graph --> rglob
+    _build_import_graph --> relative_to
+    _build_import_graph --> str
+    _build_import_graph --> replace
     find_related_files --> set
     find_related_files --> sorted
     find_related_files --> pop
+    find_related_files --> add
+    _handle_exception --> print
+    _handle_exception --> isinstance
+    _handle_exception --> analyze_exception
+    _handle_exception --> classify_error
+    check --> extend
+    cmd_dev --> resolve
+    cmd_dev --> configure
+    cmd_dev --> print
+    cmd_check --> get_config
 ```
 
 ## Reverse Engineering Guidelines

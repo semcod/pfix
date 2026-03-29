@@ -2,9 +2,9 @@ flowchart TD
     examples__demo["examples.demo<br/>1 funcs"]
     examples__demo_auto["examples.demo_auto<br/>1 funcs"]
     examples__shared["examples.shared<br/>3 funcs"]
-    src__pfix["src.pfix<br/>424 funcs"]
+    src__pfix["src.pfix<br/>438 funcs"]
     verify_runtime["verify_runtime<br/>1 funcs"]
-    examples__demo -->|3| examples__shared
-    examples__shared -->|3| src__pfix
     examples__demo_auto -->|3| examples__shared
+    examples__shared -->|3| src__pfix
+    examples__demo -->|3| examples__shared
     verify_runtime -->|1| src__pfix

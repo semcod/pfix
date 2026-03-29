@@ -47,16 +47,6 @@ ERRORS[38]{path,score}:
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sentry' not found,15
       python.import.resolvable,error,Module 'precommit' not found,28
-  src/pfix/decorator.py,0.80
-    issues[8]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'analyzer' not found,31
-      python.import.resolvable,error,Module 'dependency' not found,33
-      python.import.resolvable,error,Module 'fixer' not found,34
-      python.import.resolvable,error,Module 'llm' not found,35
-      python.import.resolvable,error,Module 'analyzer' not found,312
-      python.import.resolvable,error,Module 'llm' not found,313
-      python.import.resolvable,error,Module 'fixer' not found,314
-      python.import.resolvable,error,Module 'runtime_todo' not found,44
   src/pfix/mcp_server.py,0.80
     issues[7]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'llm' not found,68
@@ -66,6 +56,13 @@ ERRORS[38]{path,score}:
       python.import.resolvable,error,Module 'dependency' not found,158
       python.import.resolvable,error,Module 'dependency' not found,169
       python.import.resolvable,error,Module 'env_diagnostics' not found,195
+  src/pfix/decorator.py,0.84
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,31
+      python.import.resolvable,error,Module 'dependency' not found,33
+      python.import.resolvable,error,Module 'fixer' not found,34
+      python.import.resolvable,error,Module 'llm' not found,35
+      python.import.resolvable,error,Module 'runtime_todo' not found,44
   src/pfix/session.py,0.86
     issues[5]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,37

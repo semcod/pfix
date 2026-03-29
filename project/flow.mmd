@@ -17,9 +17,9 @@ flowchart TD
         src__pfix__cli__cmd_check["cmd_check"]
         src__pfix__cli__cmd_enable["cmd_enable"]
         src__pfix__cli__cmd_disable["cmd_disable"]
-        src__pfix__cli__cmd_status["cmd_status"]
-        src__pfix__cli__cmd_deps["cmd_deps"]
-        ...["+269 more"]
+        src__pfix__cli___get_installation_status_table["_get_installation_status_table"]
+        src__pfix__cli___get_config_table["_get_config_table"]
+        ...["+279 more"]
     end
 
     class verify_runtime__crash_me,src__pfix__multi_fix__find_related_files,src__pfix__multi_fix__build_multi_file_context,src__pfix__multi_fix__parse_multi_file_response,src__pfix__multi_fix__apply_multi_file_fix,src__pfix__cli__main,src__pfix__cli___build_parser,src__pfix__cli___dispatch,src__pfix__cli__cmd_run,src__pfix__cli__cmd_dev entry
