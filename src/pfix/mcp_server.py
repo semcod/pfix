@@ -42,6 +42,17 @@ def create_mcp_server():
         dependencies=["litellm", "pipreqs", "python-dotenv", "rich", "pathspec"],
     )
 
+    _register_analyze_tool(mcp)
+    _register_fix_tool(mcp)
+    _register_deps_tools(mcp)
+    _register_diagnose_tool(mcp)
+    _register_edit_tool(mcp)
+
+    return mcp
+
+
+def _register_analyze_tool(mcp):
+    """Register pfix_analyze tool."""
     @mcp.tool()
     def pfix_analyze(
         exception_type: str,
@@ -71,6 +82,9 @@ def create_mcp_server():
             "has_code_fix": proposal.has_code_fix,
         }, indent=2)
 
+
+def _register_fix_tool(mcp):
+    """Register pfix_fix tool."""
     @mcp.tool()
     def pfix_fix(
         exception_type: str,
@@ -123,6 +137,9 @@ def create_mcp_server():
             "dependencies_installed": proposal.dependencies if applied else [],
         }, indent=2)
 
+
+def _register_deps_tools(mcp):
+    """Register dependency-related tools."""
     @mcp.tool()
     def pfix_deps_scan(path: str) -> str:
         """Scan Python files for missing third-party dependencies."""
@@ -160,6 +177,9 @@ def create_mcp_server():
             }, indent=2)
         return json.dumps({"error": "Failed to generate requirements.txt"})
 
+
+def _register_diagnose_tool(mcp):
+    """Register pfix_diagnose tool."""
     @mcp.tool()
     def pfix_diagnose(
         project_path: str = ".",
@@ -215,6 +235,9 @@ def create_mcp_server():
             ],
         }, indent=2)
 
+
+def _register_edit_tool(mcp):
+    """Register pfix_edit_file tool."""
     @mcp.tool()
     def pfix_edit_file(path: str, content: str) -> str:
         """Write content to a file (used by LLM to apply fixes)."""
@@ -223,8 +246,6 @@ def create_mcp_server():
             return json.dumps({"status": "ok", "path": path})
         except Exception as e:
             return json.dumps({"error": str(e)})
-
-    return mcp
 
 
 def _build_ctx(

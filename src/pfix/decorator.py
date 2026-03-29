@@ -146,32 +146,14 @@ def pfix(
                         f"arg{i}": type(a).__name__ for i, a in enumerate(args)
                     })
 
-                    ctx = analyze_exception(exc, func=fn, hints=hints)
-                    error_class = classify_error(ctx)
-                    console.print(f"[blue]🔍 Analyzing ({error_class})...[/]")
+                    should_restart = restart if restart is not None else config.auto_restart
+                    fixed = _run_llm_fix_cycle(exc, fn, hints, should_auto, should_restart)
 
-                    proposal = request_fix(ctx)
-
-                    if proposal.confidence < 0.1:
-                        console.print("[yellow]⚠ LLM confidence too low — skipping[/]")
-                        break
-
-                    old_auto = config.auto_apply
-                    if should_auto:
-                        config.auto_apply = True
-
-                    fixed = apply_fix(ctx, proposal, confirm=not should_auto)
-                    config.auto_apply = old_auto
-
-                    if fixed:
-                        if should_restart:
-                            console.print("[green]  🔄 Restarting process...[/]")
-                            os.execv(sys.executable, [sys.executable] + sys.argv)
-                        elif _try_reload_module(fn):
-                            console.print("[green]  ↻ Module reloaded, retrying...[/]")
-                        else:
-                            console.print("[yellow]  ⚠ Reload failed — restart needed[/]")
-                            break
+                    if fixed and should_restart:
+                        console.print("[green]  🔄 Restarting process...[/]")
+                        os.execv(sys.executable, [sys.executable] + sys.argv)
+                    elif fixed:
+                        console.print("[green]  ↻ Fix applied, retrying...[/]")
                     else:
                         console.print("[yellow]  Fix not applied[/]")
                         break
@@ -248,6 +230,49 @@ def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
+
+def _run_llm_fix_cycle(
+    exc: BaseException,
+    func: Any,
+    hints: dict,
+    auto_apply: bool,
+    restart: bool,
+) -> bool:
+    """Run full LLM fix cycle. Returns True if fix was applied.
+
+    This helper reduces fan-out in the main decorator wrapper.
+    """
+    from .analyzer import analyze_exception, classify_error
+    from .llm import request_fix
+    from .fixer import apply_fix
+    from .config import get_config
+
+    config = get_config()
+    ctx = analyze_exception(exc, func=func, hints=hints)
+    error_class = classify_error(ctx)
+    console.print(f"[blue]🔍 Analyzing ({error_class})...[/]")
+
+    proposal = request_fix(ctx)
+
+    if proposal.confidence < 0.1:
+        console.print("[yellow]⚠ LLM confidence too low — skipping[/]")
+        return False
+
+    old_auto = config.auto_apply
+    if auto_apply:
+        config.auto_apply = True
+
+    fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
+    config.auto_apply = old_auto
+
+    if fixed and not restart:
+        # Try module reload for non-restart mode
+        if _try_reload_module(func):
+            return True
+        # Even if reload fails, fix was applied
+        return True
+
+    return fixed
 
 def _ensure_deps(deps: list[str]):
     missing = []

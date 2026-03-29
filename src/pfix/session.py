@@ -203,13 +203,12 @@ def install_pfix_hook(
     target_file: Optional[str] = None,
     auto_apply: bool = True,
 ) -> None:
-    """Install global pfix excepthook."""
+    """Install global pfix excepthook. CC≤5."""
     if target_file is None:
         frame = inspect.currentframe()
         if frame and frame.f_back:
             target_file = frame.f_back.f_globals.get('__file__')
     
-    target_path = Path(target_file).resolve() if target_file else None
     config = get_config()
     original_hook = sys.excepthook
     
@@ -219,94 +218,90 @@ def install_pfix_hook(
             return
         
         console.print(f"\n[red]💥 pfix: {exc_type.__name__}: {exc_value}[/]")
-        
         if exc_tb:
             exc_value.__traceback__ = exc_tb
         
-        # Handle SyntaxError specially - it has filename/lineno directly
-        if exc_type is SyntaxError and exc_value.filename:
-            console.print("[dim]Debug: SyntaxError detected, extracting file info...[/]")
-            ctx = ErrorContext()
-            ctx.exception_type = "SyntaxError"
-            ctx.exception_message = str(exc_value)
-            ctx.source_file = exc_value.filename
-            ctx.line_number = exc_value.lineno or 0
-            ctx.failing_line = exc_value.text or ""
-            ctx.traceback_text = f"  File \"{exc_value.filename}\", line {exc_value.lineno}\n    {exc_value.text}\n    {' ' * (exc_value.offset - 1)}^\nSyntaxError: {exc_value}"
-            ctx.python_version = sys.version.split()[0]
-            
-            # Read source file
-            try:
-                source_path = Path(exc_value.filename)
-                if source_path.exists():
-                    ctx.source_code = source_path.read_text(encoding="utf-8")
-            except Exception:
-                pass
-            
-            console.print(f"[dim]Debug: source_file={ctx.source_file}, line={ctx.line_number}[/]")
-            
-            proposal = request_fix(ctx)
-            console.print(f"[dim]Debug: confidence={proposal.confidence}, has_fix={proposal.has_code_fix}[/]")
-            
-            if proposal.confidence > 0.1:
-                console.print(f"[blue]🔍 Confidence OK ({proposal.confidence:.0%}), applying fix...[/]")
-                old_auto = config.auto_apply
-                config.auto_apply = auto_apply
-                fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
-                config.auto_apply = old_auto
-                
-                if fixed and config.auto_restart:
-                    if ctx.source_file:
-                        _clear_pycache(Path(ctx.source_file))
-                    console.print("[green]🔄 Restarting...[/]")
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
-            else:
-                console.print(f"[yellow]⚠ Confidence too low ({proposal.confidence:.0%}), skipping[/]")
-            
-            original_hook(exc_type, exc_value, exc_tb)
-            return
-        
-        if isinstance(exc_value, (ModuleNotFoundError, ImportError)):
-            module = detect_missing_from_error(str(exc_value))
-            if module:
-                pkg = resolve_package_name(module)
-                console.print(f"[cyan]📦 Installing: {pkg}[/]")
-                results = install_packages([pkg])
-                if results.get(pkg, False):
-                    console.print(f"[green]✓ Installed {pkg}[/]")
-                    return
-        
-        console.print("[dim]Debug: Analyzing exception...[/]")
-        ctx = analyze_exception(exc_value)
-        console.print(f"[dim]Debug: source_file={ctx.source_file}, func={ctx.function_name}[/]")
-        
-        console.print("[dim]Debug: Requesting fix from LLM...[/]")
-        proposal = request_fix(ctx)
-        console.print(f"[dim]Debug: confidence={proposal.confidence}, has_fix={proposal.has_code_fix}[/]")
-        
-        if proposal.confidence > 0.1:
-            console.print(f"[blue]🔍 Confidence OK ({proposal.confidence:.0%}), applying fix...[/]")
-            old_auto = config.auto_apply
-            config.auto_apply = auto_apply
-            fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
-            config.auto_apply = old_auto
-            
-            # Restart process if fix applied and auto_restart enabled
-            if fixed and config.auto_restart:
-                if ctx.source_file:
-                    _clear_pycache(Path(ctx.source_file))
-                console.print("[green]🔄 Restarting...[/]")
-                os.execv(sys.executable, [sys.executable] + sys.argv)
+        # Dispatch to specialized handlers
+        fixed = False
+        if exc_type is SyntaxError:
+            fixed = _handle_syntax_error_hook(exc_value, auto_apply, config)
+        elif isinstance(exc_value, (ModuleNotFoundError, ImportError)):
+            fixed = _handle_import_error_hook(exc_value)
         else:
-            console.print(f"[yellow]⚠ Confidence too low ({proposal.confidence:.0%}), skipping[/]")
-            if proposal.diagnosis:
-                console.print(f"[dim]Diagnosis: {proposal.diagnosis[:200]}[/]")
-            if proposal.raw_response:
-                console.print(f"[dim]Raw: {proposal.raw_response[:200]}[/]")
-        
+            fixed = _handle_generic_error_hook(exc_value, auto_apply, config)
+            
+        if fixed and config.auto_restart:
+            _restart_process(exc_value)
+            
         original_hook(exc_type, exc_value, exc_tb)
     
     sys.excepthook = hook
+
+
+def _handle_syntax_error_hook(exc_value: SyntaxError, auto_apply: bool, config) -> bool:
+    """Specialized handler for SyntaxError in global hook. CC≤4."""
+    if not exc_value.filename:
+        return False
+        
+    ctx = ErrorContext()
+    ctx.exception_type = "SyntaxError"
+    ctx.exception_message = str(exc_value)
+    ctx.source_file = exc_value.filename
+    ctx.line_number = exc_value.lineno or 0
+    ctx.failing_line = exc_value.text or ""
+    ctx.traceback_text = f"  File \"{exc_value.filename}\", line {exc_value.lineno}\n    {exc_value.text}\n    {' ' * (exc_value.offset - 1 if exc_value.offset else 0)}^\nSyntaxError: {exc_value}"
+    ctx.python_version = sys.version.split()[0]
+    
+    try:
+        source_path = Path(exc_value.filename)
+        if source_path.exists():
+            ctx.source_code = source_path.read_text(encoding="utf-8")
+    except Exception:
+        pass
+        
+    proposal = request_fix(ctx)
+    if proposal.confidence > 0.1:
+        return apply_fix(ctx, proposal, confirm=not auto_apply)
+    return False
+
+
+def _handle_import_error_hook(exc_value: BaseException) -> bool:
+    """Specialized handler for ImportError in global hook. CC≤3."""
+    module = detect_missing_from_error(str(exc_value))
+    if module:
+        pkg = resolve_package_name(module)
+        console.print(f"[cyan]📦 Installing: {pkg}[/]")
+        results = install_packages([pkg])
+        return results.get(pkg, False)
+    return False
+
+
+def _handle_generic_error_hook(exc_value: BaseException, auto_apply: bool, config) -> bool:
+    """Generic error handler for global hook. CC≤4."""
+    ctx = analyze_exception(exc_value)
+    proposal = request_fix(ctx)
+    
+    if proposal.confidence > 0.1:
+        return apply_fix(ctx, proposal, confirm=not auto_apply)
+    
+    if proposal.diagnosis:
+        console.print(f"[dim]Diagnosis: {proposal.diagnosis[:200]}[/]")
+    return False
+
+
+def _restart_process(exc_value: BaseException):
+    """Restart current process. CC≤2."""
+    from .analyzer import analyze_exception
+    # Try to clear cache for the failing file if known
+    try:
+        ctx = analyze_exception(exc_value)
+        if ctx.source_file:
+            _clear_pycache(Path(ctx.source_file))
+    except Exception:
+        pass
+        
+    console.print("[green]🔄 Restarting...[/]")
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
 
 # Alias for backward compatibility

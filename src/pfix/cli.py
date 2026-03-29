@@ -231,7 +231,7 @@ def cmd_dev(args) -> int:
     return 0
 
 
-def cmd_check() -> int:
+def cmd_check(args) -> int:
     from pfix.config import get_config
 
     config = get_config()
@@ -522,14 +522,21 @@ def cmd_server(args) -> int:
 
 
 def _install_excepthook():
+    """Install global exception hook with pfix auto-fix."""
     from pfix.analyzer import analyze_exception
     from pfix.llm import request_fix
     from pfix.fixer import apply_fix
     from pfix.config import get_config
-    from pathlib import Path
 
     original = sys.excepthook
     config = get_config()
+    hook = _create_excepthook(original, config)
+    sys.excepthook = hook
+
+
+def _create_excepthook(original_hook, config):
+    """Create exception hook closure."""
+    from pathlib import Path
 
     def _clear_pycache(source_file: Path):
         """Clear __pycache__ entries for a source file to prevent stale bytecode."""
@@ -546,8 +553,12 @@ def _install_excepthook():
             pass
 
     def hook(exc_type, exc_value, exc_tb):
+        from pfix.analyzer import analyze_exception
+        from pfix.llm import request_fix
+        from pfix.fixer import apply_fix
+
         if exc_type in (KeyboardInterrupt, SystemExit):
-            original(exc_type, exc_value, exc_tb)
+            original_hook(exc_type, exc_value, exc_tb)
             return
 
         console.print(f"\n[red]💥 pfix hook: {exc_type.__name__}: {exc_value}[/]")
@@ -565,9 +576,9 @@ def _install_excepthook():
                 console.print("[green]🔄 Restarting...[/]")
                 os.execv(sys.executable, [sys.executable] + sys.argv)
 
-        original(exc_type, exc_value, exc_tb)
+        original_hook(exc_type, exc_value, exc_tb)
 
-    sys.excepthook = hook
+    return hook
 
 
 def cmd_rollback(args) -> int:
