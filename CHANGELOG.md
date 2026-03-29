@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.51] - 2026-03-29
+
+### Docs
+- Update examples/README1.md
+- Update examples/environment/README.md
+- Update examples/getting_started/README.md
+
+### Other
+- Update diag_report.json
+- Update examples/demo.py
+- Update examples/demo1.py
+- Update examples/environment/env_var_errors.py
+- Update examples/environment/main.py
+- Update examples/environment/pyproject.toml
+- Update examples/environment/venv_issues.py
+- Update examples/getting_started/main.py
+- Update examples/getting_started/pyproject.toml
+- Update examples/memory/main.py
+- ... and 8 more files
+
 ## [0.1.50] - 2026-03-29
 
 ### Docs
