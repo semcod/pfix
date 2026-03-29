@@ -1,5 +1,5 @@
-# code2llm | 58f 12253L | python:57,shell:1 | 2026-03-29
-# CC̄=3.9 | critical:1/447 | dups:0 | cycles:0
+# code2llm | 58f 12218L | python:57,shell:1 | 2026-03-29
+# CC̄=3.9 | critical:1/586 | dups:0 | cycles:0
 
 HEALTH[1]:
   🟡 CC    generate_report CC=19 (limit:15)
@@ -7,16 +7,16 @@ HEALTH[1]:
 REFACTOR[1]:
   1. split 1 high-CC methods  (CC>15)
 
-PIPELINES[272]:
-  [1] Src [crash_me]: crash_me → pfix → get_config
+PIPELINES[391]:
+  [1] Src [main]: main → fetch_json → pfix → get_config
       PURITY: 100% pure
-  [2] Src [main]: main → fetch_json → pfix → get_config
+  [2] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
   [3] Src [main]: main → fetch_json → pfix → get_config
       PURITY: 100% pure
-  [4] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [4] Src [fetch_json]: fetch_json → pfix → get_config
       PURITY: 100% pure
-  [5] Src [build_multi_file_context]: build_multi_file_context
+  [5] Src [average]: average → pfix → get_config
       PURITY: 100% pure
 
 LAYERS:
@@ -28,12 +28,12 @@ LAYERS:
   │ python_version             342L  1C   11m  CC=12     ←0
   │ fixer                      338L  0C   18m  CC=10     ←7
   │ production                 323L  4C   13m  CC=9      ←0
-  │ decorator                  313L  0C   10m  CC=10     ←2
   │ filesystem                 311L  1C   12m  CC=7      ←0
   │ session                    308L  1C   13m  CC=10     ←2
   │ memory                     305L  1C   10m  CC=6      ←0
   │ mcp_server                 292L  0C    8m  CC=5      ←1
   │ process                    280L  1C   10m  CC=8      ←0
+  │ decorator                  278L  0C    9m  CC=10     ←30
   │ third_party                271L  1C    6m  CC=10     ←0
   │ explain                    267L  0C    4m  CC=5      ←1
   │ diff_fixer                 258L  1C    6m  CC=12     ←0

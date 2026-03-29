@@ -4,12 +4,12 @@
 
 - **Project**: /home/tom/github/semcod/pfix
 - **Primary Language**: python
-- **Languages**: python: 61, shell: 1
+- **Languages**: python: 89, shell: 1
 - **Analysis Mode**: static
-- **Total Functions**: 447
+- **Total Functions**: 586
 - **Total Classes**: 55
-- **Modules**: 62
-- **Entry Points**: 291
+- **Modules**: 90
+- **Entry Points**: 410
 
 ## Architecture by Module
 
@@ -64,19 +64,23 @@
 - **Classes**: 1
 - **File**: `config.py`
 
-### src.pfix.decorator
-- **Functions**: 12
-- **File**: `decorator.py`
-
 ### src.pfix.env_diagnostics.filesystem
 - **Functions**: 12
 - **Classes**: 1
 - **File**: `filesystem.py`
 
+### src.pfix.decorator
+- **Functions**: 11
+- **File**: `decorator.py`
+
 ### src.pfix.env_diagnostics.python_version
 - **Functions**: 11
 - **Classes**: 1
 - **File**: `python_version.py`
+
+### examples.production.cascading_errors
+- **Functions**: 11
+- **File**: `cascading_errors.py`
 
 ### src.pfix.env_diagnostics.process
 - **Functions**: 10
@@ -98,14 +102,9 @@
 - **Classes**: 3
 - **File**: `web.py`
 
-### src.pfix.env_diagnostics.config_env
-- **Functions**: 9
-- **Classes**: 1
-- **File**: `config_env.py`
-
-### src.pfix.mcp_server
-- **Functions**: 8
-- **File**: `mcp_server.py`
+### examples.production.api_patterns
+- **Functions**: 10
+- **File**: `api_patterns.py`
 
 ## Key Entry Points
 
@@ -158,15 +157,6 @@ Args:
 
 ### src.pfix.cli.cmd_check
 - **Calls**: src.pfix.config.get_config, config.validate, Table, table.add_column, table.add_column, console.print, console.print, table.add_row
-
-### src.pfix.decorator.apfix
-> Async version of @pfix.
-
-Usage:
-    @apfix
-    async def fetch():
-        ...
-- **Calls**: functools.wraps, decorator, src.pfix.config.get_config, kwargs.get, range, fn, console.print, src.pfix.decorator._try_quick_dep_fix
 
 ### src.pfix.multi_fix.parse_multi_file_response
 > Parse LLM response for multi-file fix.
@@ -247,6 +237,12 @@ Returns:
 ### src.pfix.integrations.precommit.main
 > Pre-commit hook entry point.
 - **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.parse_args, print, Path, src.pfix.integrations.precommit.check_syntax, print
+
+### src.pfix.production.PfixMonitor.handle_exception
+> Handle exception in production mode.
+
+Returns dict with diagnosis info (for logging/webhook).
+- **Calls**: src.pfix.analyzer.analyze_exception, src.pfix.cache.get_cached_fix, self.circuit_breaker.is_open, self.rate_limiter.record_call, None.isoformat, self._log_proposal, self._send_webhook, self.rate_limiter.can_call
 
 ## Process Flows
 
@@ -526,9 +522,29 @@ Args:
 > Load CSV, process it, return statistics.
 - **Output to**: pd.read_csv, None.mean, len, list, None.sum
 
-### src.pfix.llm._parse_response
-> Parse LLM JSON response.
-- **Output to**: FixProposal, raw.strip, re.search, data.get, data.get
+### examples.memory.resource_leaks.process_stream
+- **Output to**: src.pfix.decorator.pfix, range, len, list, results.extend
+
+### examples.types.pattern_errors.format_report
+- **Output to**: src.pfix.decorator.pfix, Metric
+
+### examples.types.pattern_errors.parse_header
+- **Output to**: src.pfix.decorator.pfix, line.split
+
+### examples.types.attribute_errors.parse_config
+- **Output to**: src.pfix.decorator.pfix, None.get, data.get
+
+### examples.types.type_errors.format_user_info
+- **Output to**: src.pfix.decorator.pfix
+
+### examples.types.type_errors.apply_transform
+- **Output to**: src.pfix.decorator.pfix, transform
+
+### examples.production.degradation.parse_api_v2_response
+- **Output to**: src.pfix.decorator.pfix
+
+### examples.production.api_patterns.validate_payload
+- **Output to**: int, ValueError, body.get
 
 ## Behavioral Patterns
 
@@ -536,6 +552,16 @@ Args:
 - **Type**: recursion
 - **Confidence**: 0.90
 - **Functions**: src.pfix.dependency.install_packages
+
+### recursion_factorial
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: examples.memory.recursion_and_alloc.factorial
+
+### recursion_fibonacci
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: examples.memory.recursion_and_alloc.fibonacci
 
 ### state_machine_MCPClient
 - **Type**: state_machine
@@ -557,12 +583,10 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.dashboard.get_log_stats` - 25 calls
 - `src.pfix.env_diagnostics.EnvDiagnostics.generate_report` - 22 calls
 - `src.pfix.multi_fix.find_related_files` - 21 calls
-- `src.pfix.decorator.pfix` - 21 calls
 - `src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check` - 20 calls
 - `src.pfix.cli.cmd_dev` - 19 calls
 - `src.pfix.cli.cmd_check` - 19 calls
 - `src.pfix.diff_fixer.parse_unified_diff` - 19 calls
-- `src.pfix.decorator.apfix` - 19 calls
 - `src.pfix.multi_fix.parse_multi_file_response` - 18 calls
 - `src.pfix.rollback.rollback_file` - 18 calls
 - `src.pfix.dependency.update_requirements_file` - 18 calls
@@ -591,6 +615,8 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.audit.log_fix_audit` - 13 calls
 - `src.pfix.explain.explain_last` - 12 calls
 - `src.pfix.cli.cmd_status` - 12 calls
+- `src.pfix.cli.cmd_deps` - 12 calls
+- `src.pfix.diff_fixer.parse_hunk_header` - 12 calls
 
 ## System Interactions
 

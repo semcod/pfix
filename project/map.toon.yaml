@@ -1,8 +1,8 @@
-# pfix | 58f 12253L | python:57,shell:1 | 2026-03-29
-# stats: 439 func | 0 cls | 58 mod | CC̄=3.9 | critical:1 | cycles:0
+# pfix | 58f 12218L | python:57,shell:1 | 2026-03-29
+# stats: 438 func | 0 cls | 58 mod | CC̄=3.9 | critical:1 | cycles:0
 # alerts[5]: CC EnvDiagnostics.generate_report=19; fan-out get_log_stats=18; fan-out _auto_activate=17; fan-out init_wizard=17; fan-out EnvDiagnostics.__init__=16
 # hotspots[5]: get_log_stats fan=18; _auto_activate fan=17; init_wizard fan=17; find_related_files fan=16; update_requirements_file fan=16
-# evolution: CC̄ 4.0→3.9 (improved -0.1)
+# evolution: CC̄ 3.9→3.9 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[58]:
   project.sh,24
@@ -14,7 +14,7 @@ M[58]:
   src/pfix/cli.py,744
   src/pfix/config.py,233
   src/pfix/dashboard.py,206
-  src/pfix/decorator.py,313
+  src/pfix/decorator.py,278
   src/pfix/dependency.py,205
   src/pfix/dev_mode.py,158
   src/pfix/diff_fixer.py,258
@@ -230,16 +230,8 @@ D:
     _handle_import_error_hook(exc_value)
     _handle_generic_error_hook(exc_value;auto_apply;config)
     _restart_process(exc_value)
-  src/pfix/audit.py:
-    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
-    AuditEntry:  # Single audit entry for a fix operation...
-    _calculate_hash(content)
-    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
-    read_audit_log(since;filepath;limit)
-    get_audit_summary(days)
-    print_audit_report(days)
   src/pfix/decorator.py:
-    e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_run_llm_fix_cycle,_ensure_deps,_try_quick_dep_fix,_try_reload_module
+    e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_ensure_deps,_try_quick_dep_fix,_try_reload_module
     _capture_runtime_error(exc;func;hints)
     pfix(func)
     pfix(func)
@@ -248,10 +240,17 @@ D:
     _handle_decorator_exception(fn;exc;attempt;max_retries;hint;args;kwargs;config;should_auto;should_restart;on_error)
     _apply_decorator_fix(ctx;proposal;config;should_auto)
     _after_fix_action(fn;should_restart)
-    _run_llm_fix_cycle(exc;func;hints;auto_apply;restart)
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
+  src/pfix/audit.py:
+    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
+    AuditEntry:  # Single audit entry for a fix operation...
+    _calculate_hash(content)
+    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
+    read_audit_log(since;filepath;limit)
+    get_audit_summary(days)
+    print_audit_report(days)
   src/pfix/env_diagnostics/third_party.py:
     e: ThirdPartyDiagnostic
     ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...

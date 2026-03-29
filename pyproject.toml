@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pfix"
-version = "0.1.47"
+version = "0.1.48"
 description = "Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP"
 readme = "README.md"
 license = "Apache-2.0"
@@ -65,7 +65,7 @@ dev = [
 diagnostics = [
     "psutil>=5.9.0",
 ]
-all = ["pfix[mcp,git,watch,production,cache,sentry,tui,pytest,diagnostics]"]
+all = ["pfix[mcp,git,watch,production,cache,sentry,tui,dev,diagnostics]"]
 
 [project.scripts]
 pfix = "pfix.cli:main"
