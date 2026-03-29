@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pfix"
-version = "0.1.57"
+version = "0.1.58"
 description = "Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP"
 readme = "README.md"
 license = "Apache-2.0"
@@ -100,3 +100,16 @@ enabled = true
 todo_file = "TODO.md"
 min_severity = "low"
 deduplicate = true
+
+[tool.costs]
+# AI Cost tracking configuration
+badge = true
+update_readme = true
+readme_path = "README.md"
+default_model = "openrouter/qwen/qwen3-coder-next"
+analysis_mode = "byok"
+full_history = true
+max_commits = 500
+
+# Cost thresholds for badge colors (USD)
+badge_color_thresholds = { low = 1.0, medium = 5.0, high = 10.0, critical = 50.0 }

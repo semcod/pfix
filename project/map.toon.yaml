@@ -1,29 +1,29 @@
-# pfix | 67f 12330L | python:66,shell:1 | 2026-03-29
-# stats: 466 func | 0 cls | 67 mod | CC̄=3.8 | critical:0 | cycles:0
-# alerts[5]: fan-out EnvDiagnostics.__init__=16; fan-out update_requirements_file=16; fan-out RuntimeCollector._build_issue=15; fan-out FixCache.set=14; fan-out PfixConfig.from_env=14
-# hotspots[5]: update_requirements_file fan=16; EnvDiagnostics.__init__ fan=16; RuntimeCollector._build_issue fan=15; PfixConfig.from_env fan=14; FixCache.set fan=14
-# evolution: CC̄ 3.9→3.8 (improved -0.1)
+# pfix | 67f 12405L | python:66,shell:1 | 2026-03-29
+# stats: 496 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
+# alerts[5]: fan-out EnvDiagnostics.__init__=16; fan-out RuntimeCollector._build_issue=15; fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13
+# hotspots[5]: EnvDiagnostics.__init__ fan=16; RuntimeCollector._build_issue fan=15; FixCache.set fan=14; render_dashboard fan=13; parse_multi_file_response fan=13
+# evolution: CC̄ 3.8→3.6 (improved -0.2)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[67]:
   project.sh,24
   src/pfix/__init__.py,105
-  src/pfix/_auto_activate.py,161
-  src/pfix/analyzer.py,246
+  src/pfix/_auto_activate.py,143
+  src/pfix/analyzer.py,245
   src/pfix/audit.py,203
   src/pfix/cache.py,227
   src/pfix/cli.py,157
   src/pfix/commands/__init__.py,0
-  src/pfix/commands/activation.py,118
-  src/pfix/commands/config.py,161
+  src/pfix/commands/activation.py,141
+  src/pfix/commands/config.py,182
   src/pfix/commands/diagnose.py,101
   src/pfix/commands/others.py,99
   src/pfix/commands/run.py,151
-  src/pfix/config.py,233
+  src/pfix/config.py,247
   src/pfix/dashboard.py,223
   src/pfix/decorator.py,278
-  src/pfix/dependency.py,205
+  src/pfix/dependency.py,253
   src/pfix/dev_mode.py,158
-  src/pfix/diff_fixer.py,258
+  src/pfix/diff_fixer.py,236
   src/pfix/env_diagnostics/__init__.py,248
   src/pfix/env_diagnostics/auto_fix.py,216
   src/pfix/env_diagnostics/base.py,43
@@ -68,37 +68,13 @@ M[67]:
   src/pfix/strategies/flask.py,49
   src/pfix/strategies/pandas.py,51
   src/pfix/syntax_error_handler.py,107
-  src/pfix/telemetry.py,168
+  src/pfix/telemetry.py,178
   src/pfix/types.py,225
   src/pfix/validation.py,192
   verify_runtime.py,55
 D:
-  src/pfix/_auto_activate.py:
-    e: _auto_activate_pfix,_install_syntax_error_handler,_handle_syntax_error
-    _auto_activate_pfix()
-    _install_syntax_error_handler()
-    _handle_syntax_error(exc)
-  src/pfix/diff_fixer.py:
-    e: DiffParseError,parse_unified_diff,parse_hunk_header,apply_hunk,apply_diff,apply_diff_to_file,create_unified_diff
-    DiffParseError(Exception):  # Raised when diff parsing fails...
-    parse_unified_diff(diff_text)
-    parse_hunk_header(line)
-    apply_hunk(old_lines;hunk_lines;old_start)
-    apply_diff(original_content;diff_text)
-    apply_diff_to_file(filepath;diff_text;create_backup)
-    create_unified_diff(old_content;new_content;old_path;new_path)
-  src/pfix/telemetry.py:
-    e: TelemetryEvent,is_telemetry_enabled,get_telemetry_endpoint,record_event,_store_event,_send_to_endpoint,get_telemetry_summary,clear_telemetry
-    TelemetryEvent:  # Anonymous telemetry event...
-    is_telemetry_enabled()
-    get_telemetry_endpoint()
-    record_event(event_type;exception_type;confidence;success;model;duration_ms)
-    _store_event(event)
-    _send_to_endpoint(event;endpoint)
-    get_telemetry_summary()
-    clear_telemetry()
   src/pfix/analyzer.py:
-    e: analyze_exception,_fill_traceback_context,_fill_function_context,_fill_file_context,_fill_environment_context,_extract_exception_info,_extract_frame_context,_extract_function_source,_extract_file_context,_scan_missing_deps,classify_error,scan_missing_deps,_extract_imports,_safe_repr
+    e: analyze_exception,_fill_traceback_context,_fill_function_context,_fill_file_context,_fill_environment_context,_extract_exception_info,_extract_frame_context,_format_local_vars,_extract_function_source,_extract_file_context,_scan_missing_deps,classify_error,scan_missing_deps,_extract_imports,_safe_repr
     analyze_exception(exc;func;local_vars;hints)
     _fill_traceback_context(ctx;exc;local_vars)
     _fill_function_context(ctx;func)
@@ -106,6 +82,7 @@ D:
     _fill_environment_context(ctx)
     _extract_exception_info(exc)
     _extract_frame_context(exc;local_vars)
+    _format_local_vars(local_vars)
     _extract_function_source(func)
     _extract_file_context(source_file;line_number)
     _scan_missing_deps(source_file)
@@ -113,38 +90,6 @@ D:
     scan_missing_deps(project_dir)
     _extract_imports(source)
     _safe_repr(obj;max_len)
-  src/pfix/dependency.py:
-    e: resolve_package_name,is_module_available,install_packages,scan_project_deps,update_requirements_file,generate_requirements,detect_missing_from_error
-    resolve_package_name(module_name)
-    is_module_available(module_name)
-    install_packages(packages;dry_run)
-    scan_project_deps(project_dir)
-    update_requirements_file(packages;requirements_path)
-    generate_requirements(project_dir)
-    detect_missing_from_error(exception_message)
-  src/pfix/commands/config.py:
-    e: cmd_check,cmd_status,_get_installation_status_table,_get_config_table,_print_status_summary
-    cmd_check(args)
-    cmd_status(args)
-    _get_installation_status_table(config)
-    _get_config_table(config)
-    _print_status_summary(warnings;pth_file;config)
-  src/pfix/commands/activation.py:
-    e: cmd_enable,cmd_disable
-    cmd_enable(args)
-    cmd_disable(args)
-  src/pfix/config.py:
-    e: PfixConfig,_load_env_values,_load_llm_env,_load_behavior_env,_load_mcp_env,_load_git_env,_load_paths_env,get_config,configure,reset_config
-    PfixConfig: from_env(1),_read_pyproject_full(0),validate(0)  # Central configuration...
-    _load_env_values()
-    _load_llm_env()
-    _load_behavior_env()
-    _load_mcp_env()
-    _load_git_env()
-    _load_paths_env()
-    get_config()
-    configure()
-    reset_config()
   src/pfix/types.py:
     e: TraceFrame,RuntimeIssue,DiagnosticResult,ErrorContext,FixProposal,PfixConfig,FixEvent
     TraceFrame:  # Single frame from a traceback...
@@ -191,6 +136,14 @@ D:
     _handle_import_error_hook(exc_value)
     _handle_generic_error_hook(exc_value;auto_apply;config)
     _restart_process(exc_value)
+  src/pfix/audit.py:
+    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
+    AuditEntry:  # Single audit entry for a fix operation...
+    _calculate_hash(content)
+    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
+    read_audit_log(since;filepath;limit)
+    get_audit_summary(days)
+    print_audit_report(days)
   src/pfix/decorator.py:
     e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_ensure_deps,_try_quick_dep_fix,_try_reload_module
     _capture_runtime_error(exc;func;hints)
@@ -204,14 +157,6 @@ D:
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
-  src/pfix/audit.py:
-    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
-    AuditEntry:  # Single audit entry for a fix operation...
-    _calculate_hash(content)
-    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
-    read_audit_log(since;filepath;limit)
-    get_audit_summary(days)
-    print_audit_report(days)
   src/pfix/env_diagnostics/third_party.py:
     e: ThirdPartyDiagnostic
     ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
@@ -220,6 +165,18 @@ D:
     check_syntax(filepath)
     check_imports(filepath)
     main(argv)
+  src/pfix/diff_fixer.py:
+    e: DiffParseError,parse_unified_diff,_parse_file_header,_collect_hunk_lines,parse_hunk_header,apply_hunk,_process_hunk_body,apply_diff,apply_diff_to_file,create_unified_diff
+    DiffParseError(Exception):  # Raised when diff parsing fails...
+    parse_unified_diff(diff_text)
+    _parse_file_header(lines;i)
+    _collect_hunk_lines(lines;i)
+    parse_hunk_header(line)
+    apply_hunk(old_lines;hunk_lines;old_start)
+    _process_hunk_body(hunk_lines;old_lines_from_start)
+    apply_diff(original_content;diff_text)
+    apply_diff_to_file(filepath;diff_text;create_backup)
+    create_unified_diff(old_content;new_content;old_path;new_path)
   src/pfix/production.py:
     e: CircuitBreaker,RateLimiter,ProductionConfig,PfixMonitor,monitor
     CircuitBreaker: record_success(0),record_failure(0),is_open(0)  # Circuit breaker pattern for LLM calls...
@@ -276,6 +233,18 @@ Collection m...
     ProjectRules: __init__(1),_load(0),get_rules_text(0),get_section(1),has_rules(0)  # Loaded project rules...
     load_project_rules(path)
     get_rules_for_prompt()
+  src/pfix/commands/config.py:
+    e: cmd_check,cmd_status,_get_installation_status_table,_check_package_status,_check_activation_status,_check_pyproject_status,_check_env_status,path_read_safe,_get_config_table,_print_status_summary
+    cmd_check(args)
+    cmd_status(args)
+    _get_installation_status_table(config)
+    _check_package_status(table)
+    _check_activation_status(table)
+    _check_pyproject_status(table)
+    _check_env_status(table)
+    path_read_safe(path)
+    _get_config_table(config)
+    _print_status_summary(warnings;pth_file;config)
   src/pfix/env_diagnostics/process.py:
     e: ProcessDiagnostic
     ProcessDiagnostic(BaseDiagnostic): check(1),_check_ulimits(0),_check_signal_handlers(0),_check_tmp_writable(0),_check_zombies(0),_check_nice_priority(0),_check_fd_usage(0),_check_core_dumps(0),_check_parent_alive(0),diagnose_exception(2)  # Diagnose process and OS-related problems...
@@ -285,6 +254,25 @@ Collection m...
   src/pfix/env_diagnostics/serialization.py:
     e: SerializationDiagnostic
     SerializationDiagnostic(BaseDiagnostic): check(1),_check_pickle_protocol(0),_check_cache_files(1),_check_yaml_safety(1),_check_json_manifest_validity(1),diagnose_exception(2)  # Diagnose serialization-related problems...
+  src/pfix/_auto_activate.py:
+    e: _auto_activate_pfix,_should_auto_activate,_install_hooks,_install_syntax_error_handler,_handle_syntax_error,_build_error_context,_attempt_fix_and_restart
+    _auto_activate_pfix()
+    _should_auto_activate(config)
+    _install_hooks(config)
+    _install_syntax_error_handler()
+    _handle_syntax_error(exc)
+    _build_error_context(exc)
+    _attempt_fix_and_restart(ctx;config;console)
+  src/pfix/commands/activation.py:
+    e: cmd_enable,_find_site_packages,_install_pth_file,_ensure_project_config,_update_existing_pyproject,_create_new_pyproject,_print_enable_summary,cmd_disable
+    cmd_enable(args)
+    _find_site_packages()
+    _install_pth_file(pfix_pkg;site_packages)
+    _ensure_project_config(path)
+    _update_existing_pyproject(path)
+    _create_new_pyproject(path)
+    _print_enable_summary(config_added)
+    cmd_disable(args)
   src/pfix/commands/others.py:
     e: cmd_deps,cmd_server,cmd_rollback,cmd_audit,cmd_init,cmd_dashboard,cmd_explain
     cmd_deps(args)
@@ -348,6 +336,22 @@ Collection m...
     wrap_module_functions(module)
     _create_wrapper(func;module_name)
     install_dev_mode_hook()
+  src/pfix/dependency.py:
+    e: resolve_package_name,is_module_available,install_packages,_install_single_package,_get_install_command,_handle_missing_pkg_manager,scan_project_deps,_categorize_imports,update_requirements_file,_get_existing_requirements,generate_requirements,detect_missing_from_error,generate_requirements,detect_missing_from_error
+    resolve_package_name(module_name)
+    is_module_available(module_name)
+    install_packages(packages;dry_run)
+    _install_single_package(pkg;config;dry_run)
+    _get_install_command(pkg;config)
+    _handle_missing_pkg_manager(pkg;config;dry_run)
+    scan_project_deps(project_dir)
+    _categorize_imports(all_imports;result)
+    update_requirements_file(packages;requirements_path)
+    _get_existing_requirements(path)
+    generate_requirements(project_dir)
+    detect_missing_from_error(exception_message)
+    generate_requirements(project_dir)
+    detect_missing_from_error(exception_message)
   src/pfix/commands/diagnose.py:
     e: cmd_diagnose,_format_diagnostic_results,_output_diagnostic_results,_apply_diagnostic_fixes,_get_diagnose_exit_code
     cmd_diagnose(args)
@@ -358,12 +362,12 @@ Collection m...
   src/pfix/env_diagnostics/memory.py:
     e: MemoryDiagnostic
     MemoryDiagnostic(BaseDiagnostic): check(1),_check_available_memory(0),_check_recursion_limit(0),_check_gc_pressure(0),_check_object_count(0),_check_swap_usage(0),_check_ulimits(0),_check_shm_usage(0),_check_process_memory(0),diagnose_exception(2)  # Diagnose memory-related problems...
-  src/pfix/env_diagnostics/paths.py:
-    e: PathDiagnostic
-    PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
   src/pfix/env_diagnostics/encoding.py:
     e: EncodingDiagnostic
     EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
+  src/pfix/env_diagnostics/paths.py:
+    e: PathDiagnostic
+    PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
   src/pfix/env_diagnostics/auto_fix.py:
     e: can_auto_fix,apply_auto_fix,_fix_stale_bytecode,_fix_missing_requirement,_fix_utf8_bom,_fix_mixed_line_endings,_fix_large_log_file,_fix_api_key_placeholder,_fix_missing_dotenv,_fix_env_not_gitignored,_fix_missing_init,_fix_hidden_pollution,_fix_no_manifest
     can_auto_fix(result)
@@ -385,6 +389,34 @@ Collection m...
     explain_exception_type(exc_type)
     _generate_explanation(exc_type;exc_msg;diagnosis)
     explain(what;file)
+  src/pfix/config.py:
+    e: PfixConfig,_find_and_load_dotenv,_sanitize_model_name,_merge_pyproject_config,_load_env_values,_load_llm_env,_load_behavior_env,_load_mcp_env,_load_git_env,_load_paths_env,get_config,configure,reset_config
+    PfixConfig: from_env(1),_read_pyproject_full(0),validate(0)  # Central configuration...
+    _find_and_load_dotenv(dotenv_path)
+    _sanitize_model_name(cfg)
+    _merge_pyproject_config(cfg)
+    _load_env_values()
+    _load_llm_env()
+    _load_behavior_env()
+    _load_mcp_env()
+    _load_git_env()
+    _load_paths_env()
+    get_config()
+    configure()
+    reset_config()
+  src/pfix/telemetry.py:
+    e: TelemetryEvent,is_telemetry_enabled,get_telemetry_endpoint,record_event,_store_event,_send_to_endpoint,get_telemetry_summary,_load_telemetry_events,_aggregate_telemetry_stats,_group_by_field,clear_telemetry
+    TelemetryEvent:  # Anonymous telemetry event...
+    is_telemetry_enabled()
+    get_telemetry_endpoint()
+    record_event(event_type;exception_type;confidence;success;model;duration_ms)
+    _store_event(event)
+    _send_to_endpoint(event;endpoint)
+    get_telemetry_summary()
+    _load_telemetry_events()
+    _aggregate_telemetry_stats(events)
+    _group_by_field(events;field_name)
+    clear_telemetry()
   src/pfix/mcp_server.py:
     e: create_mcp_server,_register_analyze_tool,_register_fix_tool,_register_deps_tools,_register_diagnose_tool,_register_edit_tool,_build_ctx,start_server
     create_mcp_server()

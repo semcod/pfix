@@ -1,24 +1,24 @@
-# code2llm | 67f 12330L | python:66,shell:1 | 2026-03-29
-# CC̄=3.8 | critical:0/603 | dups:0 | cycles:0
+# code2llm | 67f 12405L | python:66,shell:1 | 2026-03-29
+# CC̄=3.6 | critical:0/633 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
 PIPELINES[394]:
-  [1] Src [main]: main → run_git_checkout
+  [1] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [2] Src [main]: main → reset_examples
+  [2] Src [main]: main → run_git_checkout
       PURITY: 100% pure
-  [3] Src [crash_me]: crash_me → pfix → get_config
+  [3] Src [main]: main → reset_examples
       PURITY: 100% pure
-  [4] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [4] Src [main]: main → _build_parser
       PURITY: 100% pure
-  [5] Src [build_multi_file_context]: build_multi_file_context
+  [5] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
 
 LAYERS:
-  src/                            CC̄=3.8    ←in:0  →out:2
+  src/                            CC̄=3.6    ←in:0  →out:2
   │ imports                    486L  1C   19m  CC=11     ←0
   │ logging                    351L  5C   18m  CC=6      ←0
   │ python_version             342L  1C   15m  CC=11     ←0
@@ -33,15 +33,16 @@ LAYERS:
   │ decorator                  278L  0C    9m  CC=10     ←25
   │ third_party                271L  1C    6m  CC=10     ←0
   │ explain                    267L  0C    4m  CC=5      ←1
-  │ diff_fixer                 258L  1C    6m  CC=12     ←0
   │ config_env                 256L  1C   12m  CC=9      ←0
   │ network                    255L  1C    8m  CC=9      ←0
+  │ dependency                 253L  0C   12m  CC=6      ←6
   │ multi_fix                  252L  1C    6m  CC=8      ←0
   │ paths                      250L  1C   10m  CC=6      ←0
   │ init_wizard                249L  0C   14m  CC=4      ←1
   │ __init__                   248L  1C    8m  CC=8      ←0
-  │ analyzer                   246L  0C   14m  CC=12     ←7
-  │ config                     233L  1C   12m  CC=11     ←17
+  │ config                     247L  1C   15m  CC=5      ←17
+  │ analyzer                   245L  0C   15m  CC=12     ←7
+  │ diff_fixer                 236L  1C    9m  CC=9      ←0
   │ cache                      227L  1C   14m  CC=4      ←11
   │ types                      225L  7C    1m  CC=11     ←0
   │ rollback                   224L  0C    7m  CC=8      ←1
@@ -49,22 +50,21 @@ LAYERS:
   │ encoding                   220L  1C    7m  CC=6      ←0
   │ auto_fix                   216L  0C   13m  CC=6      ←1
   │ web                        216L  3C   10m  CC=5      ←0
-  │ dependency                 205L  0C    7m  CC=12     ←6
   │ audit                      203L  1C    5m  CC=10     ←3
   │ hardware                   193L  1C    8m  CC=5      ←0
   │ validation                 192L  1C    4m  CC=6      ←0
+  │ config                     182L  0C   10m  CC=8      ←0
+  │ telemetry                  178L  1C   10m  CC=5      ←1
   │ llm                        175L  0C    4m  CC=7      ←9
   │ todo_file                  174L  1C    8m  CC=5      ←0
-  │ telemetry                  168L  1C    7m  CC=12     ←1
   │ serialization              168L  1C    6m  CC=8      ←0
-  │ _auto_activate             161L  0C    3m  CC=14     ←0
-  │ config                     161L  0C    5m  CC=12     ←0
   │ permissions                160L  0C    6m  CC=6      ←1
   │ dev_mode                   158L  0C    4m  CC=6      ←2
   │ cli                        157L  0C    3m  CC=3      ←0
   │ run                        151L  0C    4m  CC=9      ←0
+  │ _auto_activate             143L  0C    7m  CC=7      ←0
   │ concurrency                143L  1C    6m  CC=4      ←0
-  │ activation                 118L  0C    2m  CC=12     ←0
+  │ activation                 141L  0C    8m  CC=7      ←0
   │ sentry                     112L  1C    4m  CC=9      ←0
   │ precommit                  110L  0C    3m  CC=10     ←0
   │ syntax_error_handler       107L  0C    3m  CC=8      ←1
