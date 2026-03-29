@@ -4,14 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pfix"
-version = "0.1.66"
+version = "0.1.67"
 description = "Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
 authors = [
-    { name = "Tom Sapletta", email = "tom@softreck.dev" },
-    {name = "Tom Sapletta", email = "tom@sapletta.com"},
+    { name = "Tom Sapletta", email = "tom@sapletta.com" },
 ]
 keywords = ["self-healing", "debugging", "llm", "mcp", "auto-fix", "developer-tools"]
 classifiers = [
@@ -61,7 +60,9 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "ruff>=0.4.0",
-,"goal>=2.1.0", "costs>=0.1.20", "pfix>=0.1.60"]
+    "goal>=2.1.0",
+    "costs>=0.1.20",
+]
 diagnostics = [
     "psutil>=5.9.0",
 ]
