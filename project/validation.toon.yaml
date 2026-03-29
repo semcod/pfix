@@ -1,9 +1,9 @@
-# vallm batch | 123f | 42✓ 0⚠ 57✗ | 2026-03-29
+# vallm batch | 143f | 57✓ 0⚠ 56✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 123  passed: 42 (34.1%)  warnings: 0  errors: 57  unsupported: 24
+  scanned: 143  passed: 57 (39.9%)  warnings: 0  errors: 56  unsupported: 30
 
-ERRORS[57]{path,score}:
+ERRORS[56]{path,score}:
   src/pfix/strategies/django.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,5
@@ -227,9 +227,6 @@ ERRORS[57]{path,score}:
   src/pfix/env_diagnostics/process.py,0.98
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'base' not found,12
-  src/pfix/cli.py,0.99
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'env_diagnostics.auto_fix' not found,683
   tests/test_new_modules.py,0.99
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,11
@@ -238,6 +235,6 @@ ERRORS[57]{path,score}:
       python.import.resolvable,error,Module 'pytest' not found,6
 
 UNSUPPORTED[3]{bucket,count}:
-  *.md,10
+  *.md,16
   *.txt,2
   other,12

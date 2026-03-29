@@ -478,13 +478,13 @@ Returns list of (old_path, new_path, hunk_lines).
 Returns (old_start, old_count, new_start, new_count).
 - **Output to**: re.match, int, int, DiffParseError, match.group
 
-### src.pfix.runtime_todo.TodoFile._format_entry
-> Format RuntimeIssue as markdown TODO entry.
-- **Output to**: enumerate, issue.timestamp.strftime, trace_parts.append, None.join, Path
-
 ### src.pfix.session._restart_process
 > Restart current process. CC≤2.
 - **Output to**: console.print, os.execv, src.pfix.analyzer.analyze_exception, src.pfix.session._clear_pycache, Path
+
+### src.pfix.runtime_todo.TodoFile._format_entry
+> Format RuntimeIssue as markdown TODO entry.
+- **Output to**: enumerate, issue.timestamp.strftime, trace_parts.append, None.join, Path
 
 ### src.pfix.validation.validate_fix
 > Validate a fix by running tests.
@@ -525,20 +525,20 @@ Args:
 ### examples.memory.resource_leaks.process_stream
 - **Output to**: src.pfix.decorator.pfix, range, len, list, results.extend
 
-### examples.types.pattern_errors.format_report
-- **Output to**: src.pfix.decorator.pfix, Metric
-
-### examples.types.pattern_errors.parse_header
-- **Output to**: src.pfix.decorator.pfix, line.split
-
-### examples.types.attribute_errors.parse_config
-- **Output to**: src.pfix.decorator.pfix, None.get, data.get
-
 ### examples.types.type_errors.format_user_info
 - **Output to**: src.pfix.decorator.pfix
 
 ### examples.types.type_errors.apply_transform
 - **Output to**: src.pfix.decorator.pfix, transform
+
+### examples.types.attribute_errors.parse_config
+- **Output to**: src.pfix.decorator.pfix, None.get, data.get
+
+### examples.types.pattern_errors.format_report
+- **Output to**: src.pfix.decorator.pfix, Metric
+
+### examples.types.pattern_errors.parse_header
+- **Output to**: src.pfix.decorator.pfix, line.split
 
 ### examples.production.degradation.parse_api_v2_response
 - **Output to**: src.pfix.decorator.pfix

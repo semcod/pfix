@@ -1,36 +1,36 @@
 flowchart LR
     subgraph examples__complex_demo
         examples__complex_demo__main__analyze_users["analyze_users"]
-        examples__complex_demo__main__main["main"]
         examples__complex_demo__main__load_and_process_data["load_and_process_data"]
+        examples__complex_demo__main__main["main"]
     end
     subgraph examples__concurrency
-        examples__concurrency__async_mistakes__test_missing_await["test_missing_await"]
         examples__concurrency__race_conditions__parallel_count["parallel_count"]
-        examples__concurrency__race_conditions__filter_dict_inplace["filter_dict_inplace"]
-        examples__concurrency__async_mistakes__test_sync_in_async["test_sync_in_async"]
-        examples__concurrency__async_mistakes__test_sync_generator_in_async["test_sync_generator_in_async"]
+        examples__concurrency__async_mistakes__test_missing_await["test_missing_await"]
         examples__concurrency__race_conditions__remove_negatives["remove_negatives"]
-        examples__concurrency__race_conditions__fetch_async_in_sync["fetch_async_in_sync"]
+        examples__concurrency__async_mistakes__test_sync_generator_in_async["test_sync_generator_in_async"]
         examples__concurrency__async_mistakes__test_await_non_coroutine["test_await_non_coroutine"]
+        examples__concurrency__async_mistakes__test_sync_in_async["test_sync_in_async"]
+        examples__concurrency__race_conditions__fetch_async_in_sync["fetch_async_in_sync"]
+        examples__concurrency__race_conditions__filter_dict_inplace["filter_dict_inplace"]
     end
     subgraph examples__data
-        examples__data__parse_errors__parse_csv_data["parse_csv_data"]
-        examples__data__numeric_errors__validate_total["validate_total"]
         examples__data__numeric_errors__calculate_average["calculate_average"]
-        examples__data__parse_errors__parse_json_response["parse_json_response"]
-        examples__data__numeric_errors__time_ago["time_ago"]
-        examples__data__numeric_errors__distribute_evenly["distribute_evenly"]
-        examples__data__parse_errors__extract_email["extract_email"]
-        examples__data__parse_errors__parse_user_age["parse_user_age"]
-        examples__data__numeric_errors__compute_statistics["compute_statistics"]
         examples__data__parse_errors__get_third_element["get_third_element"]
+        examples__data__parse_errors__parse_json_response["parse_json_response"]
+        examples__data__numeric_errors__compute_statistics["compute_statistics"]
+        examples__data__parse_errors__parse_user_age["parse_user_age"]
+        examples__data__numeric_errors__distribute_evenly["distribute_evenly"]
         examples__data__parse_errors__parse_coordinate["parse_coordinate"]
+        examples__data__parse_errors__extract_email["extract_email"]
+        examples__data__numeric_errors__time_ago["time_ago"]
+        examples__data__numeric_errors__validate_total["validate_total"]
+        examples__data__parse_errors__parse_csv_data["parse_csv_data"]
     end
     subgraph examples__demo
-        examples__demo__average["average"]
-        examples__demo__greet["greet"]
         examples__demo__fetch_json["fetch_json"]
+        examples__demo__greet["greet"]
+        examples__demo__average["average"]
     end
     subgraph examples__demo1
         examples__demo1__main["main"]
@@ -40,362 +40,362 @@ flowchart LR
     end
     subgraph examples__deps
         examples__deps__version_conflicts__legacy_json_parse["legacy_json_parse"]
-        examples__deps__version_conflicts__start_mcp_server["start_mcp_server"]
-        examples__deps__version_conflicts__use_deprecated_api["use_deprecated_api"]
         examples__deps__package_traps__test_wrong_package["test_wrong_package"]
+        examples__deps__version_conflicts__use_deprecated_api["use_deprecated_api"]
+        examples__deps__version_conflicts__start_mcp_server["start_mcp_server"]
         examples__deps__package_traps__test_namespace_conflict["test_namespace_conflict"]
-        examples__deps__package_traps__fetch_sni_url["fetch_sni_url"]
-        examples__deps__package_traps__resize_image["resize_image"]
         examples__deps__version_conflicts__get_package_version["get_package_version"]
+        examples__deps__package_traps__resize_image["resize_image"]
+        examples__deps__package_traps__fetch_sni_url["fetch_sni_url"]
     end
     subgraph examples__edge_cases
-        examples__edge_cases__tricky_errors__apply_to_all["apply_to_all"]
         examples__edge_cases__tricky_errors__consume_generator["consume_generator"]
         examples__edge_cases__python_gotchas__test_bad_context_manager["test_bad_context_manager"]
-        examples__edge_cases__class_errors__test_mro_conflict["test_mro_conflict"]
         examples__edge_cases__python_gotchas__test_no_with_statement["test_no_with_statement"]
         examples__edge_cases__class_errors__test_slots_error["test_slots_error"]
-        examples__edge_cases__class_errors__test_dataclass_mutable["test_dataclass_mutable"]
-        examples__edge_cases__python_gotchas__test_generator_confusion["test_generator_confusion"]
+        examples__edge_cases__tricky_errors__apply_to_all["apply_to_all"]
         examples__edge_cases__python_gotchas__test_property_called["test_property_called"]
-        examples__edge_cases__class_errors__test_missing_super["test_missing_super"]
+        examples__edge_cases__class_errors__test_dataclass_mutable["test_dataclass_mutable"]
+        examples__edge_cases__class_errors__test_mro_conflict["test_mro_conflict"]
+        examples__edge_cases__python_gotchas__test_staticmethod_self["test_staticmethod_self"]
+        examples__edge_cases__tricky_errors__make_multipliers["make_multipliers"]
         examples__edge_cases__tricky_errors__use_dynamic_config["use_dynamic_config"]
         examples__edge_cases__tricky_errors__subtract["subtract"]
-        examples__edge_cases__tricky_errors__make_multipliers["make_multipliers"]
-        examples__edge_cases__python_gotchas__test_staticmethod_self["test_staticmethod_self"]
+        examples__edge_cases__class_errors__test_missing_super["test_missing_super"]
+        examples__edge_cases__python_gotchas__test_generator_confusion["test_generator_confusion"]
     end
     subgraph examples__encoding
-        examples__encoding__unicode_errors__read_bom_csv["read_bom_csv"]
         examples__encoding__codec_errors__log_user_input["log_user_input"]
         examples__encoding__unicode_errors__build_search_url["build_search_url"]
-        examples__encoding__unicode_errors__format_price["format_price"]
+        examples__encoding__unicode_errors__read_bom_csv["read_bom_csv"]
+        examples__encoding__codec_errors__run_system_command["run_system_command"]
         examples__encoding__unicode_errors__process_api_response["process_api_response"]
         examples__encoding__codec_errors__write_binary_to_text["write_binary_to_text"]
-        examples__encoding__codec_errors__run_system_command["run_system_command"]
+        examples__encoding__unicode_errors__format_price["format_price"]
         examples__encoding__unicode_errors__read_legacy_file["read_legacy_file"]
     end
     subgraph examples__env
         examples__env__env_var_errors__is_debug_mode["is_debug_mode"]
-        examples__env__env_var_errors__read_user_config["read_user_config"]
-        examples__env__env_var_errors__get_database_url["get_database_url"]
         examples__env__env_var_errors__get_port["get_port"]
+        examples__env__env_var_errors__get_database_url["get_database_url"]
+        examples__env__env_var_errors__read_user_config["read_user_config"]
     end
     subgraph examples__filesystem
+        examples__filesystem__file_errors__read_ssh_key["read_ssh_key"]
         examples__filesystem__file_errors__save_report["save_report"]
         examples__filesystem__file_errors__load_settings["load_settings"]
         examples__filesystem__file_errors__read_cross_platform["read_cross_platform"]
-        examples__filesystem__file_errors__read_ssh_key["read_ssh_key"]
         examples__filesystem__file_errors__load_config["load_config"]
     end
     subgraph examples__imports
-        examples__imports__missing_module__generate_filename["generate_filename"]
-        examples__imports__platform_specific__load_toml["load_toml"]
-        examples__imports__shadowing__create_instance["create_instance"]
-        examples__imports__shadowing__make_list_from_range["make_list_from_range"]
-        examples__imports__wrong_names__parse_html["parse_html"]
-        examples__imports__wrong_names__find_files["find_files"]
-        examples__imports__missing_module__fetch_api_data["fetch_api_data"]
-        examples__imports__platform_specific__test_self_type["test_self_type"]
-        examples__imports__shadowing__get_home_dir["get_home_dir"]
-        examples__imports__platform_specific__get_inotify_events["get_inotify_events"]
-        examples__imports__wrong_names__count_words["count_words"]
         examples__imports__shadowing__parse_json_string["parse_json_string"]
+        examples__imports__missing_module__fetch_api_data["fetch_api_data"]
+        examples__imports__shadowing__get_home_dir["get_home_dir"]
+        examples__imports__wrong_names__encode_base64["encode_base64"]
+        examples__imports__wrong_names__parse_html["parse_html"]
+        examples__imports__shadowing__create_instance["create_instance"]
+        examples__imports__platform_specific__test_optional_extra["test_optional_extra"]
+        examples__imports__missing_module__load_yaml_config["load_yaml_config"]
+        examples__imports__shadowing__make_list_from_range["make_list_from_range"]
+        examples__imports__missing_module__generate_filename["generate_filename"]
         examples__imports__wrong_names__get_timestamp["get_timestamp"]
         examples__imports__circular__process_all["process_all"]
+        examples__imports__wrong_names__count_words["count_words"]
+        examples__imports__wrong_names__find_files["find_files"]
+        examples__imports__platform_specific__load_toml["load_toml"]
         examples__imports__circular__register_handler["register_handler"]
-        examples__imports__missing_module__load_yaml_config["load_yaml_config"]
-        examples__imports__platform_specific__test_optional_extra["test_optional_extra"]
-        examples__imports__wrong_names__encode_base64["encode_base64"]
+        examples__imports__platform_specific__test_self_type["test_self_type"]
+        examples__imports__platform_specific__get_inotify_events["get_inotify_events"]
     end
     subgraph examples__memory
         examples__memory__recursion_and_alloc__build_huge_string["build_huge_string"]
-        examples__memory__resource_leaks__count_lines_in_large_file["count_lines_in_large_file"]
         examples__memory__resource_leaks__squares_up_to["squares_up_to"]
-        examples__memory__recursion_and_alloc__fibonacci["fibonacci"]
-        examples__memory__resource_leaks__create_circular_ref["create_circular_ref"]
-        examples__memory__recursion_and_alloc__accumulate_data["accumulate_data"]
-        examples__memory__recursion_and_alloc__factorial["factorial"]
         examples__memory__resource_leaks__process_stream["process_stream"]
+        examples__memory__recursion_and_alloc__accumulate_data["accumulate_data"]
+        examples__memory__resource_leaks__count_lines_in_large_file["count_lines_in_large_file"]
+        examples__memory__recursion_and_alloc__factorial["factorial"]
+        examples__memory__resource_leaks__create_circular_ref["create_circular_ref"]
+        examples__memory__recursion_and_alloc__fibonacci["fibonacci"]
     end
     subgraph examples__network
-        examples__network__connection_errors__call_slow_api["call_slow_api"]
         examples__network__connection_errors__connect_to_database["connect_to_database"]
-        examples__network__connection_errors__fetch_from_typo_domain["fetch_from_typo_domain"]
+        examples__network__connection_errors__call_slow_api["call_slow_api"]
         examples__network__connection_errors__download_missing_file["download_missing_file"]
+        examples__network__connection_errors__fetch_from_typo_domain["fetch_from_typo_domain"]
     end
     subgraph examples__production
-        examples__production__degradation__render_header["render_header"]
-        examples__production__api_patterns__run_etl_pipeline["run_etl_pipeline"]
-        examples__production__degradation__parse_api_v2_response["parse_api_v2_response"]
-        examples__production__cascading_errors__start_application["start_application"]
-        examples__production__api_patterns__handle_request["handle_request"]
-        examples__production__cascading_errors__connect_database["connect_database"]
-        examples__production__cascading_errors__serve_api["serve_api"]
-        examples__production__cascading_errors__process_batch["process_batch"]
-        examples__production__api_patterns__authenticate["authenticate"]
-        examples__production__api_patterns__transform_records["transform_records"]
-        examples__production__cascading_errors__process_with_cleanup["process_with_cleanup"]
-        examples__production__degradation__get_user_cached["get_user_cached"]
-        examples__production__cascading_errors__acquire_resource["acquire_resource"]
-        examples__production__cascading_errors__release_resource["release_resource"]
-        examples__production__cascading_errors__transform_item["transform_item"]
+        examples__production__degradation__render_dashboard["render_dashboard"]
         examples__production__api_patterns__load_to_output["load_to_output"]
         examples__production__api_patterns__serialize_response["serialize_response"]
-        examples__production__degradation__render_analytics_v2["render_analytics_v2"]
-        examples__production__degradation__fetch_with_bad_retry["fetch_with_bad_retry"]
-        examples__production__api_patterns__validate_payload["validate_payload"]
+        examples__production__cascading_errors__acquire_resource["acquire_resource"]
         examples__production__api_patterns__bootstrap_config["bootstrap_config"]
-        examples__production__cascading_errors__load_db_config["load_db_config"]
+        examples__production__cascading_errors__connect_database["connect_database"]
+        examples__production__degradation__parse_api_v2_response["parse_api_v2_response"]
+        examples__production__degradation__render_analytics_v2["render_analytics_v2"]
         examples__production__cascading_errors__do_work["do_work"]
-        examples__production__degradation__render_footer["render_footer"]
-        examples__production__degradation__render_dashboard["render_dashboard"]
-        examples__production__api_patterns__extract_from_api["extract_from_api"]
+        examples__production__cascading_errors__start_application["start_application"]
+        examples__production__cascading_errors__serve_api["serve_api"]
+        examples__production__cascading_errors__process_batch["process_batch"]
         examples__production__api_patterns__query_database["query_database"]
+        examples__production__api_patterns__run_etl_pipeline["run_etl_pipeline"]
+        examples__production__cascading_errors__process_with_cleanup["process_with_cleanup"]
+        examples__production__api_patterns__extract_from_api["extract_from_api"]
+        examples__production__api_patterns__handle_request["handle_request"]
+        examples__production__cascading_errors__load_db_config["load_db_config"]
+        examples__production__degradation__render_footer["render_footer"]
+        examples__production__cascading_errors__release_resource["release_resource"]
         examples__production__cascading_errors__fetch_with_transient_failure["fetch_with_transient_failure"]
+        examples__production__api_patterns__authenticate["authenticate"]
+        examples__production__cascading_errors__transform_item["transform_item"]
+        examples__production__api_patterns__validate_payload["validate_payload"]
+        examples__production__degradation__get_user_cached["get_user_cached"]
+        examples__production__degradation__render_header["render_header"]
+        examples__production__degradation__fetch_with_bad_retry["fetch_with_bad_retry"]
+        examples__production__api_patterns__transform_records["transform_records"]
     end
     subgraph examples__shared
-        examples__shared__fetch_json["fetch_json"]
         examples__shared__greet["greet"]
         examples__shared__average["average"]
+        examples__shared__fetch_json["fetch_json"]
     end
     subgraph examples__types
         examples__types__pattern_errors__parse_header["parse_header"]
-        examples__types__type_errors__apply_transform["apply_transform"]
-        examples__types__attribute_errors__collect_results["collect_results"]
+        examples__types__pattern_errors__sort_users["sort_users"]
+        examples__types__type_errors__find_minimum["find_minimum"]
+        examples__types__pattern_errors__check_range["check_range"]
+        examples__types__type_errors__build_index["build_index"]
+        examples__types__type_errors__calculate_area["calculate_area"]
+        examples__types__attribute_errors__get_user["get_user"]
+        examples__types__type_errors__test_wrong_args["test_wrong_args"]
+        examples__types__attribute_errors__read_first_line["read_first_line"]
+        examples__types__pattern_errors__find_first_match["find_first_match"]
         examples__types__attribute_errors__clean_csv_line["clean_csv_line"]
+        examples__types__pattern_errors__format_report["format_report"]
+        examples__types__attribute_errors__collect_results["collect_results"]
+        examples__types__pattern_errors__merge_configs["merge_configs"]
+        examples__types__type_errors__apply_transform["apply_transform"]
+        examples__types__attribute_errors__check_size["check_size"]
+        examples__types__type_errors__generate_sequence["generate_sequence"]
+        examples__types__type_errors__format_user_info["format_user_info"]
         examples__types__attribute_errors__parse_config["parse_config"]
         examples__types__attribute_errors__show_user_name["show_user_name"]
-        examples__types__type_errors__calculate_area["calculate_area"]
-        examples__types__type_errors__build_index["build_index"]
-        examples__types__attribute_errors__get_user["get_user"]
-        examples__types__type_errors__generate_sequence["generate_sequence"]
-        examples__types__type_errors__test_wrong_args["test_wrong_args"]
-        examples__types__pattern_errors__merge_configs["merge_configs"]
-        examples__types__pattern_errors__find_first_match["find_first_match"]
-        examples__types__pattern_errors__sort_users["sort_users"]
-        examples__types__pattern_errors__format_report["format_report"]
-        examples__types__attribute_errors__read_first_line["read_first_line"]
-        examples__types__attribute_errors__check_size["check_size"]
-        examples__types__pattern_errors__check_range["check_range"]
-        examples__types__type_errors__format_user_info["format_user_info"]
-        examples__types__type_errors__find_minimum["find_minimum"]
     end
     subgraph src__pfix
-        src__pfix__telemetry__get_telemetry_endpoint["get_telemetry_endpoint"]
-        src__pfix__env_diagnostics__imports__ImportDiagnostic___find_cycle_dfs["_find_cycle_dfs"]
-        src__pfix__runtime_todo__RuntimeCollector___build_issue["_build_issue"]
-        src__pfix__fixer___apply_dependencies["_apply_dependencies"]
-        src__pfix__cache___get_cache_path["_get_cache_path"]
-        src__pfix__dependency__detect_missing_from_error["detect_missing_from_error"]
-        src__pfix__runtime_todo__RuntimeCollector____init__["__init__"]
-        src__pfix__cache__get_cache["get_cache"]
-        src__pfix__analyzer___fill_file_context["_fill_file_context"]
-        src__pfix__permissions__check_all_permissions["check_all_permissions"]
-        src__pfix__rollback__list_backups["list_backups"]
-        src__pfix__cli___create_excepthook["_create_excepthook"]
-        src__pfix__init_wizard__main["main"]
-        src__pfix__mcp_server__start_server["start_server"]
-        src__pfix__analyzer___fill_environment_context["_fill_environment_context"]
-        src__pfix__fixer___log_skipped_fix["_log_skipped_fix"]
-        src__pfix__logging__get_logger["get_logger"]
-        src__pfix__analyzer__scan_missing_deps["scan_missing_deps"]
-        src__pfix__session__PFixSession___handle_exception["_handle_exception"]
-        src__pfix__cli__cmd_init["cmd_init"]
-        src__pfix__fixer___replace_function["_replace_function"]
-        src__pfix__cli__main["main"]
-        src__pfix__strategies__get_strategy_context["get_strategy_context"]
-        src__pfix__runtime_todo__ErrorFingerprint___normalize_error_message["_normalize_error_message"]
-        src__pfix__fixer___git_commit["_git_commit"]
-        src__pfix__mcp_server___register_fix_tool["_register_fix_tool"]
-        src__pfix__fixer___record_fix_telemetry["_record_fix_telemetry"]
-        src__pfix__audit__print_audit_report["print_audit_report"]
-        src__pfix___auto_activate["_auto_activate"]
-        src__pfix__explain__explain_exception_type["explain_exception_type"]
-        src__pfix__fixer__apply_fix["apply_fix"]
-        src__pfix__rules__get_rules_for_prompt["get_rules_for_prompt"]
-        src__pfix__session___restart_process["_restart_process"]
-        src__pfix__fixer___write_fix["_write_fix"]
-        src__pfix__explain__explain["explain"]
-        src__pfix__rollback__rollback_last["rollback_last"]
-        src__pfix__dev_mode___create_wrapper["_create_wrapper"]
-        src__pfix__rollback__rollback_file["rollback_file"]
-        src__pfix___auto_activate___handle_syntax_error["_handle_syntax_error"]
-        src__pfix__rollback__find_backup_dir["find_backup_dir"]
-        src__pfix___auto_activate___auto_activate_pfix["_auto_activate_pfix"]
-        src__pfix__fixer___post_fix["_post_fix"]
-        src__pfix__cli___install_excepthook["_install_excepthook"]
-        src__pfix__cli__cmd_deps["cmd_deps"]
-        src__pfix__permissions__check_auto_apply_allowed["check_auto_apply_allowed"]
-        src__pfix___auto_activate___install_syntax_error_handler["_install_syntax_error_handler"]
-        src__pfix__syntax_error_handler___build_syntax_error_context["_build_syntax_error_context"]
-        src__pfix__integrations__precommit__check_imports["check_imports"]
-        src__pfix__mcp_server___build_ctx["_build_ctx"]
-        src__pfix__audit__log_fix_audit["log_fix_audit"]
-        src__pfix__runtime_todo__get_collector["get_collector"]
-        src__pfix__cache__FixCache__get["get"]
-        src__pfix__decorator___try_reload_module["_try_reload_module"]
-        src__pfix__analyzer___safe_repr["_safe_repr"]
-        src__pfix__cli___build_parser["_build_parser"]
-        src__pfix__cli___output_diagnostic_results["_output_diagnostic_results"]
-        src__pfix__session__PFixSession____init__["__init__"]
-        src__pfix__permissions__get_environment["get_environment"]
-        src__pfix__diff_fixer__parse_unified_diff["parse_unified_diff"]
-        src__pfix__permissions__check_blocked_path["check_blocked_path"]
-        src__pfix__cache__get_cached_fix["get_cached_fix"]
-        src__pfix__env_diagnostics__imports__ImportDiagnostic___build_import_graph["_build_import_graph"]
-        src__pfix__decorator___handle_decorator_exception["_handle_decorator_exception"]
-        src__pfix__cli___format_diagnostic_results["_format_diagnostic_results"]
         src__pfix__env_diagnostics__auto_fix__apply_auto_fix["apply_auto_fix"]
-        src__pfix__env_diagnostics__base__BaseDiagnostic__can_auto_fix["can_auto_fix"]
-        src__pfix__production__PfixMonitor__handle_exception["handle_exception"]
-        src__pfix__analyzer___fill_traceback_context["_fill_traceback_context"]
-        src__pfix__dashboard__run_dashboard["run_dashboard"]
-        src__pfix__cli___apply_diagnostic_fixes["_apply_diagnostic_fixes"]
-        src__pfix__runtime_todo__capture_exception["capture_exception"]
-        src__pfix__permissions__check_complexity_approval["check_complexity_approval"]
-        src__pfix__env_diagnostics__process__ProcessDiagnostic___check_tmp_writable["_check_tmp_writable"]
-        src__pfix__mcp_server___register_edit_tool["_register_edit_tool"]
-        src__pfix__validation__validate_fix["validate_fix"]
-        src__pfix__integrations__precommit__main["main"]
+        src__pfix__llm___request_with_chain["_request_with_chain"]
+        src__pfix__fixer__apply_fix["apply_fix"]
+        src__pfix__fixer___git_commit["_git_commit"]
+        src__pfix__analyzer___extract_frame_context["_extract_frame_context"]
+        src__pfix__decorator___ensure_deps["_ensure_deps"]
+        src__pfix__cli__cmd_diagnose["cmd_diagnose"]
+        src__pfix__rules__load_project_rules["load_project_rules"]
+        src__pfix__syntax_error_handler___apply_syntax_fix["_apply_syntax_fix"]
+        src__pfix__dependency__is_module_available["is_module_available"]
+        src__pfix__llm___parse_response["_parse_response"]
+        src__pfix__env_diagnostics__auto_fix___fix_missing_requirement["_fix_missing_requirement"]
         src__pfix__llm___request_single_model["_request_single_model"]
-        src__pfix__fixer___prepare_code_change["_prepare_code_change"]
-        src__pfix__init_wizard__find_pyproject["find_pyproject"]
-        src__pfix__fixer___clear_pycache["_clear_pycache"]
-        src__pfix__telemetry__record_event["record_event"]
-        src__pfix__cli__cmd_run["cmd_run"]
-        src__pfix__cache__FixCache__set["set"]
+        src__pfix__integrations__precommit__check_syntax["check_syntax"]
+        src__pfix__mcp_server___register_diagnose_tool["_register_diagnose_tool"]
+        src__pfix__runtime_todo__capture_exception["capture_exception"]
+        src__pfix__env_diagnostics__imports__ImportDiagnostic___check_missing_imports["_check_missing_imports"]
+        src__pfix__analyzer___fill_file_context["_fill_file_context"]
+        src__pfix__env_diagnostics__imports__ImportDiagnostic___extract_imports["_extract_imports"]
+        src__pfix__rollback__list_backups["list_backups"]
+        src__pfix__cache__FixCache__get["get"]
+        src__pfix__env_diagnostics__imports__ImportDiagnostic___check_circular_imports["_check_circular_imports"]
+        src__pfix__fixer___display_diff["_display_diff"]
+        src__pfix__production__PfixMonitor__handle_exception["handle_exception"]
         src__pfix__session__install_pfix_hook["install_pfix_hook"]
-        src__pfix__dashboard__run_console_dashboard["run_console_dashboard"]
+        src__pfix__rollback__rollback_file["rollback_file"]
+        src__pfix__mcp_server___register_fix_tool["_register_fix_tool"]
+        src__pfix__analyzer__classify_error["classify_error"]
+        src__pfix__decorator___after_fix_action["_after_fix_action"]
+        src__pfix__config___load_llm_env["_load_llm_env"]
+        src__pfix__diff_fixer__parse_hunk_header["parse_hunk_header"]
         src__pfix__dev_mode__install_dev_mode_hook["install_dev_mode_hook"]
-        src__pfix__cache__FixCache____init__["__init__"]
-        src__pfix__fixer___backup["_backup"]
+        src__pfix__dashboard__get_cache_stats["get_cache_stats"]
+        src__pfix__decorator__pfix["pfix"]
+        src__pfix__cli__cmd_deps["cmd_deps"]
+        src__pfix__env_diagnostics__imports__ImportDiagnostic___find_cycle_dfs["_find_cycle_dfs"]
+        src__pfix__audit__get_audit_summary["get_audit_summary"]
+        src__pfix__cli___format_diagnostic_results["_format_diagnostic_results"]
+        src__pfix__telemetry___send_to_endpoint["_send_to_endpoint"]
+        src__pfix__strategies__StrategyRegistry__enhance_prompt["enhance_prompt"]
+        src__pfix__analyzer___extract_imports["_extract_imports"]
+        src__pfix__runtime_todo__ErrorFingerprint___normalize_error_message["_normalize_error_message"]
+        src__pfix__dashboard__run_dashboard["run_dashboard"]
+        src__pfix__session___clear_pycache["_clear_pycache"]
+        src__pfix__fixer___apply_dependencies["_apply_dependencies"]
+        src__pfix___auto_activate___install_syntax_error_handler["_install_syntax_error_handler"]
+        src__pfix___auto_activate["_auto_activate"]
+        src__pfix__session___handle_generic_error_hook["_handle_generic_error_hook"]
+        src__pfix__dev_mode__wrap_module_functions["wrap_module_functions"]
+        src__pfix__cache___json_to_proposal["_json_to_proposal"]
+        src__pfix__dependency__update_requirements_file["update_requirements_file"]
+        src__pfix__analyzer___extract_file_context["_extract_file_context"]
+        src__pfix__analyzer___safe_repr["_safe_repr"]
+        src__pfix__telemetry___store_event["_store_event"]
+        src__pfix__config___load_mcp_env["_load_mcp_env"]
+        src__pfix__rollback__rollback_before["rollback_before"]
+        src__pfix__mcp_server___register_edit_tool["_register_edit_tool"]
+        src__pfix__cli___get_installation_status_table["_get_installation_status_table"]
+        src__pfix__init_wizard__main["main"]
+        src__pfix__fixer___confirm_fix["_confirm_fix"]
+        src__pfix__syntax_error_handler___build_syntax_error_context["_build_syntax_error_context"]
+        src__pfix__env_diagnostics__python_version__PythonVersionDiagnostic___check_deprecated_imports["_check_deprecated_imports"]
+        src__pfix__dev_mode___create_wrapper["_create_wrapper"]
+        src__pfix__env_diagnostics__auto_fix___fix_no_manifest["_fix_no_manifest"]
+        src__pfix__rollback__rollback_command["rollback_command"]
+        src__pfix__session___restart_process["_restart_process"]
+        src__pfix__cache__FixCache__set["set"]
+        src__pfix__dashboard__run_console_dashboard["run_console_dashboard"]
+        src__pfix__analyzer___fill_traceback_context["_fill_traceback_context"]
+        src__pfix__session__PFixSession____init__["__init__"]
+        src__pfix__analyzer___extract_function_source["_extract_function_source"]
         src__pfix__cli___print_status_summary["_print_status_summary"]
         src__pfix__fixer___validate_syntax["_validate_syntax"]
-        src__pfix__analyzer___scan_missing_deps["_scan_missing_deps"]
-        src__pfix__decorator___capture_runtime_error["_capture_runtime_error"]
-        src__pfix__audit___calculate_hash["_calculate_hash"]
-        src__pfix__dashboard__render_dashboard["render_dashboard"]
-        src__pfix__dashboard__get_cache_stats["get_cache_stats"]
-        src__pfix__permissions__get_permissions_summary["get_permissions_summary"]
-        src__pfix__env_diagnostics__imports__ImportDiagnostic___check_missing_imports["_check_missing_imports"]
-        src__pfix__integrations__precommit__check_syntax["check_syntax"]
-        src__pfix__fixer___make_diff["_make_diff"]
-        src__pfix__diff_fixer__apply_hunk["apply_hunk"]
-        src__pfix__telemetry__get_telemetry_summary["get_telemetry_summary"]
-        src__pfix__fixer___prepare_code_fix["_prepare_code_fix"]
-        src__pfix__env_diagnostics__python_version__PythonVersionDiagnostic___check_deprecated_imports["_check_deprecated_imports"]
-        src__pfix__session___handle_generic_error_hook["_handle_generic_error_hook"]
-        src__pfix__fixer___confirm_and_validate["_confirm_and_validate"]
-        src__pfix__cli__cmd_dashboard["cmd_dashboard"]
-        src__pfix__rollback__show_history["show_history"]
-        src__pfix__telemetry__is_telemetry_enabled["is_telemetry_enabled"]
-        src__pfix__config__get_config["get_config"]
-        src__pfix__init_wizard__init_wizard["init_wizard"]
-        src__pfix__decorator___ensure_deps["_ensure_deps"]
-        src__pfix__analyzer__classify_error["classify_error"]
-        src__pfix__dev_mode__wrap_module_functions["wrap_module_functions"]
         src__pfix__session___handle_import_error_hook["_handle_import_error_hook"]
-        src__pfix__integrations__sentry__PfixSentryIntegration___process_event["_process_event"]
-        src__pfix__llm___request_with_chain["_request_with_chain"]
-        src__pfix__cli___get_diagnose_exit_code["_get_diagnose_exit_code"]
-        src__pfix__session___handle_syntax_error_hook["_handle_syntax_error_hook"]
-        src__pfix__telemetry___send_to_endpoint["_send_to_endpoint"]
-        src__pfix__syntax_error_handler___apply_syntax_fix["_apply_syntax_fix"]
-        src__pfix__llm__request_fix["request_fix"]
-        src__pfix__fixer___confirm_fix["_confirm_fix"]
-        src__pfix__dev_mode__is_site_package["is_site_package"]
-        src__pfix__cli__cmd_server["cmd_server"]
-        src__pfix__config___load_git_env["_load_git_env"]
-        src__pfix__dependency__scan_project_deps["scan_project_deps"]
-        src__pfix__dependency__install_packages["install_packages"]
-        src__pfix__validation__quick_validate_syntax["quick_validate_syntax"]
-        src__pfix__cache___proposal_to_json["_proposal_to_json"]
-        src__pfix__analyzer___fill_function_context["_fill_function_context"]
-        src__pfix__mcp_server___register_analyze_tool["_register_analyze_tool"]
-        src__pfix__cli___dispatch["_dispatch"]
-        src__pfix__strategies__StrategyRegistry__enhance_prompt["enhance_prompt"]
-        src__pfix__cache__cache_fix["cache_fix"]
-        src__pfix__env_diagnostics__auto_fix___fix_no_manifest["_fix_no_manifest"]
-        src__pfix__config__configure["configure"]
-        src__pfix__decorator___apply_decorator_fix["_apply_decorator_fix"]
-        src__pfix__cli__cmd_dev["cmd_dev"]
-        src__pfix__decorator__pfix["pfix"]
-        src__pfix__env_diagnostics__imports__ImportDiagnostic___check_circular_imports["_check_circular_imports"]
-        src__pfix__mcp_server__create_mcp_server["create_mcp_server"]
-        src__pfix__env_diagnostics__auto_fix___fix_missing_requirement["_fix_missing_requirement"]
-        src__pfix__mcp_server___register_diagnose_tool["_register_diagnose_tool"]
-        src__pfix__logging__log_fix["log_fix"]
-        src__pfix__multi_fix__find_related_files["find_related_files"]
-        src__pfix__analyzer___extract_imports["_extract_imports"]
-        src__pfix__cache___init_sqlite_db["_init_sqlite_db"]
-        src__pfix__cli___get_installation_status_table["_get_installation_status_table"]
-        src__pfix__dependency__resolve_package_name["resolve_package_name"]
-        src__pfix__cache___make_cache_key["_make_cache_key"]
-        src__pfix__decorator__apfix["apfix"]
-        src__pfix__fixer___display_diff["_display_diff"]
-        src__pfix__config___load_mcp_env["_load_mcp_env"]
-        src__pfix__audit__get_audit_summary["get_audit_summary"]
-        src__pfix__validation__run_tests["run_tests"]
-        src__pfix__rollback__rollback_before["rollback_before"]
-        src__pfix__mcp_server___register_deps_tools["_register_deps_tools"]
-        src__pfix__dependency__is_module_available["is_module_available"]
-        src__pfix__cli__cmd_audit["cmd_audit"]
         src__pfix__mcp_client__MCPClient____init__["__init__"]
-        src__pfix__config___load_env_values["_load_env_values"]
-        src__pfix__config___load_paths_env["_load_paths_env"]
-        src__pfix__analyzer___extract_function_source["_extract_function_source"]
-        src__pfix__audit__read_audit_log["read_audit_log"]
-        src__pfix__decorator___after_fix_action["_after_fix_action"]
-        src__pfix__validation__validate_with_fallback["validate_with_fallback"]
-        src__pfix__cli__cmd_diagnose["cmd_diagnose"]
-        src__pfix__cli___get_config_table["_get_config_table"]
-        src__pfix__dashboard__get_log_stats["get_log_stats"]
-        src__pfix__cli__cmd_rollback["cmd_rollback"]
         src__pfix__config__PfixConfig__from_env["from_env"]
-        src__pfix__fixer___show_diagnosis["_show_diagnosis"]
-        src__pfix__telemetry___store_event["_store_event"]
-        src__pfix__dependency__update_requirements_file["update_requirements_file"]
-        src__pfix__config___load_behavior_env["_load_behavior_env"]
-        src__pfix__llm___parse_response["_parse_response"]
-        src__pfix__config___load_llm_env["_load_llm_env"]
-        src__pfix__session___clear_pycache["_clear_pycache"]
-        src__pfix__explain___generate_explanation["_generate_explanation"]
-        src__pfix__analyzer__analyze_exception["analyze_exception"]
-        src__pfix__analyzer___extract_file_context["_extract_file_context"]
-        src__pfix__runtime_todo__ErrorFingerprint__compute["compute"]
-        src__pfix__rollback__rollback_command["rollback_command"]
-        src__pfix__analyzer___extract_frame_context["_extract_frame_context"]
-        src__pfix__diff_fixer__apply_diff_to_file["apply_diff_to_file"]
-        src__pfix__rules__load_project_rules["load_project_rules"]
-        src__pfix__cli__cmd_check["cmd_check"]
+        src__pfix__permissions__get_environment["get_environment"]
+        src__pfix__cli__cmd_dev["cmd_dev"]
+        src__pfix__diff_fixer__parse_unified_diff["parse_unified_diff"]
+        src__pfix__permissions__get_permissions_summary["get_permissions_summary"]
+        src__pfix__explain__explain["explain"]
+        src__pfix__cache___proposal_to_json["_proposal_to_json"]
+        src__pfix__mcp_server___register_deps_tools["_register_deps_tools"]
+        src__pfix__runtime_todo__RuntimeCollector____init__["__init__"]
+        src__pfix__mcp_server___build_ctx["_build_ctx"]
+        src__pfix__analyzer___scan_missing_deps["_scan_missing_deps"]
+        src__pfix__cli___build_parser["_build_parser"]
+        src__pfix___auto_activate___auto_activate_pfix["_auto_activate_pfix"]
+        src__pfix__fixer___log_skipped_fix["_log_skipped_fix"]
+        src__pfix__dependency__scan_project_deps["scan_project_deps"]
         src__pfix__cli__cmd_status["cmd_status"]
-        src__pfix__dependency__generate_requirements["generate_requirements"]
-        src__pfix__decorator___try_quick_dep_fix["_try_quick_dep_fix"]
-        src__pfix__syntax_error_handler__handle_syntax_error["handle_syntax_error"]
-        src__pfix__diff_fixer__parse_hunk_header["parse_hunk_header"]
-        src__pfix__diff_fixer__apply_diff["apply_diff"]
-        src__pfix__cli__cmd_explain["cmd_explain"]
-        src__pfix__explain__explain_last["explain_last"]
-        src__pfix__cache___json_to_proposal["_json_to_proposal"]
+        src__pfix__env_diagnostics__base__BaseDiagnostic__can_auto_fix["can_auto_fix"]
+        src__pfix__cache__get_cached_fix["get_cached_fix"]
+        src__pfix__integrations__precommit__check_imports["check_imports"]
+        src__pfix__permissions__check_complexity_approval["check_complexity_approval"]
+        src__pfix__cli__cmd_run["cmd_run"]
+        src__pfix__dependency__detect_missing_from_error["detect_missing_from_error"]
+        src__pfix__telemetry__get_telemetry_summary["get_telemetry_summary"]
+        src__pfix__fixer___show_diagnosis["_show_diagnosis"]
         src__pfix__env_diagnostics__paths__PathDiagnostic___check_sys_path["_check_sys_path"]
-        src__pfix__env_diagnostics__imports__ImportDiagnostic___extract_imports["_extract_imports"]
+        src__pfix__analyzer__analyze_exception["analyze_exception"]
+        src__pfix__diff_fixer__apply_hunk["apply_hunk"]
+        src__pfix__fixer___prepare_code_change["_prepare_code_change"]
+        src__pfix__fixer___make_diff["_make_diff"]
+        src__pfix__audit__print_audit_report["print_audit_report"]
+        src__pfix__validation__run_tests["run_tests"]
+        src__pfix__cli__cmd_init["cmd_init"]
+        src__pfix__cli__cmd_rollback["cmd_rollback"]
+        src__pfix__config___load_behavior_env["_load_behavior_env"]
+        src__pfix___auto_activate___handle_syntax_error["_handle_syntax_error"]
+        src__pfix__cache___get_cache_path["_get_cache_path"]
+        src__pfix__logging__log_fix["log_fix"]
+        src__pfix__diff_fixer__apply_diff_to_file["apply_diff_to_file"]
+        src__pfix__decorator___handle_decorator_exception["_handle_decorator_exception"]
+        src__pfix__dependency__resolve_package_name["resolve_package_name"]
+        src__pfix__telemetry__is_telemetry_enabled["is_telemetry_enabled"]
+        src__pfix__dashboard__render_dashboard["render_dashboard"]
+        src__pfix__mcp_server__start_server["start_server"]
+        src__pfix__explain___generate_explanation["_generate_explanation"]
+        src__pfix__fixer___backup["_backup"]
+        src__pfix__telemetry__record_event["record_event"]
+        src__pfix__cli__main["main"]
+        src__pfix__dev_mode__is_site_package["is_site_package"]
+        src__pfix__cache__get_cache["get_cache"]
+        src__pfix__explain__explain_exception_type["explain_exception_type"]
+        src__pfix__runtime_todo__ErrorFingerprint__compute["compute"]
+        src__pfix__decorator___apply_decorator_fix["_apply_decorator_fix"]
+        src__pfix__mcp_server___register_analyze_tool["_register_analyze_tool"]
+        src__pfix__telemetry__get_telemetry_endpoint["get_telemetry_endpoint"]
+        src__pfix__rules__get_rules_for_prompt["get_rules_for_prompt"]
+        src__pfix__cli___get_diagnose_exit_code["_get_diagnose_exit_code"]
+        src__pfix__validation__validate_fix["validate_fix"]
+        src__pfix__syntax_error_handler__handle_syntax_error["handle_syntax_error"]
+        src__pfix__fixer___record_fix_telemetry["_record_fix_telemetry"]
+        src__pfix__rollback__rollback_last["rollback_last"]
+        src__pfix__cli__cmd_audit["cmd_audit"]
+        src__pfix__cli___install_excepthook["_install_excepthook"]
+        src__pfix__cli__cmd_check["cmd_check"]
+        src__pfix__mcp_server__create_mcp_server["create_mcp_server"]
+        src__pfix__fixer___prepare_code_fix["_prepare_code_fix"]
+        src__pfix__multi_fix__find_related_files["find_related_files"]
+        src__pfix__fixer___write_fix["_write_fix"]
+        src__pfix__fixer___replace_function["_replace_function"]
+        src__pfix__validation__quick_validate_syntax["quick_validate_syntax"]
+        src__pfix__cli__cmd_explain["cmd_explain"]
+        src__pfix__session__PFixSession___handle_exception["_handle_exception"]
+        src__pfix__cli___output_diagnostic_results["_output_diagnostic_results"]
+        src__pfix__analyzer___fill_environment_context["_fill_environment_context"]
+        src__pfix__session___handle_syntax_error_hook["_handle_syntax_error_hook"]
+        src__pfix__runtime_todo__get_collector["get_collector"]
+        src__pfix__cache__cache_fix["cache_fix"]
+        src__pfix__decorator___capture_runtime_error["_capture_runtime_error"]
+        src__pfix__permissions__check_all_permissions["check_all_permissions"]
+        src__pfix__decorator___try_reload_module["_try_reload_module"]
+        src__pfix__audit__read_audit_log["read_audit_log"]
+        src__pfix__cli___get_config_table["_get_config_table"]
+        src__pfix__cache___init_sqlite_db["_init_sqlite_db"]
+        src__pfix__rollback__find_backup_dir["find_backup_dir"]
+        src__pfix__cli___dispatch["_dispatch"]
+        src__pfix__cli__cmd_server["cmd_server"]
+        src__pfix__cache__FixCache____init__["__init__"]
+        src__pfix__fixer___clear_pycache["_clear_pycache"]
+        src__pfix__permissions__check_blocked_path["check_blocked_path"]
+        src__pfix__cache___make_cache_key["_make_cache_key"]
+        src__pfix__analyzer___fill_function_context["_fill_function_context"]
+        src__pfix__analyzer__scan_missing_deps["scan_missing_deps"]
+        src__pfix__logging__get_logger["get_logger"]
+        src__pfix__cli___create_excepthook["_create_excepthook"]
+        src__pfix__audit__log_fix_audit["log_fix_audit"]
+        src__pfix__strategies__get_strategy_context["get_strategy_context"]
+        src__pfix__cli__cmd_dashboard["cmd_dashboard"]
+        src__pfix__integrations__precommit__main["main"]
+        src__pfix__config___load_paths_env["_load_paths_env"]
+        src__pfix__fixer___confirm_and_validate["_confirm_and_validate"]
+        src__pfix__config__get_config["get_config"]
+        src__pfix__integrations__sentry__PfixSentryIntegration___process_event["_process_event"]
+        src__pfix__rollback__show_history["show_history"]
+        src__pfix__validation__validate_with_fallback["validate_with_fallback"]
+        src__pfix__dependency__generate_requirements["generate_requirements"]
+        src__pfix__dependency__install_packages["install_packages"]
+        src__pfix__dashboard__get_log_stats["get_log_stats"]
+        src__pfix__audit___calculate_hash["_calculate_hash"]
+        src__pfix__env_diagnostics__process__ProcessDiagnostic___check_tmp_writable["_check_tmp_writable"]
+        src__pfix__runtime_todo__RuntimeCollector___build_issue["_build_issue"]
+        src__pfix__diff_fixer__apply_diff["apply_diff"]
+        src__pfix__init_wizard__find_pyproject["find_pyproject"]
+        src__pfix__llm__request_fix["request_fix"]
+        src__pfix__fixer___post_fix["_post_fix"]
+        src__pfix__config__configure["configure"]
+        src__pfix__env_diagnostics__imports__ImportDiagnostic___build_import_graph["_build_import_graph"]
+        src__pfix__config___load_git_env["_load_git_env"]
+        src__pfix__init_wizard__init_wizard["init_wizard"]
+        src__pfix__decorator___try_quick_dep_fix["_try_quick_dep_fix"]
+        src__pfix__decorator__apfix["apfix"]
+        src__pfix__permissions__check_auto_apply_allowed["check_auto_apply_allowed"]
+        src__pfix__explain__explain_last["explain_last"]
+        src__pfix__cli___apply_diagnostic_fixes["_apply_diagnostic_fixes"]
+        src__pfix__config___load_env_values["_load_env_values"]
     end
     subgraph verify_runtime
         verify_runtime__crash_me["crash_me"]
     end
-    examples__demo_auto__main --> examples__demo__fetch_json
-    examples__demo_auto__main --> examples__demo__average
-    examples__demo_auto__main --> examples__demo__greet
-    verify_runtime__crash_me --> src__pfix__decorator__pfix
-    examples__demo1__main --> examples__demo__fetch_json
-    examples__demo1__main --> examples__demo__average
-    examples__demo1__main --> examples__demo__greet
-    examples__demo__fetch_json --> src__pfix__decorator__pfix
-    examples__demo__average --> src__pfix__decorator__pfix
-    examples__demo__greet --> src__pfix__decorator__pfix
+    examples__demo1__main --> examples__shared__fetch_json
+    examples__demo1__main --> examples__shared__average
+    examples__demo1__main --> examples__shared__greet
+    examples__demo_auto__main --> examples__shared__fetch_json
+    examples__demo_auto__main --> examples__shared__average
+    examples__demo_auto__main --> examples__shared__greet
     examples__shared__fetch_json --> src__pfix__decorator__pfix
     examples__shared__average --> src__pfix__decorator__pfix
     examples__shared__greet --> src__pfix__decorator__pfix
+    examples__demo__fetch_json --> src__pfix__decorator__pfix
+    examples__demo__average --> src__pfix__decorator__pfix
+    examples__demo__greet --> src__pfix__decorator__pfix
+    verify_runtime__crash_me --> src__pfix__decorator__pfix
     src__pfix__dashboard__render_dashboard --> src__pfix__dashboard__get_log_stats
     src__pfix__dashboard__render_dashboard --> src__pfix__dashboard__get_cache_stats
     src__pfix__dashboard__run_console_dashboard --> src__pfix__dashboard__render_dashboard
@@ -480,11 +480,6 @@ flowchart LR
     src__pfix__diff_fixer__apply_diff_to_file --> src__pfix__diff_fixer__apply_diff
     src__pfix___auto_activate --> src__pfix__config__get_config
     src__pfix___auto_activate --> src__pfix__session__install_pfix_hook
-    src__pfix__runtime_todo__ErrorFingerprint__compute --> src__pfix__runtime_todo__ErrorFingerprint___normalize_error_message
-    src__pfix__runtime_todo__RuntimeCollector____init__ --> src__pfix__cache__FixCache__set
-    src__pfix__runtime_todo__RuntimeCollector___build_issue --> src__pfix__runtime_todo__ErrorFingerprint__compute
-    src__pfix__runtime_todo__get_collector --> src__pfix__config__get_config
-    src__pfix__runtime_todo__capture_exception --> src__pfix__config__get_config
     src__pfix__session__PFixSession____init__ --> src__pfix__config__get_config
     src__pfix__session__PFixSession___handle_exception --> src__pfix__analyzer__analyze_exception
     src__pfix__session__PFixSession___handle_exception --> src__pfix__analyzer__classify_error
@@ -505,6 +500,11 @@ flowchart LR
     src__pfix__session___handle_generic_error_hook --> src__pfix__fixer__apply_fix
     src__pfix__session___restart_process --> src__pfix__analyzer__analyze_exception
     src__pfix__session___restart_process --> src__pfix__session___clear_pycache
+    src__pfix__runtime_todo__ErrorFingerprint__compute --> src__pfix__runtime_todo__ErrorFingerprint___normalize_error_message
+    src__pfix__runtime_todo__RuntimeCollector____init__ --> src__pfix__cache__FixCache__set
+    src__pfix__runtime_todo__RuntimeCollector___build_issue --> src__pfix__runtime_todo__ErrorFingerprint__compute
+    src__pfix__runtime_todo__get_collector --> src__pfix__config__get_config
+    src__pfix__runtime_todo__capture_exception --> src__pfix__config__get_config
     src__pfix__telemetry__is_telemetry_enabled --> src__pfix__config__get_config
     src__pfix__telemetry__get_telemetry_endpoint --> src__pfix__config__get_config
     src__pfix__telemetry__record_event --> src__pfix__telemetry___store_event
@@ -518,6 +518,36 @@ flowchart LR
     src__pfix__validation__validate_with_fallback --> src__pfix__validation__validate_fix
     src__pfix__validation__validate_with_fallback --> src__pfix__validation__quick_validate_syntax
     src__pfix__logging__log_fix --> src__pfix__logging__get_logger
+    src__pfix__production__PfixMonitor__handle_exception --> src__pfix__analyzer__analyze_exception
+    src__pfix__production__PfixMonitor__handle_exception --> src__pfix__cache__get_cached_fix
+    src__pfix__production__PfixMonitor__handle_exception --> src__pfix__llm__request_fix
+    src__pfix__permissions__check_auto_apply_allowed --> src__pfix__config__get_config
+    src__pfix__permissions__check_auto_apply_allowed --> src__pfix__permissions__get_environment
+    src__pfix__permissions__check_complexity_approval --> src__pfix__config__get_config
+    src__pfix__permissions__check_blocked_path --> src__pfix__config__get_config
+    src__pfix__permissions__check_all_permissions --> src__pfix__permissions__check_blocked_path
+    src__pfix__permissions__check_all_permissions --> src__pfix__permissions__check_auto_apply_allowed
+    src__pfix__permissions__check_all_permissions --> src__pfix__permissions__check_complexity_approval
+    src__pfix__permissions__get_permissions_summary --> src__pfix__config__get_config
+    src__pfix__permissions__get_permissions_summary --> src__pfix__permissions__get_environment
+    src__pfix__permissions__get_permissions_summary --> src__pfix__permissions__check_auto_apply_allowed
+    src__pfix__rollback__list_backups --> src__pfix__rollback__find_backup_dir
+    src__pfix__rollback__rollback_last --> src__pfix__audit__read_audit_log
+    src__pfix__rollback__rollback_file --> src__pfix__rollback__find_backup_dir
+    src__pfix__rollback__rollback_before --> src__pfix__audit__read_audit_log
+    src__pfix__rollback__rollback_before --> src__pfix__cache__FixCache__set
+    src__pfix__rollback__rollback_before --> src__pfix__rollback__rollback_file
+    src__pfix__rollback__show_history --> src__pfix__audit__read_audit_log
+    src__pfix__rollback__rollback_command --> src__pfix__rollback__rollback_last
+    src__pfix__rollback__rollback_command --> src__pfix__rollback__rollback_file
+    src__pfix__rollback__rollback_command --> src__pfix__rollback__rollback_before
+    src__pfix__rollback__rollback_command --> src__pfix__rollback__show_history
+    src__pfix___auto_activate___auto_activate_pfix --> src__pfix__config__get_config
+    src__pfix___auto_activate___auto_activate_pfix --> src__pfix__session__install_pfix_hook
+    src__pfix___auto_activate___auto_activate_pfix --> src__pfix___auto_activate___install_syntax_error_handler
+    src__pfix___auto_activate___install_syntax_error_handler --> src__pfix___auto_activate___handle_syntax_error
+    src__pfix___auto_activate___handle_syntax_error --> src__pfix__config__get_config
+    src__pfix___auto_activate___handle_syntax_error --> src__pfix__llm__request_fix
     src__pfix__analyzer__analyze_exception --> src__pfix__analyzer___fill_traceback_context
     src__pfix__analyzer__analyze_exception --> src__pfix__analyzer___fill_function_context
     src__pfix__analyzer__analyze_exception --> src__pfix__analyzer___fill_file_context
@@ -530,42 +560,19 @@ flowchart LR
     src__pfix__analyzer___extract_frame_context --> src__pfix__analyzer___safe_repr
     src__pfix__analyzer___scan_missing_deps --> src__pfix__analyzer__scan_missing_deps
     src__pfix__analyzer__scan_missing_deps --> src__pfix__cache__FixCache__set
-    src__pfix__permissions__check_auto_apply_allowed --> src__pfix__config__get_config
-    src__pfix__permissions__check_auto_apply_allowed --> src__pfix__permissions__get_environment
-    src__pfix__permissions__check_complexity_approval --> src__pfix__config__get_config
-    src__pfix__permissions__check_blocked_path --> src__pfix__config__get_config
-    src__pfix__permissions__check_all_permissions --> src__pfix__permissions__check_blocked_path
-    src__pfix__permissions__check_all_permissions --> src__pfix__permissions__check_auto_apply_allowed
-    src__pfix__permissions__check_all_permissions --> src__pfix__permissions__check_complexity_approval
-    src__pfix__permissions__get_permissions_summary --> src__pfix__config__get_config
-    src__pfix__permissions__get_permissions_summary --> src__pfix__permissions__get_environment
-    src__pfix__permissions__get_permissions_summary --> src__pfix__permissions__check_auto_apply_allowed
-    src__pfix__production__PfixMonitor__handle_exception --> src__pfix__analyzer__analyze_exception
-    src__pfix__production__PfixMonitor__handle_exception --> src__pfix__cache__get_cached_fix
-    src__pfix__production__PfixMonitor__handle_exception --> src__pfix__llm__request_fix
+    src__pfix__dev_mode__wrap_module_functions --> src__pfix__dev_mode___create_wrapper
+    src__pfix__dev_mode___create_wrapper --> src__pfix__analyzer__analyze_exception
+    src__pfix__dev_mode___create_wrapper --> src__pfix__llm__request_fix
+    src__pfix__dev_mode___create_wrapper --> src__pfix__config__get_config
+    src__pfix__dev_mode___create_wrapper --> src__pfix__fixer__apply_fix
+    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__is_site_package
+    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__wrap_module_functions
     src__pfix__syntax_error_handler___apply_syntax_fix --> src__pfix__fixer__apply_fix
     src__pfix__syntax_error_handler___apply_syntax_fix --> src__pfix__fixer___clear_pycache
     src__pfix__syntax_error_handler__handle_syntax_error --> src__pfix__config__get_config
     src__pfix__syntax_error_handler__handle_syntax_error --> src__pfix__syntax_error_handler___build_syntax_error_context
     src__pfix__syntax_error_handler__handle_syntax_error --> src__pfix__llm__request_fix
     src__pfix__syntax_error_handler__handle_syntax_error --> src__pfix__syntax_error_handler___apply_syntax_fix
-    src__pfix___auto_activate___auto_activate_pfix --> src__pfix__config__get_config
-    src__pfix___auto_activate___auto_activate_pfix --> src__pfix__session__install_pfix_hook
-    src__pfix___auto_activate___auto_activate_pfix --> src__pfix___auto_activate___install_syntax_error_handler
-    src__pfix___auto_activate___install_syntax_error_handler --> src__pfix___auto_activate___handle_syntax_error
-    src__pfix___auto_activate___handle_syntax_error --> src__pfix__config__get_config
-    src__pfix___auto_activate___handle_syntax_error --> src__pfix__llm__request_fix
-    src__pfix__rollback__list_backups --> src__pfix__rollback__find_backup_dir
-    src__pfix__rollback__rollback_last --> src__pfix__audit__read_audit_log
-    src__pfix__rollback__rollback_file --> src__pfix__rollback__find_backup_dir
-    src__pfix__rollback__rollback_before --> src__pfix__audit__read_audit_log
-    src__pfix__rollback__rollback_before --> src__pfix__cache__FixCache__set
-    src__pfix__rollback__rollback_before --> src__pfix__rollback__rollback_file
-    src__pfix__rollback__show_history --> src__pfix__audit__read_audit_log
-    src__pfix__rollback__rollback_command --> src__pfix__rollback__rollback_last
-    src__pfix__rollback__rollback_command --> src__pfix__rollback__rollback_file
-    src__pfix__rollback__rollback_command --> src__pfix__rollback__rollback_before
-    src__pfix__rollback__rollback_command --> src__pfix__rollback__show_history
     src__pfix__init_wizard__init_wizard --> src__pfix__init_wizard__find_pyproject
     src__pfix__init_wizard__main --> src__pfix__init_wizard__init_wizard
     src__pfix__cache__FixCache____init__ --> src__pfix__cache___get_cache_path
@@ -576,20 +583,6 @@ flowchart LR
     src__pfix__cache__FixCache__set --> src__pfix__cache___proposal_to_json
     src__pfix__cache__get_cached_fix --> src__pfix__cache__get_cache
     src__pfix__cache__cache_fix --> src__pfix__cache__get_cache
-    src__pfix__dev_mode__wrap_module_functions --> src__pfix__dev_mode___create_wrapper
-    src__pfix__dev_mode___create_wrapper --> src__pfix__analyzer__analyze_exception
-    src__pfix__dev_mode___create_wrapper --> src__pfix__llm__request_fix
-    src__pfix__dev_mode___create_wrapper --> src__pfix__config__get_config
-    src__pfix__dev_mode___create_wrapper --> src__pfix__fixer__apply_fix
-    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__is_site_package
-    src__pfix__dev_mode__install_dev_mode_hook --> src__pfix__dev_mode__wrap_module_functions
-    src__pfix__dependency__install_packages --> src__pfix__config__get_config
-    src__pfix__dependency__scan_project_deps --> src__pfix__config__get_config
-    src__pfix__dependency__scan_project_deps --> src__pfix__cache__FixCache__set
-    src__pfix__dependency__scan_project_deps --> src__pfix__dependency__is_module_available
-    src__pfix__dependency__update_requirements_file --> src__pfix__cache__FixCache__set
-    src__pfix__dependency__update_requirements_file --> src__pfix__config__get_config
-    src__pfix__dependency__generate_requirements --> src__pfix__config__get_config
     src__pfix__decorator___capture_runtime_error --> src__pfix__runtime_todo__get_collector
     src__pfix__decorator__pfix --> src__pfix__config__get_config
     src__pfix__decorator__pfix --> src__pfix__decorator___ensure_deps
@@ -607,7 +600,18 @@ flowchart LR
     src__pfix__decorator___try_quick_dep_fix --> src__pfix__dependency__detect_missing_from_error
     src__pfix__decorator___try_quick_dep_fix --> src__pfix__dependency__resolve_package_name
     src__pfix__decorator___try_quick_dep_fix --> src__pfix__dependency__install_packages
+    src__pfix__dependency__install_packages --> src__pfix__config__get_config
+    src__pfix__dependency__scan_project_deps --> src__pfix__config__get_config
+    src__pfix__dependency__scan_project_deps --> src__pfix__cache__FixCache__set
+    src__pfix__dependency__scan_project_deps --> src__pfix__dependency__is_module_available
+    src__pfix__dependency__update_requirements_file --> src__pfix__cache__FixCache__set
+    src__pfix__dependency__update_requirements_file --> src__pfix__config__get_config
+    src__pfix__dependency__generate_requirements --> src__pfix__config__get_config
     src__pfix__rules__get_rules_for_prompt --> src__pfix__rules__load_project_rules
+    src__pfix__audit__log_fix_audit --> src__pfix__audit___calculate_hash
+    src__pfix__audit__get_audit_summary --> src__pfix__audit__read_audit_log
+    src__pfix__audit__print_audit_report --> src__pfix__audit__get_audit_summary
+    src__pfix__audit__print_audit_report --> src__pfix__audit__read_audit_log
     src__pfix__mcp_server__create_mcp_server --> src__pfix__mcp_server___register_analyze_tool
     src__pfix__mcp_server__create_mcp_server --> src__pfix__mcp_server___register_fix_tool
     src__pfix__mcp_server__create_mcp_server --> src__pfix__mcp_server___register_deps_tools
@@ -624,10 +628,6 @@ flowchart LR
     src__pfix__mcp_server___register_deps_tools --> src__pfix__dependency__install_packages
     src__pfix__mcp_server___register_deps_tools --> src__pfix__dependency__generate_requirements
     src__pfix__mcp_server__start_server --> src__pfix__mcp_server__create_mcp_server
-    src__pfix__audit__log_fix_audit --> src__pfix__audit___calculate_hash
-    src__pfix__audit__get_audit_summary --> src__pfix__audit__read_audit_log
-    src__pfix__audit__print_audit_report --> src__pfix__audit__get_audit_summary
-    src__pfix__audit__print_audit_report --> src__pfix__audit__read_audit_log
     src__pfix__env_diagnostics__process__ProcessDiagnostic___check_tmp_writable --> src__pfix__cache__FixCache__set
     src__pfix__env_diagnostics__python_version__PythonVersionDiagnostic___check_deprecated_imports --> src__pfix__cache__FixCache__set
     src__pfix__env_diagnostics__paths__PathDiagnostic___check_sys_path --> src__pfix__cache__FixCache__set
@@ -661,19 +661,6 @@ flowchart LR
     examples__memory__recursion_and_alloc__fibonacci --> src__pfix__decorator__pfix
     examples__memory__recursion_and_alloc__accumulate_data --> src__pfix__decorator__pfix
     examples__memory__recursion_and_alloc__build_huge_string --> src__pfix__decorator__pfix
-    examples__types__pattern_errors__format_report --> src__pfix__decorator__pfix
-    examples__types__pattern_errors__sort_users --> src__pfix__decorator__pfix
-    examples__types__pattern_errors__check_range --> src__pfix__decorator__pfix
-    examples__types__pattern_errors__parse_header --> src__pfix__decorator__pfix
-    examples__types__pattern_errors__merge_configs --> src__pfix__decorator__pfix
-    examples__types__pattern_errors__find_first_match --> src__pfix__decorator__pfix
-    examples__types__attribute_errors__collect_results --> src__pfix__decorator__pfix
-    examples__types__attribute_errors__clean_csv_line --> src__pfix__decorator__pfix
-    examples__types__attribute_errors__get_user --> src__pfix__decorator__pfix
-    examples__types__attribute_errors__show_user_name --> examples__types__attribute_errors__get_user
-    examples__types__attribute_errors__check_size --> src__pfix__decorator__pfix
-    examples__types__attribute_errors__parse_config --> src__pfix__decorator__pfix
-    examples__types__attribute_errors__read_first_line --> src__pfix__decorator__pfix
     examples__types__type_errors__format_user_info --> src__pfix__decorator__pfix
     examples__types__type_errors__generate_sequence --> src__pfix__decorator__pfix
     examples__types__type_errors__apply_transform --> src__pfix__decorator__pfix
@@ -681,6 +668,19 @@ flowchart LR
     examples__types__type_errors__test_wrong_args --> examples__types__type_errors__calculate_area
     examples__types__type_errors__build_index --> src__pfix__decorator__pfix
     examples__types__type_errors__find_minimum --> src__pfix__decorator__pfix
+    examples__types__attribute_errors__collect_results --> src__pfix__decorator__pfix
+    examples__types__attribute_errors__clean_csv_line --> src__pfix__decorator__pfix
+    examples__types__attribute_errors__get_user --> src__pfix__decorator__pfix
+    examples__types__attribute_errors__show_user_name --> examples__types__attribute_errors__get_user
+    examples__types__attribute_errors__check_size --> src__pfix__decorator__pfix
+    examples__types__attribute_errors__parse_config --> src__pfix__decorator__pfix
+    examples__types__attribute_errors__read_first_line --> src__pfix__decorator__pfix
+    examples__types__pattern_errors__format_report --> src__pfix__decorator__pfix
+    examples__types__pattern_errors__sort_users --> src__pfix__decorator__pfix
+    examples__types__pattern_errors__check_range --> src__pfix__decorator__pfix
+    examples__types__pattern_errors__parse_header --> src__pfix__decorator__pfix
+    examples__types__pattern_errors__merge_configs --> src__pfix__decorator__pfix
+    examples__types__pattern_errors__find_first_match --> src__pfix__decorator__pfix
     examples__production__degradation__get_user_cached --> src__pfix__decorator__pfix
     examples__production__degradation__render_dashboard --> src__pfix__decorator__pfix
     examples__production__degradation__render_dashboard --> examples__production__degradation__render_header
@@ -737,13 +737,13 @@ flowchart LR
     examples__concurrency__async_mistakes__test_sync_in_async --> src__pfix__decorator__pfix
     examples__concurrency__async_mistakes__test_await_non_coroutine --> src__pfix__decorator__pfix
     examples__concurrency__async_mistakes__test_sync_generator_in_async --> src__pfix__decorator__pfix
+    examples__imports__missing_module__fetch_api_data --> src__pfix__decorator__pfix
+    examples__imports__missing_module__load_yaml_config --> src__pfix__decorator__pfix
+    examples__imports__missing_module__generate_filename --> src__pfix__decorator__pfix
     examples__concurrency__race_conditions__filter_dict_inplace --> src__pfix__decorator__pfix
     examples__concurrency__race_conditions__remove_negatives --> src__pfix__decorator__pfix
     examples__concurrency__race_conditions__fetch_async_in_sync --> src__pfix__decorator__pfix
     examples__concurrency__race_conditions__parallel_count --> src__pfix__decorator__pfix
-    examples__imports__missing_module__fetch_api_data --> src__pfix__decorator__pfix
-    examples__imports__missing_module__load_yaml_config --> src__pfix__decorator__pfix
-    examples__imports__missing_module__generate_filename --> src__pfix__decorator__pfix
     examples__imports__shadowing__make_list_from_range --> src__pfix__decorator__pfix
     examples__imports__shadowing__parse_json_string --> src__pfix__decorator__pfix
     examples__imports__shadowing__get_home_dir --> src__pfix__decorator__pfix

@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.50] - 2026-03-29
+
+### Docs
+- Update docs/README.md
+- Update examples/concurrency/README.md
+- Update examples/data/README.md
+- Update examples/deps/README.md
+- Update examples/edge_cases/README.md
+- Update examples/encoding/README.md
+- Update examples/filesystem/README.md
+- Update examples/imports/README.md
+- Update examples/memory/README.md
+- Update examples/network/README.md
+- ... and 3 more files
+
+### Other
+- Update diag_report.json
+- Update examples/concurrency/main.py
+- Update examples/concurrency/pyproject.toml
+- Update examples/data/main.py
+- Update examples/data/pyproject.toml
+- Update examples/deps/main.py
+- Update examples/deps/pyproject.toml
+- Update examples/edge_cases/main.py
+- Update examples/edge_cases/pyproject.toml
+- Update examples/encoding/main.py
+- ... and 23 more files
+
 ## [0.1.49] - 2026-03-29
 
 ### Other

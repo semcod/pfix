@@ -10,13 +10,13 @@ REFACTOR[1]:
 PIPELINES[391]:
   [1] Src [main]: main → fetch_json → pfix → get_config
       PURITY: 100% pure
-  [2] Src [crash_me]: crash_me → pfix → get_config
+  [2] Src [main]: main → fetch_json → pfix → get_config
       PURITY: 100% pure
-  [3] Src [main]: main → fetch_json → pfix → get_config
+  [3] Src [fetch_json]: fetch_json → pfix → get_config
       PURITY: 100% pure
-  [4] Src [fetch_json]: fetch_json → pfix → get_config
+  [4] Src [average]: average → pfix → get_config
       PURITY: 100% pure
-  [5] Src [average]: average → pfix → get_config
+  [5] Src [greet]: greet → pfix → get_config
       PURITY: 100% pure
 
 LAYERS:
