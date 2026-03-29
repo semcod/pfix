@@ -1,9 +1,9 @@
-# vallm batch | 167f | 72✓ 0⚠ 58✗ | 2026-03-29
+# vallm batch | 167f | 73✓ 0⚠ 57✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 167  passed: 72 (43.1%)  warnings: 0  errors: 58  unsupported: 37
+  scanned: 167  passed: 73 (43.7%)  warnings: 0  errors: 57  unsupported: 37
 
-ERRORS[58]{path,score}:
+ERRORS[57]{path,score}:
   src/pfix/runtime_todo.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'runtime_todo' not found,7
@@ -64,9 +64,6 @@ ERRORS[58]{path,score}:
       python.import.resolvable,error,Module 'dependency' not found,158
       python.import.resolvable,error,Module 'dependency' not found,169
       python.import.resolvable,error,Module 'env_diagnostics' not found,195
-  examples/complex_demo/main.py,0.79
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pandas' not found,11
   examples/getting_started/main.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'shared' not found,12
@@ -105,14 +102,6 @@ ERRORS[58]{path,score}:
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'inotify.adapters' not found,17
       python.import.resolvable,error,Module 'mcp.server.fastmcp' not found,38
-  src/pfix/fixer.py,0.86
-    issues[6]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,20
-      python.import.resolvable,error,Module 'dependency' not found,21
-      python.import.resolvable,error,Module 'permissions' not found,23
-      python.import.resolvable,error,Module 'audit' not found,24
-      python.import.resolvable,error,Module 'telemetry' not found,25
-      python.import.resolvable,error,Module 'git' not found,330
   src/pfix/integrations/sentry.py,0.88
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sentry_sdk.integrations' not found,33
@@ -124,6 +113,13 @@ ERRORS[58]{path,score}:
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'dependency' not found,61
       python.import.resolvable,error,Module 'dependency' not found,196
+  src/pfix/fixer.py,0.89
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,20
+      python.import.resolvable,error,Module 'dependency' not found,21
+      python.import.resolvable,error,Module 'permissions' not found,23
+      python.import.resolvable,error,Module 'audit' not found,24
+      python.import.resolvable,error,Module 'telemetry' not found,25
   src/pfix/production.py,0.89
     issues[4]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,23
@@ -170,7 +166,7 @@ ERRORS[58]{path,score}:
       python.import.resolvable,error,Module 'diskcache' not found,104
   src/pfix/config.py,0.95
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'tomli' not found,103
+      python.import.resolvable,error,Module 'tomli' not found,85
   src/pfix/env_diagnostics/config_env.py,0.95
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'base' not found,11

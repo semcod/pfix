@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pfix
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.10-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-603-green)
-> **603** functions | **55** classes | **106** files | CC̄ = 3.2
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.10-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-633-green)
+> **633** functions | **55** classes | **106** files | CC̄ = 3.1
 
 > Auto-generated project documentation from source code analysis.
 
@@ -155,7 +155,7 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 pfix/
-    ├── reset├── verify_runtime    ├── run_all    ├── shared        ├── dashboard        ├── explain        ├── cli        ├── multi_fix        ├── mcp_client        ├── runtime_todo/        ├── fixer        ├── diff_fixer    ├── pfix/        ├── config        ├── telemetry        ├── logging        ├── validation        ├── session        ├── production        ├── permissions        ├── analyzer        ├── rollback        ├── _auto_activate        ├── types        ├── syntax_error_handler        ├── dev_mode        ├── pfix_python        ├── init_wizard        ├── cache        ├── decorator        ├── dependency        ├── rules        ├── audit            ├── activation        ├── mcp_server        ├── commands/            ├── config            ├── diagnose            ├── others            ├── run            ├── base            ├── process            ├── memory            ├── config_env        ├── env_diagnostics/            ├── hardware            ├── python_version            ├── encoding            ├── paths            ├── auto_fix            ├── concurrency            ├── third_party            ├── filesystem            ├── imports            ├── network            ├── django            ├── serialization            ├── flask            ├── pandas            ├── fastapi        ├── strategies/            ├── fingerprint            ├── sentry            ├── todo_file        ├── integrations/            ├── collector            ├── precommit        ├── main            ├── web        ├── main        ├── main        ├── main        ├── degradation        ├── cascading_errors        ├── main        ├── main        ├── main        ├── unicode_errors        ├── main        ├── codec_errors        ├── api_patterns        ├── main        ├── file_errors        ├── class_errors        ├── python_gotchas        ├── tricky_errors        ├── package_traps        ├── main        ├── version_conflicts        ├── env_var_errors        ├── main        ├── main        ├── async_mistakes        ├── race_conditions        ├── shadowing        ├── missing_module        ├── main        ├── circular        ├── wrong_names        ├── platform_specific        ├── main├── project        ├── parse_errors        ├── numeric_errors        ├── llm```
+    ├── reset    ├── shared    ├── run_all├── verify_runtime        ├── dashboard        ├── multi_fix        ├── explain        ├── cli        ├── mcp_client        ├── runtime_todo/        ├── fixer        ├── diff_fixer    ├── pfix/        ├── config        ├── telemetry        ├── logging        ├── validation        ├── session        ├── analyzer        ├── permissions        ├── syntax_error_handler        ├── production        ├── rollback        ├── types        ├── dev_mode        ├── _auto_activate        ├── init_wizard        ├── pfix_python        ├── dependency        ├── cache        ├── mcp_server        ├── audit        ├── decorator        ├── rules        ├── commands/            ├── activation            ├── run            ├── config            ├── others            ├── diagnose            ├── base            ├── process            ├── config_env            ├── memory            ├── hardware        ├── env_diagnostics/            ├── python_version            ├── paths            ├── encoding            ├── concurrency            ├── auto_fix            ├── third_party            ├── filesystem            ├── network            ├── serialization            ├── imports            ├── django            ├── flask            ├── fastapi            ├── pandas        ├── strategies/            ├── fingerprint            ├── sentry            ├── todo_file            ├── precommit        ├── integrations/            ├── collector        ├── main            ├── web        ├── main        ├── main        ├── main        ├── degradation        ├── cascading_errors        ├── main        ├── main        ├── main        ├── unicode_errors        ├── api_patterns        ├── main        ├── codec_errors        ├── file_errors        ├── main        ├── class_errors        ├── python_gotchas        ├── package_traps        ├── version_conflicts        ├── main        ├── tricky_errors        ├── main        ├── env_var_errors        ├── main        ├── race_conditions        ├── async_mistakes        ├── missing_module        ├── main        ├── wrong_names        ├── shadowing        ├── circular        ├── platform_specific        ├── main├── project        ├── parse_errors        ├── numeric_errors        ├── llm```
 
 ## API Overview
 
@@ -186,27 +186,27 @@ pfix/
 - **`PfixConfig`** — Runtime configuration for pfix.
 - **`FixEvent`** — Structured log event for each fix operation.
 - **`FixCache`** — Cache for fix proposals to avoid redundant LLM calls.
-- **`ProjectRules`** — Loaded project rules.
 - **`AuditEntry`** — Single audit entry for a fix operation.
+- **`ProjectRules`** — Loaded project rules.
 - **`BaseDiagnostic`** — Base class for all environment diagnostics.
 - **`ProcessDiagnostic`** — Diagnose process and OS-related problems.
-- **`MemoryDiagnostic`** — Diagnose memory-related problems.
 - **`ConfigEnvDiagnostic`** — Diagnose configuration and environment variable problems.
-- **`EnvDiagnostics`** — Orchestrator for all environment diagnostics.
+- **`MemoryDiagnostic`** — Diagnose memory-related problems.
 - **`HardwareDiagnostic`** — Diagnose hardware-related problems.
+- **`EnvDiagnostics`** — Orchestrator for all environment diagnostics.
 - **`PythonVersionDiagnostic`** — Diagnose Python version compatibility problems.
-- **`EncodingDiagnostic`** — Diagnose encoding-related problems.
 - **`PathDiagnostic`** — Diagnose path-related problems.
+- **`EncodingDiagnostic`** — Diagnose encoding-related problems.
 - **`ConcurrencyDiagnostic`** — Diagnose concurrency-related problems.
 - **`ThirdPartyDiagnostic`** — Diagnose third-party API-related problems.
 - **`FilesystemDiagnostic`** — Diagnose filesystem-related problems.
-- **`ImportDiagnostic`** — Diagnose import and dependency problems.
 - **`NetworkDiagnostic`** — Diagnose network-related problems.
-- **`DjangoFixStrategy`** — Strategy for Django framework errors.
 - **`SerializationDiagnostic`** — Diagnose serialization-related problems.
+- **`ImportDiagnostic`** — Diagnose import and dependency problems.
+- **`DjangoFixStrategy`** — Strategy for Django framework errors.
 - **`FlaskFixStrategy`** — Strategy for Flask framework errors.
-- **`PandasFixStrategy`** — Strategy for pandas data manipulation errors.
 - **`FastAPIFixStrategy`** — Strategy for FastAPI framework errors.
+- **`PandasFixStrategy`** — Strategy for pandas data manipulation errors.
 - **`FixStrategy`** — Base class for framework-specific fix strategies.
 - **`StrategyRegistry`** — Registry of fix strategies.
 - **`ErrorFingerprint`** — Generates stable hash for error deduplication.
@@ -221,26 +221,26 @@ pfix/
 
 - `run_git_checkout(paths)` — Run git checkout to restore files.
 - `main()` — Reset all example directories to original buggy state.
-- `crash_me()` — This function will crash and should be logged to TODO.md
-- `run_example(examples_dir, category, script)` — Run a single example and return success status.
-- `reset_examples(examples_dir)` — Reset all examples to original state using git.
-- `main()` — —
 - `fetch_json(url)` — Fetch JSON from URL — dependencies auto-installed on first run.
 - `average(numbers)` — Calculate average — ZeroDivisionError will be auto-fixed.
 - `greet(name, age)` — Greet user — TypeError will be auto-fixed.
+- `run_example(examples_dir, category, script)` — Run a single example and return success status.
+- `reset_examples(examples_dir)` — Reset all examples to original state using git.
+- `main()` — —
+- `crash_me()` — This function will crash and should be logged to TODO.md
 - `get_log_stats(log_dir)` — Calculate statistics from log files.
 - `get_cache_stats(cache_dir)` — Get cache statistics.
 - `render_dashboard()` — Render rich console dashboard.
 - `run_console_dashboard()` — Run rich console-based dashboard.
 - `run_dashboard()` — Main entry point for dashboard command.
-- `explain_last()` — Explain the most recent error from logs.
-- `explain_exception_type(exc_type)` — Generate general educational content about an exception type.
-- `explain(what, file)` — Main entry point for explain command.
-- `main(argv)` — —
 - `find_related_files(source_file, error_ctx, max_depth)` — Find files related to the error through imports.
 - `build_multi_file_context(error_ctx, related_files)` — Build LLM prompt with multiple files.
 - `parse_multi_file_response(raw)` — Parse LLM response for multi-file fix.
 - `apply_multi_file_fix(proposal, project_root, create_backups)` — Apply multi-file fix proposal.
+- `explain_last()` — Explain the most recent error from logs.
+- `explain_exception_type(exc_type)` — Generate general educational content about an exception type.
+- `explain(what, file)` — Main entry point for explain command.
+- `main(argv)` — —
 - `apply_fix(ctx, proposal, confirm)` — Apply a FixProposal. Returns True if anything was applied. CC≤5.
 - `parse_unified_diff(diff_text)` — Parse unified diff text into hunks.
 - `parse_hunk_header(line)` — Parse hunk header like @@ -1,5 +1,7 @@.
@@ -265,16 +265,17 @@ pfix/
 - `pfix_session(target_file)` — Create pfix session for file-level auto-healing.
 - `auto_pfix(func)` — Decorator that auto-fixes exceptions in wrapped function.
 - `install_pfix_hook(target_file, auto_apply)` — Install global pfix excepthook. CC≤5.
-- `monitor(webhook_url, rate_limit)` — Create a production monitor with sensible defaults.
+- `analyze_exception(exc, func, local_vars, hints)` — Build ErrorContext from a caught exception. Orkiestrator — CC≤4.
+- `classify_error(ctx)` — Classify error to guide fix strategy.
+- `scan_missing_deps(project_dir)` — Use pipreqs to detect imports that aren't installed.
 - `get_environment()` — Detect current environment.
 - `check_auto_apply_allowed()` — Check if auto-apply is permitted in current environment.
 - `check_complexity_approval(cc)` — Check if high-complexity fix requires manual approval.
 - `check_blocked_path(filepath)` — Check if file path is blocked from modification.
 - `check_all_permissions(filepath, cc, auto_apply)` — Check all permissions for a fix operation.
 - `get_permissions_summary()` — Get summary of current permissions.
-- `analyze_exception(exc, func, local_vars, hints)` — Build ErrorContext from a caught exception. Orkiestrator — CC≤4.
-- `classify_error(ctx)` — Classify error to guide fix strategy.
-- `scan_missing_deps(project_dir)` — Use pipreqs to detect imports that aren't installed.
+- `handle_syntax_error(exc, auto_apply)` — Handle SyntaxError by calling pfix to fix it.
+- `monitor(webhook_url, rate_limit)` — Create a production monitor with sensible defaults.
 - `find_backup_dir(filepath)` — Find backup directory for a file.
 - `list_backups(filepath)` — List available backup files.
 - `rollback_last()` — Rollback the most recent fix.
@@ -282,22 +283,16 @@ pfix/
 - `rollback_before(cutoff_date)` — Rollback all fixes before a specific date.
 - `show_history(limit)` — Show fix history with rollback options.
 - `rollback_command(last, filepath, before)` — Main entry point for rollback CLI command.
-- `handle_syntax_error(exc, auto_apply)` — Handle SyntaxError by calling pfix to fix it.
 - `is_site_package(module)` — Check if module is from site-packages (third-party).
 - `wrap_module_functions(module)` — Wrap all callable attributes of a module with error handling.
 - `install_dev_mode_hook()` — Install the development mode import hook.
-- `main()` — —
 - `find_pyproject()` — Find pyproject.toml in current or parent directories.
 - `init_wizard()` — Run the interactive setup wizard.
 - `update_pyproject(pyproject, model, auto_apply)` — Add [tool.pfix] section to pyproject.toml.
 - `get_gitignore_content()` — Get pfix-related .gitignore entries.
 - `update_gitignore(gitignore)` — Add pfix entries to existing .gitignore.
 - `main()` — CLI entry point.
-- `get_cache()` — Get or create global cache instance.
-- `get_cached_fix(ctx)` — Get cached fix for error context (convenience function).
-- `cache_fix(ctx, proposal)` — Cache fix proposal (convenience function).
-- `pfix(func)` — Self-healing decorator. Catches errors, fixes code via LLM.
-- `apfix(func)` — Async version of @pfix. CC≤5.
+- `main()` — —
 - `resolve_package_name(module_name)` — Map Python module name → PyPI package name.
 - `is_module_available(module_name)` — —
 - `install_packages(packages, dry_run)` — Install packages via pip or uv. Returns {package: success}.
@@ -305,19 +300,26 @@ pfix/
 - `update_requirements_file(packages, requirements_path)` — Append packages to requirements.txt.
 - `generate_requirements(project_dir)` — Generate requirements.txt via pipreqs for the project.
 - `detect_missing_from_error(exception_message)` — Extract module name from ModuleNotFoundError/ImportError.
-- `load_project_rules(path)` — Load project rules from file.
-- `get_rules_for_prompt()` — Get rules formatted for LLM prompt.
+- `get_cache()` — Get or create global cache instance.
+- `get_cached_fix(ctx)` — Get cached fix for error context (convenience function).
+- `cache_fix(ctx, proposal)` — Cache fix proposal (convenience function).
+- `create_mcp_server()` — Create FastMCP server with pfix tools.
+- `start_server(transport, host, port)` — Start the MCP server.
 - `log_fix_audit(filepath, function_name, error, error_type)` — Log a fix operation to audit trail.
 - `read_audit_log(since, filepath, limit)` — Read audit log with optional filtering.
 - `get_audit_summary(days)` — Get summary statistics from audit log.
 - `print_audit_report(days)` — Print formatted audit report.
-- `cmd_enable(args)` — Enable pfix auto-activation and add config to pyproject.toml.
+- `pfix(func)` — Self-healing decorator. Catches errors, fixes code via LLM.
+- `apfix(func)` — Async version of @pfix. CC≤5.
+- `load_project_rules(path)` — Load project rules from file.
+- `get_rules_for_prompt()` — Get rules formatted for LLM prompt.
+- `cmd_enable(args)` — Enable pfix auto-activation and add config to pyproject.toml. CC≤5.
 - `cmd_disable(args)` — Disable pfix auto-activation.
-- `create_mcp_server()` — Create FastMCP server with pfix tools.
-- `start_server(transport, host, port)` — Start the MCP server.
+- `cmd_run(args)` — —
+- `cmd_dev(args)` — Run with dependency development mode active.
 - `cmd_check(args)` — —
 - `cmd_status(args)` — Show diagnostic status of pfix.
-- `cmd_diagnose(args)` — Run environment diagnostics.
+- `path_read_safe(path)` — Safely read file content.
 - `cmd_deps(args)` — —
 - `cmd_server(args)` — —
 - `cmd_rollback(args)` — —
@@ -325,8 +327,7 @@ pfix/
 - `cmd_init(args)` — —
 - `cmd_dashboard(args)` — —
 - `cmd_explain(args)` — —
-- `cmd_run(args)` — —
-- `cmd_dev(args)` — Run with dependency development mode active.
+- `cmd_diagnose(args)` — Run environment diagnostics.
 - `can_auto_fix(result)` — Check if this result can be auto-fixed.
 - `apply_auto_fix(result, project_root)` — Apply auto-fix for a diagnostic result.
 - `get_strategy_context(ctx)` — Convenience function to get enhanced context.
@@ -341,12 +342,12 @@ pfix/
 - `call_slow_api()` — —
 - `download_missing_file()` — —
 - `create_error_handler(auto_fix, notify_url)` — Create a generic error handler for custom frameworks.
-- `load_and_process_data(filepath)` — Load CSV, process it, return statistics.
-- `analyze_users(users)` — Analyze user data with multiple bugs.
-- `main()` — —
 - `attribute_error_test()` — Accessing non-existent attribute.
 - `type_error_test()` — Type mismatch in operations.
 - `pattern_error_test()` — Common pattern mismatch.
+- `load_and_process_data(filepath)` — Load CSV, process it, return statistics.
+- `analyze_users(users)` — Analyze user data with multiple bugs.
+- `main()` — —
 - `count_lines_in_large_file(path)` — —
 - `squares_up_to(n)` — —
 - `process_stream()` — —
@@ -377,10 +378,6 @@ pfix/
 - `format_price(amount, currency)` — —
 - `build_search_url(query)` — —
 - `read_bom_csv()` — —
-- `main()` — —
-- `run_system_command()` — —
-- `write_binary_to_text()` — —
-- `log_user_input(text)` — —
 - `handle_request(request)` — —
 - `authenticate(request)` — —
 - `validate_payload(request)` — —
@@ -392,11 +389,15 @@ pfix/
 - `load_to_output(records)` — —
 - `bootstrap_config()` — —
 - `main()` — —
+- `run_system_command()` — —
+- `write_binary_to_text()` — —
+- `log_user_input(text)` — —
 - `load_config()` — —
 - `load_settings()` — —
 - `save_report(data)` — —
 - `read_ssh_key()` — —
 - `read_cross_platform(filename)` — —
+- `main()` — —
 - `test_missing_super()` — —
 - `test_slots_error()` — —
 - `test_dataclass_mutable()` — —
@@ -406,50 +407,50 @@ pfix/
 - `test_staticmethod_self()` — —
 - `test_generator_confusion()` — —
 - `test_bad_context_manager()` — —
+- `test_wrong_package()` — —
+- `fetch_sni_url()` — —
+- `resize_image()` — —
+- `test_namespace_conflict()` — —
+- `use_deprecated_api()` — —
+- `get_package_version(name)` — —
+- `legacy_json_parse(data)` — —
+- `start_mcp_server()` — —
+- `main()` — —
 - `apply_to_all(items, func)` — —
 - `make_multipliers()` — —
 - `validate_positive(func)` — —
 - `subtract(a, b)` — —
 - `use_dynamic_config()` — —
 - `consume_generator()` — —
-- `test_wrong_package()` — —
-- `fetch_sni_url()` — —
-- `resize_image()` — —
-- `test_namespace_conflict()` — —
 - `main()` — —
-- `use_deprecated_api()` — —
-- `get_package_version(name)` — —
-- `legacy_json_parse(data)` — —
-- `start_mcp_server()` — —
 - `get_database_url()` — —
 - `get_port()` — —
 - `is_debug_mode()` — —
 - `read_user_config()` — —
 - `main()` — —
-- `main()` — —
-- `test_missing_await()` — —
-- `test_sync_in_async()` — —
-- `test_await_non_coroutine()` — —
-- `test_sync_generator_in_async()` — —
 - `filter_dict_inplace(data)` — —
 - `remove_negatives(numbers)` — —
 - `fetch_async_in_sync()` — —
 - `parallel_count()` — —
-- `make_list_from_range(n)` — —
-- `parse_json_string(data)` — —
-- `get_home_dir()` — —
-- `create_instance(type, value)` — Parameter 'type' shadows builtin type().
+- `test_missing_await()` — —
+- `test_sync_in_async()` — —
+- `test_await_non_coroutine()` — —
+- `test_sync_generator_in_async()` — —
 - `fetch_api_data(url)` — —
 - `load_yaml_config(path)` — —
 - `generate_filename(prefix)` — —
 - `main()` — —
-- `register_handler(name, func)` — Register a handler — but tries to import processor which imports this module.
-- `process_all()` — Process all registered handlers.
 - `count_words(text)` — —
 - `get_timestamp()` — —
 - `encode_base64(data)` — —
 - `parse_html(html)` — —
 - `find_files(pattern)` — —
+- `make_list_from_range(n)` — —
+- `parse_json_string(data)` — —
+- `get_home_dir()` — —
+- `create_instance(type, value)` — Parameter 'type' shadows builtin type().
+- `register_handler(name, func)` — Register a handler — but tries to import processor which imports this module.
+- `process_all()` — Process all registered handlers.
 - `load_toml(path)` — —
 - `get_inotify_events()` — —
 - `test_self_type()` — —
@@ -511,23 +512,23 @@ pfix/
 📄 `examples.types.main` (3 functions)
 📄 `project`
 📦 `src.pfix` (4 functions)
-📄 `src.pfix._auto_activate` (3 functions)
-📄 `src.pfix.analyzer` (14 functions)
+📄 `src.pfix._auto_activate` (7 functions)
+📄 `src.pfix.analyzer` (15 functions)
 📄 `src.pfix.audit` (5 functions, 1 classes)
 📄 `src.pfix.cache` (14 functions, 1 classes)
 📄 `src.pfix.cli` (3 functions)
 📦 `src.pfix.commands`
-📄 `src.pfix.commands.activation` (2 functions)
-📄 `src.pfix.commands.config` (5 functions)
+📄 `src.pfix.commands.activation` (8 functions)
+📄 `src.pfix.commands.config` (10 functions)
 📄 `src.pfix.commands.diagnose` (5 functions)
 📄 `src.pfix.commands.others` (7 functions)
 📄 `src.pfix.commands.run` (4 functions)
-📄 `src.pfix.config` (12 functions, 1 classes)
+📄 `src.pfix.config` (15 functions, 1 classes)
 📄 `src.pfix.dashboard` (7 functions)
 📄 `src.pfix.decorator` (11 functions)
-📄 `src.pfix.dependency` (7 functions)
+📄 `src.pfix.dependency` (14 functions)
 📄 `src.pfix.dev_mode` (4 functions)
-📄 `src.pfix.diff_fixer` (6 functions, 1 classes)
+📄 `src.pfix.diff_fixer` (9 functions, 1 classes)
 📦 `src.pfix.env_diagnostics` (8 functions, 1 classes)
 📄 `src.pfix.env_diagnostics.auto_fix` (13 functions)
 📄 `src.pfix.env_diagnostics.base` (3 functions, 1 classes)
@@ -572,7 +573,7 @@ pfix/
 📄 `src.pfix.strategies.flask` (3 functions, 1 classes)
 📄 `src.pfix.strategies.pandas` (3 functions, 1 classes)
 📄 `src.pfix.syntax_error_handler` (3 functions)
-📄 `src.pfix.telemetry` (7 functions, 1 classes)
+📄 `src.pfix.telemetry` (10 functions, 1 classes)
 📄 `src.pfix.types` (1 functions, 7 classes)
 📄 `src.pfix.validation` (4 functions, 1 classes)
 📄 `verify_runtime` (1 functions)

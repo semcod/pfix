@@ -2,7 +2,7 @@
 # stats: 496 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
 # alerts[5]: fan-out EnvDiagnostics.__init__=16; fan-out RuntimeCollector._build_issue=15; fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13
 # hotspots[5]: EnvDiagnostics.__init__ fan=16; RuntimeCollector._build_issue fan=15; FixCache.set fan=14; render_dashboard fan=13; parse_multi_file_response fan=13
-# evolution: CC̄ 3.8→3.6 (improved -0.2)
+# evolution: CC̄ 3.6→3.6 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[67]:
   project.sh,24
@@ -362,12 +362,12 @@ Collection m...
   src/pfix/env_diagnostics/memory.py:
     e: MemoryDiagnostic
     MemoryDiagnostic(BaseDiagnostic): check(1),_check_available_memory(0),_check_recursion_limit(0),_check_gc_pressure(0),_check_object_count(0),_check_swap_usage(0),_check_ulimits(0),_check_shm_usage(0),_check_process_memory(0),diagnose_exception(2)  # Diagnose memory-related problems...
-  src/pfix/env_diagnostics/encoding.py:
-    e: EncodingDiagnostic
-    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/env_diagnostics/paths.py:
     e: PathDiagnostic
     PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
+  src/pfix/env_diagnostics/encoding.py:
+    e: EncodingDiagnostic
+    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/env_diagnostics/auto_fix.py:
     e: can_auto_fix,apply_auto_fix,_fix_stale_bytecode,_fix_missing_requirement,_fix_utf8_bom,_fix_mixed_line_endings,_fix_large_log_file,_fix_api_key_placeholder,_fix_missing_dotenv,_fix_env_not_gitignored,_fix_missing_init,_fix_hidden_pollution,_fix_no_manifest
     can_auto_fix(result)

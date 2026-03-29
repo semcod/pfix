@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.59] - 2026-03-29
+
+### Docs
+- Update docs/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update project/analysis.toon.yaml
+- Update project/duplication.toon.yaml
+- Update project/index.html
+- Update project/map.toon.yaml
+- Update project/project.toon.yaml
+- Update project/prompt.txt
+- Update project/validation.toon.yaml
+
 ## [0.1.58] - 2026-03-29
 
 ### Docs
