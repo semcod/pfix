@@ -6,7 +6,7 @@ SUMMARY:
   dup_groups:    11
   dup_fragments: 25
   saved_lines:   149
-  scan_ms:       6594
+  scan_ms:       6724
 
 DUPLICATES[11] (ranked by impact):
   [e18ce76c91035468]   STRU  main  L=15 N=3 saved=30 sim=1.00
@@ -22,14 +22,14 @@ DUPLICATES[11] (ranked by impact):
   [ffa5a585859227c9]   EXAC  _clear_pycache  L=16 N=2 saved=16 sim=1.00
       src/pfix/session.py:0-15  (_clear_pycache)
       src/pfix/fixer.py:0-15  (_clear_pycache)
+  [05379f819265eb14]   STRU  get_priority  L=4 N=4 saved=12 sim=1.00
+      src/pfix/strategies/django.py:0-3  (get_priority)
+      src/pfix/strategies/flask.py:0-3  (get_priority)
+      src/pfix/strategies/pandas.py:0-3  (get_priority)
+      src/pfix/strategies/fastapi.py:0-3  (get_priority)
   [275db3cb0431cbce]   STRU  detect  L=12 N=2 saved=12 sim=1.00
       src/pfix/strategies/flask.py:0-11  (detect)
       src/pfix/strategies/fastapi.py:0-11  (detect)
-  [05379f819265eb14]   STRU  get_priority  L=4 N=4 saved=12 sim=1.00
-      src/pfix/strategies/flask.py:0-3  (get_priority)
-      src/pfix/strategies/django.py:0-3  (get_priority)
-      src/pfix/strategies/pandas.py:0-3  (get_priority)
-      src/pfix/strategies/fastapi.py:0-3  (get_priority)
   [8e18a9671be36cb9]   STRU  get_logger  L=9 N=2 saved=9 sim=1.00
       src/pfix/logging.py:0-8  (get_logger)
       src/pfix/cache.py:0-8  (get_cache)
@@ -59,12 +59,12 @@ REFACTOR[11] (ranked by priority):
   [4] ○ extract_function   → src/pfix/utils/_clear_pycache.py
       WHY: 2 occurrences of 16-line block across 2 files — saves 16 lines
       FILES: src/pfix/fixer.py, src/pfix/session.py
-  [5] ○ extract_function   → src/pfix/strategies/utils/detect.py
-      WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
-      FILES: src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py
-  [6] ○ extract_function   → src/pfix/strategies/utils/get_priority.py
+  [5] ○ extract_function   → src/pfix/strategies/utils/get_priority.py
       WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
       FILES: src/pfix/strategies/django.py, src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py, src/pfix/strategies/pandas.py
+  [6] ○ extract_function   → src/pfix/strategies/utils/detect.py
+      WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
+      FILES: src/pfix/strategies/fastapi.py, src/pfix/strategies/flask.py
   [7] ○ extract_function   → src/pfix/utils/get_logger.py
       WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
       FILES: src/pfix/cache.py, src/pfix/logging.py

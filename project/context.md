@@ -195,13 +195,13 @@ Returns:
 Returns dict with diagnosis info (for logging/webhook).
 - **Calls**: src.pfix.analyzer.analyze_exception, src.pfix.cache.get_cached_fix, self.circuit_breaker.is_open, self.rate_limiter.record_call, None.isoformat, self._log_proposal, self._send_webhook, self.rate_limiter.can_call
 
-### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check
-> Run all config/env checks.
-- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, self._check_dotenv
-
 ### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_deprecated_imports
 > Check for deprecated stdlib imports.
 - **Calls**: src.pfix.cache.FixCache.set, self.DEPRECATED_MODULES.items, project_root.rglob, deprecated.update, str, pyfile.read_text, ast.parse, ast.walk
+
+### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check
+> Run all config/env checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, self._check_dotenv
 
 ### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_import_source
 > Check if local modules are being overshadowed by installed packages.
@@ -214,13 +214,13 @@ Returns dict with diagnosis info (for logging/webhook).
 > Generate formatted text report from results.
 - **Calls**: lines.extend, lines.extend, lines.extend, sum, lines.append, None.join, self._format_severity_section, self._format_severity_section
 
-### src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph
-> Build import dependency graph from project files.
-- **Calls**: project_root.rglob, self._get_module_name, ast.parse, src.pfix.cache.FixCache.set, ast.walk, str, str, pyfile.read_text
-
 ### src.pfix.runtime_todo.capture_exception
 > Capture single exception to TODO.md (convenience function).
 - **Calls**: src.pfix.config.get_config, getattr, None.get, rt_config.get, RuntimeCollector, collector.capture, collector.shutdown, rt_config.get
+
+### src.pfix.env_diagnostics.imports.ImportDiagnostic._build_import_graph
+> Build import dependency graph from project files.
+- **Calls**: project_root.rglob, self._get_module_name, ast.parse, src.pfix.cache.FixCache.set, ast.walk, str, str, pyfile.read_text
 
 ### src.pfix.logging.SQLiteLogger.query
 > Query events with filters.
@@ -422,14 +422,6 @@ Features:
 
 Key functions that process and transform data:
 
-### src.pfix.dashboard._process_log_file
-> Process single log file and update stats/history.
-- **Output to**: None.strip, content.split, log_file.read_text, json.loads, src.pfix.dashboard._update_stats_from_entry
-
-### src.pfix.cli._build_parser
-> Build and configure ArgumentParser for pfix CLI.
-- **Output to**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument
-
 ### src.pfix.multi_fix.parse_multi_file_response
 > Parse LLM response for multi-file fix.
 
@@ -439,6 +431,14 @@ Args:
 Returns:
     MultiFile
 - **Output to**: raw.strip, re.search, m.group, json.loads, MultiFileFixProposal
+
+### src.pfix.dashboard._process_log_file
+> Process single log file and update stats/history.
+- **Output to**: None.strip, content.split, log_file.read_text, json.loads, src.pfix.dashboard._update_stats_from_entry
+
+### src.pfix.cli._build_parser
+> Build and configure ArgumentParser for pfix CLI.
+- **Output to**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument
 
 ### src.pfix.fixer._confirm_and_validate
 > Check permissions, show diff, and get user confirmation. CC≤5.
@@ -516,13 +516,13 @@ Args:
 > Parse version numbers from a requirement string.
 - **Output to**: re.search, int, int
 
-### src.pfix.integrations.sentry.PfixSentryIntegration._process_event
-> Process Sentry event to add pfix context.
-- **Output to**: hint.get, src.pfix.analyzer.analyze_exception, src.pfix.llm.request_fix, len
-
 ### src.pfix.runtime_todo.todo_file.TodoFile._format_entry
 > Format RuntimeIssue as markdown TODO entry.
 - **Output to**: enumerate, issue.timestamp.strftime, trace_parts.append, None.join, Path
+
+### src.pfix.integrations.sentry.PfixSentryIntegration._process_event
+> Process Sentry event to add pfix context.
+- **Output to**: hint.get, src.pfix.analyzer.analyze_exception, src.pfix.llm.request_fix, len
 
 ### examples.complex_demo.main.load_and_process_data
 > Load CSV, process it, return statistics.
@@ -567,8 +567,8 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.env_diagnostics.memory.MemoryDiagnostic.check` - 16 calls
 - `src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check` - 16 calls
 - `src.pfix.env_diagnostics.paths.PathDiagnostic.check` - 16 calls
-- `src.pfix.env_diagnostics.imports.ImportDiagnostic.check` - 16 calls
 - `src.pfix.runtime_todo.get_collector` - 16 calls
+- `src.pfix.env_diagnostics.imports.ImportDiagnostic.check` - 16 calls
 - `src.pfix.validation.run_tests` - 15 calls
 - `src.pfix.rollback.show_history` - 15 calls
 - `src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.diagnose_exception` - 15 calls
@@ -579,12 +579,12 @@ Functions exposed as public API (no underscore prefix):
 - `src.pfix.cache.FixCache.set` - 14 calls
 - `src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check` - 14 calls
 - `src.pfix.diff_fixer.apply_diff` - 13 calls
-- `src.pfix.types.ErrorContext.to_prompt` - 13 calls
 - `src.pfix.audit.log_fix_audit` - 13 calls
+- `src.pfix.types.ErrorContext.to_prompt` - 13 calls
 - `src.pfix.env_diagnostics.EnvDiagnostics.generate_report` - 13 calls
 - `src.pfix.runtime_todo.capture_exception` - 13 calls
-- `src.pfix.dashboard.get_log_stats` - 12 calls
 - `src.pfix.explain.explain_last` - 12 calls
+- `src.pfix.dashboard.get_log_stats` - 12 calls
 - `src.pfix.diff_fixer.parse_hunk_header` - 12 calls
 - `src.pfix.logging.SQLiteLogger.query` - 12 calls
 - `src.pfix.commands.config.cmd_status` - 12 calls

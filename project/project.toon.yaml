@@ -5,8 +5,8 @@ HEALTH:
 
 ALERTS[20]:
   !   high_fan_out     FixCache.set = 14 (limit:10)
-  !   high_fan_out     render_dashboard = 13 (limit:10)
   !   high_fan_out     parse_multi_file_response = 13 (limit:10)
+  !   high_fan_out     render_dashboard = 13 (limit:10)
   !   high_fan_out     _replace_function = 13 (limit:10)
   !   high_fan_out     PfixMonitor.handle_exception = 13 (limit:10)
   !   high_fan_out     cmd_run = 13 (limit:10)
@@ -35,13 +35,13 @@ MODULES[67] (top by size):
 
 HOTSPOTS[10]:
   ★ FixCache.set fan=14  // Cache fix proposal for error context.
-  ★ render_dashboard fan=13  // Render rich console dashboard.
   ★ parse_multi_file_response fan=13  // Parse LLM response for multi-file fix.
 
 Args:
     raw: Raw LLM response text
 
 Re
+  ★ render_dashboard fan=13  // Render rich console dashboard.
   ★ _replace_function fan=13  // Replace a function definition in source.
   ★ PfixMonitor.handle_exception fan=13  // Handle exception in production mode.
 
