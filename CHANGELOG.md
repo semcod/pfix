@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.47] - 2026-03-29
+
+### Docs
+- Update docs/README.md
+- Update examples/README.md
+- Update examples/README1.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update diag_report.json
+- Update examples/concurrency/async_mistakes.py
+- Update examples/concurrency/race_conditions.py
+- Update examples/data/numeric_errors.py
+- Update examples/data/parse_errors.py
+- Update examples/demo.py
+- Update examples/demo1.py
+- Update examples/deps/package_traps.py
+- Update examples/deps/version_conflicts.py
+- Update examples/edge_cases/class_errors.py
+- ... and 33 more files
+
 ## [0.1.46] - 2026-03-29
 
 ### Docs

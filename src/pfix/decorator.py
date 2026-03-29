@@ -124,41 +124,6 @@ def pfix(
                         continue
                     break
 
-                    console.print(
-                        f"\n[red]💥 pfix caught: {type(exc).__name__}: {exc}[/]"
-                        f"  [dim](attempt {attempt + 1}/{max_retries})[/]"
-                    )
-
-                    # Custom handler
-                    if on_error:
-                        try:
-                            on_error(exc)
-                        except Exception:
-                            pass
-
-                    # Quick path: missing module → pip install → retry
-                    if _try_quick_dep_fix(exc):
-                        console.print("[green]  ↻ Dependency installed, retrying...[/]")
-                        continue
-
-                    # Full LLM path
-                    hints = {"hint": hint} if hint else {}
-                    hints["args_types"] = str({
-                        f"arg{i}": type(a).__name__ for i, a in enumerate(args)
-                    })
-
-                    should_restart = restart if restart is not None else config.auto_restart
-                    fixed = _run_llm_fix_cycle(exc, fn, hints, should_auto, should_restart)
-
-                    if fixed and should_restart:
-                        console.print("[green]  🔄 Restarting process...[/]")
-                        os.execv(sys.executable, [sys.executable] + sys.argv)
-                    elif fixed:
-                        console.print("[green]  ↻ Fix applied, retrying...[/]")
-                    else:
-                        console.print("[yellow]  Fix not applied[/]")
-                        break
-
             if last_exc is not None:
                 raise last_exc
 
@@ -175,13 +140,7 @@ def pfix(
 # ── Async variant ───────────────────────────────────────────────────
 
 def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
-    """Async version of @pfix.
-
-    Usage:
-        @apfix
-        async def fetch():
-            ...
-    """
+    """Async version of @pfix. CC≤5."""
     def decorator(fn: F) -> F:
         @functools.wraps(fn)
         async def wrapper(*args: Any, **kw: Any) -> Any:
@@ -196,28 +155,13 @@ def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
                     raise
                 except BaseException as exc:
                     last_exc = exc
-                    if attempt >= max_retries:
-                        # Capture final error to runtime TODO before giving up
-                        _capture_runtime_error(exc, fn, {"hint": kwargs.get("hint", "")} if kwargs.get("hint") else {})
-                        break
-
-                    console.print(f"\n[red]💥 apfix caught: {type(exc).__name__}: {exc}[/]")
-
-                    if _try_quick_dep_fix(exc):
+                    if _handle_decorator_exception(
+                        fn, exc, attempt, max_retries, kwargs.get("hint", ""),
+                        args, kw, config, kwargs.get("auto_apply"), 
+                        kwargs.get("restart"), kwargs.get("on_error")
+                    ):
                         continue
-
-                    hints = {"hint": kwargs.get("hint", "")} if kwargs.get("hint") else {}
-                    ctx = analyze_exception(exc, func=fn, hints=hints)
-                    proposal = request_fix(ctx)
-
-                    if proposal.confidence < 0.1:
-                        break
-
-                    auto = kwargs.get("auto_apply", config.auto_apply)
-                    fixed = apply_fix(ctx, proposal, confirm=not auto)
-                    if not fixed:
-                        break
-                    _try_reload_module(fn)
+                    break
 
             if last_exc is not None:
                 raise last_exc
@@ -298,48 +242,6 @@ def _after_fix_action(fn, should_restart) -> bool:
 
 # ── Helpers ─────────────────────────────────────────────────────────
 
-def _run_llm_fix_cycle(
-    exc: BaseException,
-    func: Any,
-    hints: dict,
-    auto_apply: bool,
-    restart: bool,
-) -> bool:
-    """Run full LLM fix cycle. Returns True if fix was applied.
-
-    This helper reduces fan-out in the main decorator wrapper.
-    """
-    from .analyzer import analyze_exception, classify_error
-    from .llm import request_fix
-    from .fixer import apply_fix
-    from .config import get_config
-
-    config = get_config()
-    ctx = analyze_exception(exc, func=func, hints=hints)
-    error_class = classify_error(ctx)
-    console.print(f"[blue]🔍 Analyzing ({error_class})...[/]")
-
-    proposal = request_fix(ctx)
-
-    if proposal.confidence < 0.1:
-        console.print("[yellow]⚠ LLM confidence too low — skipping[/]")
-        return False
-
-    old_auto = config.auto_apply
-    if auto_apply:
-        config.auto_apply = True
-
-    fixed = apply_fix(ctx, proposal, confirm=not auto_apply)
-    config.auto_apply = old_auto
-
-    if fixed and not restart:
-        # Try module reload for non-restart mode
-        if _try_reload_module(func):
-            return True
-        # Even if reload fails, fix was applied
-        return True
-
-    return fixed
 
 def _ensure_deps(deps: list[str]):
     missing = []

@@ -1,25 +1,24 @@
-# pfix | 425 func | 56f | 13849L | python | 2026-03-29
+# pfix | 439 func | 56f | 13894L | python | 2026-03-29
 
 HEALTH:
-  CC̄=4.0  critical=33 (limit:10)  dup=2  cycles=0
+  CC̄=3.9  critical=31 (limit:10)  dup=2  cycles=0
 
 ALERTS[20]:
-  !!! high_fan_out     ImportDiagnostic._check_circular_imports = 25 (limit:10)
-  !!  cc_exceeded      cmd_status = 22 (limit:15)
   !!  high_fan_out     get_log_stats = 18 (limit:10)
-  !!  high_fan_out     cmd_status = 18 (limit:10)
   !!  high_fan_out     _auto_activate = 17 (limit:10)
   !!  high_fan_out     init_wizard = 17 (limit:10)
   !!  high_fan_out     find_related_files = 16 (limit:10)
   !!  high_fan_out     update_requirements_file = 16 (limit:10)
   !!  high_fan_out     EnvDiagnostics.__init__ = 16 (limit:10)
   !!  high_fan_out     RuntimeCollector._build_issue = 15 (limit:10)
+  !!  high_fan_out     pfix = 15 (limit:10)
+  !!  high_fan_out     ImportDiagnostic._build_import_graph = 15 (limit:10)
+  !   cc_exceeded      EnvDiagnostics.generate_report = 19 (limit:15)
 
 MODULES[58] (top by size):
-  M[src/pfix/cli.py] 705L C:0 F:19 CC↑22 D:0 (python)
+  M[src/pfix/cli.py] 744L C:0 F:26 CC↑12 D:0 (python)
   M[src/pfix/runtime_todo.py] 567L C:3 F:25 CC↑9 D:1 (python)
-  M[src/pfix/env_diagnostics/imports.py] 444L C:1 F:12 CC↑17 D:0 (python)
-  M[src/pfix/decorator.py] 376L C:0 F:10 CC↑10 D:2 (python)
+  M[src/pfix/env_diagnostics/imports.py] 486L C:1 F:15 CC↑12 D:0 (python)
   M[src/pfix/logging.py] 351L C:5 F:18 CC↑6 D:0 (python)
   M[src/pfix/env_diagnostics/python_version.py] 342L C:1 F:11 CC↑12 D:0 (python)
   M[src/pfix/fixer.py] 338L C:0 F:18 CC↑10 D:7 (python)
@@ -29,23 +28,27 @@ MODULES[58] (top by size):
   M[src/pfix/env_diagnostics/memory.py] 305L C:1 F:10 CC↑6 D:0 (python)
   M[src/pfix/mcp_server.py] 292L C:0 F:8 CC↑5 D:1 (python)
   M[src/pfix/env_diagnostics/process.py] 280L C:1 F:10 CC↑8 D:0 (python)
+  M[src/pfix/decorator.py] 278L C:0 F:10 CC↑10 D:2 (python)
+  M[src/pfix/env_diagnostics/third_party.py] 271L C:1 F:6 CC↑10 D:0 (python)
   M[src/pfix/explain.py] 267L C:0 F:4 CC↑5 D:1 (python)
-  M[src/pfix/diff_fixer.py] 258L C:1 F:6 CC↑12 D:0 (python)
   LANGS: python:57/shell:1
 
 HOTSPOTS[10]:
-  ★ ImportDiagnostic._check_circular_imports fan=25  // Detect circular import patterns using module dependency graph.
   ★ get_log_stats fan=18  // Calculate statistics from log files.
-  ★ cmd_status fan=18  // Show diagnostic status of pfix.
   ★ _auto_activate fan=17  // Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true.
   ★ init_wizard fan=17  // Run the interactive setup wizard.
+  ★ find_related_files fan=16  // Find files related to the error through imports.
 
-REFACTOR[11]:
-  [1] H/H Split god module src/pfix/cli.py (705L, 0 classes)
+Args:
+    source_file: File wh
+  ★ update_requirements_file fan=16  // Append packages to requirements.txt.
+
+REFACTOR[6]:
+  [1] H/H Split god module src/pfix/cli.py (744L, 0 classes)
   [2] H/H Split god module src/pfix/runtime_todo.py (567L, 3 classes)
-  [3] M/L Split cmd_status (CC=22 → target CC<10)
-  [4] M/L Split cmd_diagnose (CC=16 → target CC<10)
-  [5] M/L Split handle_syntax_error (CC=15 → target CC<10)
+  [3] M/L Split EnvDiagnostics.generate_report (CC=19 → target CC<10)
+  [4] M/M Reduce get_log_stats fan-out (currently 18)
+  [5] M/M Reduce _auto_activate fan-out (currently 17)
 
 EVOLUTION:
-  2026-03-29 CC̄=4.0 crit=33 13849L // Automated analysis
+  2026-03-29 CC̄=3.9 crit=31 13894L // Automated analysis

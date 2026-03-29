@@ -1,8 +1,8 @@
-# pfix | 58f 12173L | python:57,shell:1 | 2026-03-29
-# stats: 425 func | 0 cls | 58 mod | CC̄=4.0 | critical:6 | cycles:0
-# alerts[5]: fan-out ImportDiagnostic._check_circular_imports=25; CC cmd_status=22; CC EnvDiagnostics.generate_report=19; CC ThirdPartyDiagnostic._check_api_client_configs=18; fan-out cmd_status=18
-# hotspots[5]: ImportDiagnostic._check_circular_imports fan=25; get_log_stats fan=18; cmd_status fan=18; _auto_activate fan=17; init_wizard fan=17
-# evolution: CC̄ 5.1→4.0 (improved -1.1)
+# pfix | 58f 12253L | python:57,shell:1 | 2026-03-29
+# stats: 439 func | 0 cls | 58 mod | CC̄=3.9 | critical:1 | cycles:0
+# alerts[5]: CC EnvDiagnostics.generate_report=19; fan-out get_log_stats=18; fan-out _auto_activate=17; fan-out init_wizard=17; fan-out EnvDiagnostics.__init__=16
+# hotspots[5]: get_log_stats fan=18; _auto_activate fan=17; init_wizard fan=17; find_related_files fan=16; update_requirements_file fan=16
+# evolution: CC̄ 4.0→3.9 (improved -0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[58]:
   project.sh,24
@@ -11,10 +11,10 @@ M[58]:
   src/pfix/analyzer.py,246
   src/pfix/audit.py,203
   src/pfix/cache.py,227
-  src/pfix/cli.py,705
+  src/pfix/cli.py,744
   src/pfix/config.py,233
   src/pfix/dashboard.py,206
-  src/pfix/decorator.py,376
+  src/pfix/decorator.py,313
   src/pfix/dependency.py,205
   src/pfix/dev_mode.py,158
   src/pfix/diff_fixer.py,258
@@ -26,14 +26,14 @@ M[58]:
   src/pfix/env_diagnostics/encoding.py,220
   src/pfix/env_diagnostics/filesystem.py,311
   src/pfix/env_diagnostics/hardware.py,193
-  src/pfix/env_diagnostics/imports.py,444
+  src/pfix/env_diagnostics/imports.py,486
   src/pfix/env_diagnostics/memory.py,305
   src/pfix/env_diagnostics/network.py,255
   src/pfix/env_diagnostics/paths.py,250
   src/pfix/env_diagnostics/process.py,280
   src/pfix/env_diagnostics/python_version.py,342
   src/pfix/env_diagnostics/serialization.py,168
-  src/pfix/env_diagnostics/third_party.py,233
+  src/pfix/env_diagnostics/third_party.py,271
   src/pfix/explain.py,267
   src/pfix/fixer.py,338
   src/pfix/init_wizard.py,217
@@ -58,45 +58,15 @@ M[58]:
   src/pfix/strategies/fastapi.py,49
   src/pfix/strategies/flask.py,49
   src/pfix/strategies/pandas.py,51
-  src/pfix/syntax_error_handler.py,83
+  src/pfix/syntax_error_handler.py,107
   src/pfix/telemetry.py,168
   src/pfix/types.py,225
   src/pfix/validation.py,192
   verify_runtime.py,55
 D:
-  src/pfix/cli.py:
-    e: main,_build_parser,_dispatch,cmd_run,cmd_dev,cmd_check,cmd_enable,cmd_disable,cmd_status,cmd_deps,cmd_server,_install_excepthook,_create_excepthook,cmd_rollback,cmd_audit,cmd_init,cmd_dashboard,cmd_explain,cmd_diagnose
-    main(argv)
-    _build_parser()
-    _dispatch(args)
-    cmd_run(args)
-    cmd_dev(args)
-    cmd_check(args)
-    cmd_enable()
-    cmd_disable()
-    cmd_status()
-    cmd_deps(args)
-    cmd_server(args)
-    _install_excepthook()
-    _create_excepthook(original_hook;config)
-    cmd_rollback(args)
-    cmd_audit(args)
-    cmd_init()
-    cmd_dashboard()
-    cmd_explain(args)
-    cmd_diagnose(args)
   src/pfix/env_diagnostics/__init__.py:
     e: EnvDiagnostics
     EnvDiagnostics: __init__(1),check_all(1),diagnose_exception(2),generate_report(1),_format_result(1),to_todo_issues(1)  # Orchestrator for all environment diagnostics...
-  src/pfix/env_diagnostics/third_party.py:
-    e: ThirdPartyDiagnostic
-    ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
-  src/pfix/env_diagnostics/imports.py:
-    e: ImportDiagnostic
-    ImportDiagnostic(BaseDiagnostic): check(1),_check_missing_imports(1),_check_circular_imports(1),_check_shadow_stdlib(1),_check_stale_bytecode(1),_check_version_conflicts(0),_check_missing_inits(1),_check_deprecated_apis(1),_check_import_source(1),_extract_imports(1),diagnose_exception(2),_extract_module_name(1)  # Diagnose import and dependency problems...
-  src/pfix/syntax_error_handler.py:
-    e: handle_syntax_error
-    handle_syntax_error(exc;auto_apply)
   src/pfix/multi_fix.py:
     e: MultiFileFixProposal,find_related_files,build_multi_file_context,parse_multi_file_response,apply_multi_file_fix
     MultiFileFixProposal:  # Fix proposal affecting multiple files...
@@ -124,6 +94,34 @@ D:
     render_dashboard()
     run_console_dashboard()
     run_dashboard()
+  src/pfix/cli.py:
+    e: main,_build_parser,_dispatch,cmd_run,cmd_dev,cmd_check,cmd_enable,cmd_disable,_get_installation_status_table,_get_config_table,_print_status_summary,cmd_status,cmd_deps,cmd_server,_install_excepthook,_create_excepthook,cmd_rollback,cmd_audit,cmd_init,cmd_dashboard,cmd_explain,_format_diagnostic_results,_output_diagnostic_results,_apply_diagnostic_fixes,_get_diagnose_exit_code,cmd_diagnose
+    main(argv)
+    _build_parser()
+    _dispatch(args)
+    cmd_run(args)
+    cmd_dev(args)
+    cmd_check(args)
+    cmd_enable()
+    cmd_disable()
+    _get_installation_status_table(config)
+    _get_config_table(config)
+    _print_status_summary(warnings;pth_file;config)
+    cmd_status()
+    cmd_deps(args)
+    cmd_server(args)
+    _install_excepthook()
+    _create_excepthook(original_hook;config)
+    cmd_rollback(args)
+    cmd_audit(args)
+    cmd_init()
+    cmd_dashboard()
+    cmd_explain(args)
+    _format_diagnostic_results(results;diag;json_output)
+    _output_diagnostic_results(output;output_path)
+    _apply_diagnostic_fixes(results;project_root)
+    _get_diagnose_exit_code(results;check_mode)
+    cmd_diagnose(args)
   src/pfix/diff_fixer.py:
     e: DiffParseError,parse_unified_diff,parse_hunk_header,apply_hunk,apply_diff,apply_diff_to_file,create_unified_diff
     DiffParseError(Exception):  # Raised when diff parsing fails...
@@ -174,6 +172,9 @@ D:
   src/pfix/env_diagnostics/python_version.py:
     e: PythonVersionDiagnostic
     PythonVersionDiagnostic(BaseDiagnostic): check(1),_check_pyproject_requires(1),_check_version_features(1),_check_deprecated_imports(1),_get_deprecated_version(1),_check_eol_status(0),_check_32bit_python(0),_check_sys_executable_mismatch(0),_check_optimization_flags(0),_check_gil_status(0),diagnose_exception(2)  # Diagnose Python version compatibility problems...
+  src/pfix/env_diagnostics/imports.py:
+    e: ImportDiagnostic
+    ImportDiagnostic(BaseDiagnostic): check(1),_check_missing_imports(1),_build_import_graph(1),_find_cycle_dfs(4),_create_cycle_result(3),_check_circular_imports(1),_check_shadow_stdlib(1),_check_stale_bytecode(1),_check_version_conflicts(0),_check_missing_inits(1),_check_deprecated_apis(1),_check_import_source(1),_extract_imports(1),diagnose_exception(2),_extract_module_name(1)  # Diagnose import and dependency problems...
   src/pfix/config.py:
     e: PfixConfig,_load_env_values,_load_llm_env,_load_behavior_env,_load_mcp_env,_load_git_env,_load_paths_env,get_config,configure,reset_config
     PfixConfig: from_env(1),_read_pyproject_full(0),validate(0)  # Central configuration...
@@ -251,6 +252,9 @@ D:
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
+  src/pfix/env_diagnostics/third_party.py:
+    e: ThirdPartyDiagnostic
+    ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
   src/pfix/integrations/precommit.py:
     e: check_syntax,check_imports,main
     check_syntax(filepath)
@@ -284,6 +288,11 @@ Collection m...
     e: PfixSentryIntegration,init_sentry
     PfixSentryIntegration: __init__(2),setup_once(2),_process_event(2)  # Sentry integration that adds pfix diagnosis to error events...
     init_sentry(dsn;auto_analyze;min_confidence)
+  src/pfix/syntax_error_handler.py:
+    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
+    _build_syntax_error_context(exc)
+    _apply_syntax_fix(ctx;proposal;auto_apply;config)
+    handle_syntax_error(exc;auto_apply)
   src/pfix/rollback.py:
     e: find_backup_dir,list_backups,rollback_last,rollback_file,rollback_before,show_history,rollback_command
     find_backup_dir(filepath)

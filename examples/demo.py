@@ -1,34 +1,44 @@
 #!/usr/bin/env python3
-"""pfix demo — file-level auto-healing with pfix_session
+"""pfix demo — run with: python examples/demo.py"""
 
-Run with: python examples/demo.py
-"""
+from pfix import pfix, configure
 
-from pfix import configure, pfix_session
-
-from shared import fetch_json, average, greet
-
-configure(auto_apply=True, dry_run=False)
+configure(dry_run=True, auto_apply=True)
 
 
-def main():
-    print("=== pfix Demo (file-level healing) ===\n")
+@pfix(deps=["requests"])
+def fetch_json(url: str) -> dict:
+    import requests
+    return requests.get(url).json()
 
-    print("1. fetch_json (dep management):")
-    result = fetch_json('https://httpbin.org/json')
-    print(f"   ✓ Success: {type(result).__name__}")
 
-    print("\n2. average([]) (ZeroDivisionError):")
-    result = average([])
-    print(f"   ✓ Result: {result}")
+@pfix(hint="Calculate average of numbers list")
+def average(numbers: list[float]) -> float:
+    return sum(numbers) / len(numbers)  # ZeroDivisionError if empty
 
-    print("\n3. greet('Alice', 30) (TypeError):")
-    result = greet('Alice', 30)
-    print(f"   ✓ Result: {result}")
+
+@pfix(retries=2)
+def greet(name: str, age: int) -> str:
+    return "Hello " + name + "! Age: " + age  # TypeError: str + int
 
 
 if __name__ == "__main__":
-    # Wrap entire execution in pfix session
-    # Any exception triggers LLM auto-repair for this file
-    with pfix_session(__file__, auto_apply=True):
-        main()
+    print("=== pfix Demo ===\n")
+
+    print("1. fetch_json (dep management):")
+    try:
+        print(f"   {type(fetch_json('https://httpbin.org/json'))}")
+    except Exception as e:
+        print(f"   {e}\n")
+
+    print("2. average([]) (ZeroDivisionError):")
+    try:
+        print(f"   {average([])}")
+    except Exception as e:
+        print(f"   {e}\n")
+
+    print("3. greet('Alice', 30) (TypeError):")
+    try:
+        print(f"   {greet('Alice', 30)}")
+    except Exception as e:
+        print(f"   {e}\n")
