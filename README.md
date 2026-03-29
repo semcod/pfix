@@ -10,6 +10,21 @@
 [![Docs](https://img.shields.io/badge/docs-available-brightgreen.svg)](docs/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
+
+## AI Cost Tracking
+
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.70-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$14.53-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-17.1h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+
+- 🤖 **LLM usage:** $14.5287 (75 commits)
+- 👤 **Human dev:** ~$1712 (17.1h @ $100/h, 30min dedup)
+
+Generated on 2026-03-29 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
+
+---
+
+
+
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.
 
 The strategy of using a small tool for detecting errors in a single library or file enables quick bug fixes before writing a prompt, since all context is contained in the error file. This offloads large and expensive models that should be used where smaller ones are insufficient—allowing them to plan and create strategy for the entire library instead of handling individual errors, like in test files.

@@ -6,15 +6,15 @@ HEALTH[0]: ok
 REFACTOR[0]: none needed
 
 PIPELINES[396]:
-  [1] Src [main]: main → run_git_checkout
+  [1] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [2] Src [main]: main → reset_examples
+  [2] Src [main]: main → run_git_checkout
       PURITY: 100% pure
-  [3] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [3] Src [main]: main → reset_examples
       PURITY: 100% pure
-  [4] Src [build_multi_file_context]: build_multi_file_context
+  [4] Src [main]: main → _build_parser
       PURITY: 100% pure
-  [5] Src [parse_multi_file_response]: parse_multi_file_response
+  [5] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
 
 LAYERS:
@@ -77,8 +77,8 @@ LAYERS:
   │ __init__                    59L  0C    2m  CC=3      ←1
   │ django                      55L  1C    3m  CC=7      ←0
   │ pandas                      51L  1C    3m  CC=7      ←0
-  │ flask                       49L  1C    3m  CC=5      ←0
   │ fastapi                     49L  1C    3m  CC=5      ←0
+  │ flask                       49L  1C    3m  CC=5      ←0
   │ fingerprint                 48L  1C    2m  CC=1      ←1
   │ base                        43L  1C    3m  CC=1      ←1
   │ pfix_python                 39L  0C    1m  CC=3      ←0

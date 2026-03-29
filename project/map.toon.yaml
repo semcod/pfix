@@ -1,7 +1,7 @@
 # pfix | 67f 12441L | python:66,shell:1 | 2026-03-29
 # stats: 499 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
 # alerts[5]: fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13; fan-out _replace_function=13; fan-out cmd_dev=13
-# hotspots[5]: FixCache.set fan=14; parse_multi_file_response fan=13; render_dashboard fan=13; _replace_function fan=13; PfixMonitor.handle_exception fan=13
+# hotspots[5]: FixCache.set fan=14; render_dashboard fan=13; parse_multi_file_response fan=13; _replace_function fan=13; PfixMonitor.handle_exception fan=13
 # evolution: CC̄ 3.6→3.6 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[67]:
@@ -136,6 +136,14 @@ D:
     _handle_import_error_hook(exc_value)
     _handle_generic_error_hook(exc_value;auto_apply;config)
     _restart_process(exc_value)
+  src/pfix/audit.py:
+    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
+    AuditEntry:  # Single audit entry for a fix operation...
+    _calculate_hash(content)
+    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
+    read_audit_log(since;filepath;limit)
+    get_audit_summary(days)
+    print_audit_report(days)
   src/pfix/decorator.py:
     e: _capture_runtime_error,pfix,pfix,pfix,apfix,_handle_decorator_exception,_apply_decorator_fix,_after_fix_action,_ensure_deps,_try_quick_dep_fix,_try_reload_module
     _capture_runtime_error(exc;func;hints)
@@ -149,14 +157,6 @@ D:
     _ensure_deps(deps)
     _try_quick_dep_fix(exc)
     _try_reload_module(func)
-  src/pfix/audit.py:
-    e: AuditEntry,_calculate_hash,log_fix_audit,read_audit_log,get_audit_summary,print_audit_report
-    AuditEntry:  # Single audit entry for a fix operation...
-    _calculate_hash(content)
-    log_fix_audit(filepath;function_name;error;error_type;fix_applied;diff;model;confidence;approved_by;backup_path;original_content;new_content)
-    read_audit_log(since;filepath;limit)
-    get_audit_summary(days)
-    print_audit_report(days)
   src/pfix/env_diagnostics/third_party.py:
     e: ThirdPartyDiagnostic
     ThirdPartyDiagnostic(BaseDiagnostic): check(1),_check_api_keys_in_env(0),_check_hardcoded_key(2),_check_missing_timeout(2),_check_api_client_configs(1),diagnose_exception(2)  # Diagnose third-party API-related problems...
@@ -209,11 +209,6 @@ D:
     build_multi_file_context(error_ctx;related_files)
     parse_multi_file_response(raw)
     apply_multi_file_fix(proposal;project_root;create_backups)
-  src/pfix/syntax_error_handler.py:
-    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
-    _build_syntax_error_context(exc)
-    _apply_syntax_fix(ctx;proposal;auto_apply;config)
-    handle_syntax_error(exc;auto_apply)
   src/pfix/rollback.py:
     e: find_backup_dir,list_backups,rollback_last,rollback_file,rollback_before,show_history,rollback_command
     find_backup_dir(filepath)
@@ -223,6 +218,11 @@ D:
     rollback_before(cutoff_date)
     show_history(limit)
     rollback_command(last;filepath;before)
+  src/pfix/syntax_error_handler.py:
+    e: _build_syntax_error_context,_apply_syntax_fix,handle_syntax_error
+    _build_syntax_error_context(exc)
+    _apply_syntax_fix(ctx;proposal;auto_apply;config)
+    handle_syntax_error(exc;auto_apply)
   src/pfix/rules.py:
     e: ProjectRules,load_project_rules,get_rules_for_prompt
     ProjectRules: __init__(1),_load(0),get_rules_text(0),get_section(1),has_rules(0)  # Loaded project rules...
@@ -360,9 +360,6 @@ D:
   src/pfix/env_diagnostics/paths.py:
     e: PathDiagnostic
     PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
-  src/pfix/env_diagnostics/encoding.py:
-    e: EncodingDiagnostic
-    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/env_diagnostics/auto_fix.py:
     e: can_auto_fix,apply_auto_fix,_fix_stale_bytecode,_fix_missing_requirement,_fix_utf8_bom,_fix_mixed_line_endings,_fix_large_log_file,_fix_api_key_placeholder,_fix_missing_dotenv,_fix_env_not_gitignored,_fix_missing_init,_fix_hidden_pollution,_fix_no_manifest
     can_auto_fix(result)
@@ -378,6 +375,9 @@ D:
     _fix_missing_init(result;project_root)
     _fix_hidden_pollution(result;project_root)
     _fix_no_manifest(result;project_root)
+  src/pfix/env_diagnostics/encoding.py:
+    e: EncodingDiagnostic
+    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/runtime_todo/collector.py:
     e: RuntimeCollector
     RuntimeCollector: __init__(9),capture(2),_should_capture(1),_build_issue(2),_get_location_info(1),_get_system_info(0),_get_timestamps(0),_extract_frames(1),_should_exclude_path(1),_filepath_to_module(1),_capture_locals(1),_classify(1),_severity(1),_flush(0),install_excepthook(0),shutdown(0)  # Captures runtime errors and writes to TODO.md.
@@ -430,12 +430,12 @@ Collection m...
   src/pfix/env_diagnostics/hardware.py:
     e: HardwareDiagnostic
     HardwareDiagnostic(BaseDiagnostic): check(1),_check_gpu_availability(0),_check_cpu_count(0),_check_docker_limits(0),_check_thermal_throttling(0),_check_battery_status(0),_check_avx_support(0),diagnose_exception(2)  # Diagnose hardware-related problems...
-  src/pfix/strategies/flask.py:
-    e: FlaskFixStrategy
-    FlaskFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for Flask framework errors...
   src/pfix/strategies/fastapi.py:
     e: FastAPIFixStrategy
     FastAPIFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for FastAPI framework errors...
+  src/pfix/strategies/flask.py:
+    e: FlaskFixStrategy
+    FlaskFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for Flask framework errors...
   src/pfix/runtime_todo/todo_file.py:
     e: TodoFile
     TodoFile: __init__(1),append_issue(1),_file_lock(0),_load_existing_fingerprints(0),_increment_counter(2),_append_new_entry(1),_format_entry(1),get_section_content(0)  # Thread-safe, append-only manager for TODO.md.
