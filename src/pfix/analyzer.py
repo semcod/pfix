@@ -14,6 +14,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Optional
 
+from .classifiers import classify_error
 from .types import ErrorContext
 
 
@@ -165,34 +166,6 @@ def _scan_missing_deps(source_file: str) -> list[str]:
         return scan_missing_deps(Path(source_file).parent)
     except Exception:
         return []
-
-
-def classify_error(ctx: ErrorContext) -> str:
-    """Classify error to guide fix strategy."""
-    exc = ctx.exception_type
-    msg = ctx.exception_message.lower()
-
-    if exc in ("ModuleNotFoundError", "ImportError"):
-        return "missing_dependency"
-    if exc == "NameError" and "is not defined" in msg:
-        return "missing_import"
-    if exc == "TypeError":
-        return "type_error"
-    if exc == "AttributeError":
-        return "attribute_error"
-    if exc == "SyntaxError":
-        return "syntax_error"
-    if exc == "IndexError":
-        return "index_error"
-    if exc == "KeyError":
-        return "key_error"
-    if exc == "ValueError":
-        return "value_error"
-    if exc == "FileNotFoundError":
-        return "file_not_found"
-    if exc == "PermissionError":
-        return "permission_error"
-    return "other"
 
 
 def scan_missing_deps(project_dir: Path) -> list[str]:

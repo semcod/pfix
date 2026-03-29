@@ -31,7 +31,7 @@ from .concurrency import ConcurrencyDiagnostic
 from .encoding import EncodingDiagnostic
 from .filesystem import FilesystemDiagnostic
 from .hardware import HardwareDiagnostic
-from .imports import ImportDiagnostic
+from .import_diagnostic import ImportDiagnostic
 from .memory import MemoryDiagnostic
 from .network import NetworkDiagnostic
 from .paths import PathDiagnostic

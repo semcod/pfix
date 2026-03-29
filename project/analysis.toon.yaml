@@ -1,25 +1,24 @@
-# code2llm | 67f 12441L | python:66,shell:1 | 2026-03-29
-# CC̄=3.6 | critical:0/636 | dups:0 | cycles:0
+# code2llm | 71f 12553L | python:70,shell:1 | 2026-03-29
+# CC̄=3.5 | critical:0/641 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
-PIPELINES[396]:
+PIPELINES[386]:
   [1] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [2] Src [main]: main → run_git_checkout
+  [2] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
-  [3] Src [main]: main → reset_examples
+  [3] Src [build_multi_file_context]: build_multi_file_context
       PURITY: 100% pure
-  [4] Src [main]: main → _build_parser
+  [4] Src [parse_multi_file_response]: parse_multi_file_response
       PURITY: 100% pure
-  [5] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [5] Src [apply_multi_file_fix]: apply_multi_file_fix
       PURITY: 100% pure
 
 LAYERS:
-  src/                            CC̄=3.6    ←in:0  →out:2
-  │ imports                    486L  1C   19m  CC=11     ←0
+  src/                            CC̄=3.5    ←in:0  →out:2
   │ logging                    351L  5C   18m  CC=6      ←0
   │ python_version             342L  1C   15m  CC=11     ←0
   │ fixer                      338L  0C   18m  CC=10     ←7
@@ -39,15 +38,16 @@ LAYERS:
   │ dependency                 253L  0C   12m  CC=6      ←6
   │ multi_fix                  252L  1C    6m  CC=8      ←0
   │ paths                      250L  1C   10m  CC=6      ←0
+  │ checks                     250L  0C    7m  CC=11     ←1
   │ init_wizard                249L  0C   14m  CC=4      ←1
   │ config                     247L  1C   15m  CC=5      ←17
-  │ analyzer                   245L  0C   15m  CC=12     ←7
   │ diff_fixer                 236L  1C    9m  CC=9      ←0
-  │ cache                      227L  1C   14m  CC=4      ←11
+  │ cache                      227L  1C   14m  CC=4      ←13
   │ types                      225L  7C    1m  CC=11     ←0
   │ rollback                   224L  0C    7m  CC=8      ←1
   │ dashboard                  223L  0C    7m  CC=6      ←1
   │ encoding                   220L  1C    7m  CC=6      ←0
+  │ analyzer                   218L  0C   14m  CC=8      ←6
   │ auto_fix                   216L  0C   13m  CC=6      ←1
   │ web                        216L  3C   10m  CC=5      ←0
   │ audit                      203L  1C    5m  CC=10     ←3
@@ -65,6 +65,8 @@ LAYERS:
   │ _auto_activate             143L  0C    7m  CC=7      ←0
   │ concurrency                143L  1C    6m  CC=4      ←0
   │ activation                 141L  0C    8m  CC=7      ←0
+  │ classifiers                127L  6C    8m  CC=4      ←3
+  │ import_diagnostic          121L  1C    5m  CC=6      ←0
   │ sentry                     112L  1C    4m  CC=9      ←0
   │ precommit                  110L  0C    3m  CC=10     ←0
   │ syntax_error_handler       107L  0C    3m  CC=8      ←1
@@ -73,12 +75,14 @@ LAYERS:
   │ diagnose                   101L  0C    5m  CC=6      ←0
   │ others                      99L  0C    7m  CC=7      ←0
   │ mcp_client                  81L  2C    6m  CC=4      ←0
+  │ extractor                   76L  0C    5m  CC=7      ←2
   │ __init__                    75L  2C    7m  CC=4      ←0
   │ __init__                    59L  0C    2m  CC=3      ←1
   │ django                      55L  1C    3m  CC=7      ←0
   │ pandas                      51L  1C    3m  CC=7      ←0
-  │ fastapi                     49L  1C    3m  CC=5      ←0
+  │ __init__                    51L  0C    0m  CC=0.0    ←0
   │ flask                       49L  1C    3m  CC=5      ←0
+  │ fastapi                     49L  1C    3m  CC=5      ←0
   │ fingerprint                 48L  1C    2m  CC=1      ←1
   │ base                        43L  1C    3m  CC=1      ←1
   │ pfix_python                 39L  0C    1m  CC=3      ←0

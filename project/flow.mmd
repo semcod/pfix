@@ -5,13 +5,13 @@ flowchart TD
 
     subgraph Core
         verify_runtime__crash_me["crash_me"]
-        src__pfix__cli__main["main"]
-        src__pfix__cli___build_parser["_build_parser"]
-        src__pfix__cli___dispatch["_dispatch"]
         src__pfix__multi_fix__find_related_files["find_related_files"]
         src__pfix__multi_fix__build_multi_file_context["build_multi_file_context"]
         src__pfix__multi_fix__parse_multi_file_response["parse_multi_file_response"]
         src__pfix__multi_fix__apply_multi_file_fix["apply_multi_file_fix"]
+        src__pfix__cli__main["main"]
+        src__pfix__cli___build_parser["_build_parser"]
+        src__pfix__cli___dispatch["_dispatch"]
         src__pfix__mcp_client__MCPClient__connect["connect"]
         src__pfix__mcp_client__MCPClient__disconnect["disconnect"]
         src__pfix__mcp_client__MCPClient__call_tool["call_tool"]
@@ -19,7 +19,7 @@ flowchart TD
         src__pfix__mcp_client__MCPClient__run_command["run_command"]
         src__pfix__fixer__apply_fix["apply_fix"]
         src__pfix__fixer___confirm_and_validate["_confirm_and_validate"]
-        ...["+287 more"]
+        ...["+282 more"]
     end
 
-    class verify_runtime__crash_me,src__pfix__cli__main,src__pfix__cli___build_parser,src__pfix__cli___dispatch,src__pfix__multi_fix__find_related_files,src__pfix__multi_fix__build_multi_file_context,src__pfix__multi_fix__parse_multi_file_response,src__pfix__multi_fix__apply_multi_file_fix,src__pfix__mcp_client__MCPClient__connect,src__pfix__mcp_client__MCPClient__disconnect entry
+    class verify_runtime__crash_me,src__pfix__multi_fix__find_related_files,src__pfix__multi_fix__build_multi_file_context,src__pfix__multi_fix__parse_multi_file_response,src__pfix__multi_fix__apply_multi_file_fix,src__pfix__cli__main,src__pfix__cli___build_parser,src__pfix__cli___dispatch,src__pfix__mcp_client__MCPClient__connect,src__pfix__mcp_client__MCPClient__disconnect entry

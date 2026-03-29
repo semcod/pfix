@@ -1,12 +1,12 @@
-# pfix | 499 func | 64f | 14132L | python | 2026-03-29
+# pfix | 504 func | 67f | 14358L | python | 2026-03-29
 
 HEALTH:
-  CC̄=3.6  critical=12 (limit:10)  dup=2  cycles=0
+  CC̄=3.5  critical=11 (limit:10)  dup=2  cycles=0
 
 ALERTS[20]:
   !   high_fan_out     FixCache.set = 14 (limit:10)
-  !   high_fan_out     render_dashboard = 13 (limit:10)
   !   high_fan_out     parse_multi_file_response = 13 (limit:10)
+  !   high_fan_out     render_dashboard = 13 (limit:10)
   !   high_fan_out     _replace_function = 13 (limit:10)
   !   high_fan_out     PfixMonitor.handle_exception = 13 (limit:10)
   !   high_fan_out     cmd_run = 13 (limit:10)
@@ -15,8 +15,7 @@ ALERTS[20]:
   !   high_fan_out     get_log_stats = 12 (limit:10)
   !   high_fan_out     _build_parser = 12 (limit:10)
 
-MODULES[67] (top by size):
-  M[src/pfix/env_diagnostics/imports.py] 486L C:1 F:19 CC↑11 D:0 (python)
+MODULES[71] (top by size):
   M[src/pfix/logging.py] 351L C:5 F:18 CC↑6 D:0 (python)
   M[src/pfix/env_diagnostics/python_version.py] 342L C:1 F:15 CC↑11 D:0 (python)
   M[src/pfix/fixer.py] 338L C:0 F:18 CC↑10 D:7 (python)
@@ -31,21 +30,22 @@ MODULES[67] (top by size):
   M[src/pfix/env_diagnostics/third_party.py] 271L C:1 F:6 CC↑10 D:0 (python)
   M[src/pfix/explain.py] 267L C:0 F:4 CC↑5 D:1 (python)
   M[src/pfix/env_diagnostics/__init__.py] 258L C:1 F:8 CC↑8 D:0 (python)
-  LANGS: python:66/shell:1
+  M[src/pfix/env_diagnostics/config_env.py] 256L C:1 F:12 CC↑9 D:0 (python)
+  LANGS: python:70/shell:1
 
 HOTSPOTS[10]:
   ★ FixCache.set fan=14  // Cache fix proposal for error context.
-  ★ render_dashboard fan=13  // Render rich console dashboard.
   ★ parse_multi_file_response fan=13  // Parse LLM response for multi-file fix.
 
 Args:
     raw: Raw LLM response text
 
 Re
+  ★ render_dashboard fan=13  // Render rich console dashboard.
   ★ _replace_function fan=13  // Replace a function definition in source.
   ★ PfixMonitor.handle_exception fan=13  // Handle exception in production mode.
 
 Returns dict with diagnosis info (for logg
 
 EVOLUTION:
-  2026-03-29 CC̄=3.6 crit=12 14132L // Automated analysis
+  2026-03-29 CC̄=3.5 crit=11 14358L // Automated analysis

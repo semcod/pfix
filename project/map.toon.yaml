@@ -1,16 +1,17 @@
-# pfix | 67f 12441L | python:66,shell:1 | 2026-03-29
-# stats: 499 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
+# pfix | 71f 12553L | python:70,shell:1 | 2026-03-29
+# stats: 504 func | 0 cls | 71 mod | CC̄=3.5 | critical:0 | cycles:0
 # alerts[5]: fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13; fan-out _replace_function=13; fan-out cmd_dev=13
-# hotspots[5]: FixCache.set fan=14; render_dashboard fan=13; parse_multi_file_response fan=13; _replace_function fan=13; PfixMonitor.handle_exception fan=13
-# evolution: CC̄ 3.6→3.6 (flat 0.0)
+# hotspots[5]: FixCache.set fan=14; parse_multi_file_response fan=13; render_dashboard fan=13; _replace_function fan=13; PfixMonitor.handle_exception fan=13
+# evolution: CC̄ 3.6→3.5 (improved -0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[67]:
+M[71]:
   project.sh,24
   src/pfix/__init__.py,105
   src/pfix/_auto_activate.py,143
-  src/pfix/analyzer.py,245
+  src/pfix/analyzer.py,218
   src/pfix/audit.py,203
   src/pfix/cache.py,227
+  src/pfix/classifiers.py,127
   src/pfix/cli.py,157
   src/pfix/commands/__init__.py,0
   src/pfix/commands/activation.py,141
@@ -32,7 +33,10 @@ M[67]:
   src/pfix/env_diagnostics/encoding.py,220
   src/pfix/env_diagnostics/filesystem.py,311
   src/pfix/env_diagnostics/hardware.py,193
-  src/pfix/env_diagnostics/imports.py,486
+  src/pfix/env_diagnostics/import_diagnostic.py,121
+  src/pfix/env_diagnostics/imports/__init__.py,51
+  src/pfix/env_diagnostics/imports/checks.py,250
+  src/pfix/env_diagnostics/imports/extractor.py,76
   src/pfix/env_diagnostics/memory.py,305
   src/pfix/env_diagnostics/network.py,255
   src/pfix/env_diagnostics/paths.py,250
@@ -73,23 +77,6 @@ M[67]:
   src/pfix/validation.py,192
   verify_runtime.py,55
 D:
-  src/pfix/analyzer.py:
-    e: analyze_exception,_fill_traceback_context,_fill_function_context,_fill_file_context,_fill_environment_context,_extract_exception_info,_extract_frame_context,_format_local_vars,_extract_function_source,_extract_file_context,_scan_missing_deps,classify_error,scan_missing_deps,_extract_imports,_safe_repr
-    analyze_exception(exc;func;local_vars;hints)
-    _fill_traceback_context(ctx;exc;local_vars)
-    _fill_function_context(ctx;func)
-    _fill_file_context(ctx)
-    _fill_environment_context(ctx)
-    _extract_exception_info(exc)
-    _extract_frame_context(exc;local_vars)
-    _format_local_vars(local_vars)
-    _extract_function_source(func)
-    _extract_file_context(source_file;line_number)
-    _scan_missing_deps(source_file)
-    classify_error(ctx)
-    scan_missing_deps(project_dir)
-    _extract_imports(source)
-    _safe_repr(obj;max_len)
   src/pfix/types.py:
     e: TraceFrame,RuntimeIssue,DiagnosticResult,ErrorContext,FixProposal,PfixConfig,FixEvent
     TraceFrame:  # Single frame from a traceback...
@@ -102,9 +89,15 @@ D:
   src/pfix/env_diagnostics/python_version.py:
     e: PythonVersionDiagnostic
     PythonVersionDiagnostic(BaseDiagnostic): check(1),_check_pyproject_requires(1),_get_requires_python(1),_parse_version_requirement(2),_create_version_error(5),_check_version_features(1),_check_file_features(3),_check_deprecated_imports(1),_get_deprecated_version(1),_check_eol_status(0),_check_32bit_python(0),_check_sys_executable_mismatch(0),_check_optimization_flags(0),_check_gil_status(0),diagnose_exception(2)  # Diagnose Python version compatibility problems...
-  src/pfix/env_diagnostics/imports.py:
-    e: ImportDiagnostic
-    ImportDiagnostic(BaseDiagnostic): check(1),_check_missing_imports(1),_get_all_project_imports(1),_get_installed_packages(0),_build_import_graph(1),_get_module_name(2),_resolve_relative_import(2),_find_cycle_dfs(4),_create_cycle_result(3),_check_circular_imports(1),_check_shadow_stdlib(1),_check_stale_bytecode(1),_check_version_conflicts(0),_check_missing_inits(1),_check_deprecated_apis(1),_check_import_source(1),_extract_imports(1),diagnose_exception(2),_extract_module_name(1)  # Diagnose import and dependency problems...
+  src/pfix/env_diagnostics/imports/checks.py:
+    e: check_missing_imports,check_shadow_stdlib,check_stale_bytecode,check_version_conflicts,check_missing_inits,check_deprecated_apis,check_import_source
+    check_missing_imports(project_root;category;get_all_project_imports)
+    check_shadow_stdlib(project_root;category)
+    check_stale_bytecode(project_root;category)
+    check_version_conflicts(category)
+    check_missing_inits(project_root;category)
+    check_deprecated_apis(project_root;category)
+    check_import_source(project_root;category)
   src/pfix/fixer.py:
     e: apply_fix,_apply_dependencies,_prepare_code_change,_confirm_and_validate,_show_diagnosis,_log_skipped_fix,_record_fix_telemetry,_prepare_code_fix,_display_diff,_confirm_fix,_write_fix,_post_fix,_replace_function,_make_diff,_validate_syntax,_backup,_clear_pycache,_git_commit
     apply_fix(ctx;proposal;confirm)
@@ -240,6 +233,22 @@ D:
     path_read_safe(path)
     _get_config_table(config)
     _print_status_summary(warnings;pth_file;config)
+  src/pfix/analyzer.py:
+    e: analyze_exception,_fill_traceback_context,_fill_function_context,_fill_file_context,_fill_environment_context,_extract_exception_info,_extract_frame_context,_format_local_vars,_extract_function_source,_extract_file_context,_scan_missing_deps,scan_missing_deps,_extract_imports,_safe_repr
+    analyze_exception(exc;func;local_vars;hints)
+    _fill_traceback_context(ctx;exc;local_vars)
+    _fill_function_context(ctx;func)
+    _fill_file_context(ctx)
+    _fill_environment_context(ctx)
+    _extract_exception_info(exc)
+    _extract_frame_context(exc;local_vars)
+    _format_local_vars(local_vars)
+    _extract_function_source(func)
+    _extract_file_context(source_file;line_number)
+    _scan_missing_deps(source_file)
+    scan_missing_deps(project_dir)
+    _extract_imports(source)
+    _safe_repr(obj;max_len)
   src/pfix/env_diagnostics/process.py:
     e: ProcessDiagnostic
     ProcessDiagnostic(BaseDiagnostic): check(1),_check_ulimits(0),_check_signal_handlers(0),_check_tmp_writable(0),_check_zombies(0),_check_nice_priority(0),_check_fd_usage(0),_check_core_dumps(0),_check_parent_alive(0),diagnose_exception(2)  # Diagnose process and OS-related problems...
@@ -286,6 +295,13 @@ D:
   src/pfix/strategies/pandas.py:
     e: PandasFixStrategy
     PandasFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for pandas data manipulation errors...
+  src/pfix/env_diagnostics/imports/extractor.py:
+    e: extract_imports,get_module_name,resolve_relative_import,extract_module_name,get_installed_packages
+    extract_imports(source)
+    get_module_name(pyfile;project_root)
+    resolve_relative_import(node;module_name)
+    extract_module_name(msg)
+    get_installed_packages()
   src/pfix/llm.py:
     e: request_fix,_request_with_chain,_request_single_model,_parse_response
     request_fix(error_ctx)
@@ -357,6 +373,12 @@ D:
   src/pfix/env_diagnostics/memory.py:
     e: MemoryDiagnostic
     MemoryDiagnostic(BaseDiagnostic): check(1),_check_available_memory(0),_check_recursion_limit(0),_check_gc_pressure(0),_check_object_count(0),_check_swap_usage(0),_check_ulimits(0),_check_shm_usage(0),_check_process_memory(0),diagnose_exception(2)  # Diagnose memory-related problems...
+  src/pfix/env_diagnostics/import_diagnostic.py:
+    e: ImportDiagnostic
+    ImportDiagnostic(BaseDiagnostic): check(1),_check_missing_imports(1),_get_all_project_imports(1),_check_circular_imports(1),diagnose_exception(2)  # Diagnose import and dependency problems...
+  src/pfix/env_diagnostics/encoding.py:
+    e: EncodingDiagnostic
+    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/env_diagnostics/paths.py:
     e: PathDiagnostic
     PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
@@ -375,9 +397,6 @@ D:
     _fix_missing_init(result;project_root)
     _fix_hidden_pollution(result;project_root)
     _fix_no_manifest(result;project_root)
-  src/pfix/env_diagnostics/encoding.py:
-    e: EncodingDiagnostic
-    EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
   src/pfix/runtime_todo/collector.py:
     e: RuntimeCollector
     RuntimeCollector: __init__(9),capture(2),_should_capture(1),_build_issue(2),_get_location_info(1),_get_system_info(0),_get_timestamps(0),_extract_frames(1),_should_exclude_path(1),_filepath_to_module(1),_capture_locals(1),_classify(1),_severity(1),_flush(0),install_excepthook(0),shutdown(0)  # Captures runtime errors and writes to TODO.md.
@@ -430,24 +449,24 @@ Collection m...
   src/pfix/env_diagnostics/hardware.py:
     e: HardwareDiagnostic
     HardwareDiagnostic(BaseDiagnostic): check(1),_check_gpu_availability(0),_check_cpu_count(0),_check_docker_limits(0),_check_thermal_throttling(0),_check_battery_status(0),_check_avx_support(0),diagnose_exception(2)  # Diagnose hardware-related problems...
-  src/pfix/strategies/fastapi.py:
-    e: FastAPIFixStrategy
-    FastAPIFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for FastAPI framework errors...
   src/pfix/strategies/flask.py:
     e: FlaskFixStrategy
     FlaskFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for Flask framework errors...
-  src/pfix/runtime_todo/todo_file.py:
-    e: TodoFile
-    TodoFile: __init__(1),append_issue(1),_file_lock(0),_load_existing_fingerprints(0),_increment_counter(2),_append_new_entry(1),_format_entry(1),get_section_content(0)  # Thread-safe, append-only manager for TODO.md.
-
-Features:
-- F...
+  src/pfix/strategies/fastapi.py:
+    e: FastAPIFixStrategy
+    FastAPIFixStrategy(FixStrategy): detect(1),enhance_prompt(1),get_priority(0)  # Strategy for FastAPI framework errors...
   src/pfix/integrations/web.py:
     e: PfixMiddleware,PfixFlaskExtension,PfixDjangoMiddleware,create_error_handler
     PfixMiddleware: __init__(4),__call__(3),_handle_exception(2)  # ASGI middleware for FastAPI/Starlette that captures and anal...
     PfixFlaskExtension: __init__(4),init_app(1),_handle_exception(1)  # Flask extension for pfix error monitoring...
     PfixDjangoMiddleware: __init__(1),__call__(1),_handle_exception(2)  # Django middleware for pfix error monitoring...
     create_error_handler(auto_fix;notify_url)
+  src/pfix/runtime_todo/todo_file.py:
+    e: TodoFile
+    TodoFile: __init__(1),append_issue(1),_file_lock(0),_load_existing_fingerprints(0),_increment_counter(2),_append_new_entry(1),_format_entry(1),get_section_content(0)  # Thread-safe, append-only manager for TODO.md.
+
+Features:
+- F...
   src/pfix/mcp_client.py:
     e: MCPResult,MCPClient
     MCPResult:
@@ -458,6 +477,16 @@ Features:
     _load_env()
     _get_caller_file()
     _setup_runtime_todo()
+  src/pfix/classifiers.py:
+    e: ErrorClassifier,ImportErrorClassifier,TypeErrorClassifier,DataStructureErrorClassifier,IOErrorClassifier,SyntaxErrorClassifier,classify_error,get_error_category
+    ErrorClassifier: classify(2)  # Base class for error classification strategies...
+    ImportErrorClassifier(ErrorClassifier): classify(2)  # Classify import-related errors...
+    TypeErrorClassifier(ErrorClassifier): classify(2)  # Classify type-related errors...
+    DataStructureErrorClassifier(ErrorClassifier): classify(2)  # Classify data structure access errors...
+    IOErrorClassifier(ErrorClassifier): classify(2)  # Classify file/IO related errors...
+    SyntaxErrorClassifier(ErrorClassifier): classify(2)  # Classify syntax errors...
+    classify_error(ctx)
+    get_error_category(exc_type)
   src/pfix/init_wizard.py:
     e: find_pyproject,init_wizard,_show_welcome,_step_select_model,_step_auto_apply,_step_create_env,_step_update_pyproject,_step_update_gitignore,_step_auto_activation,_show_summary,update_pyproject,get_gitignore_content,update_gitignore,main
     find_pyproject()
@@ -520,4 +549,5 @@ Each diagnostic...
 Same error =...
   src/pfix/commands/__init__.py:
   src/pfix/integrations/__init__.py:
+  src/pfix/env_diagnostics/imports/__init__.py:
   project.sh:
