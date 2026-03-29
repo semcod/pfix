@@ -117,12 +117,11 @@ def pfix(
                     raise
                 except BaseException as exc:
                     last_exc = exc
-                    if _handle_decorator_exception(
-                        fn, exc, attempt, max_retries, hint, args, kwargs,
-                        config, should_auto, should_restart, on_error
-                    ):
-                        continue
-                    break
+
+                    if attempt >= max_retries:
+                        # Capture final error to runtime TODO before giving up
+                        _capture_runtime_error(exc, fn, {"hint": hint} if hint else {})
+                        break
 
                     console.print(
                         f"\n[red]💥 pfix caught: {type(exc).__name__}: {exc}[/]"

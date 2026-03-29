@@ -1,51 +1,99 @@
-# code2llm | 14f 2541L | python:13,shell:1 | 2026-03-28
-# CC̄=5.1 | critical:2/75 | dups:0 | cycles:1
+# code2llm | 58f 12173L | python:57,shell:1 | 2026-03-29
+# CC̄=4.0 | critical:6/433 | dups:0 | cycles:0
 
-HEALTH[2]:
-  🟡 CC    apply_fix CC=20 (limit:15)
-  🟡 CC    analyze_exception CC=16 (limit:15)
+HEALTH[6]:
+  🟡 CC    cmd_status CC=22 (limit:15)
+  🟡 CC    cmd_diagnose CC=16 (limit:15)
+  🟡 CC    handle_syntax_error CC=15 (limit:15)
+  🟡 CC    generate_report CC=19 (limit:15)
+  🟡 CC    _check_circular_imports CC=17 (limit:15)
+  🟡 CC    _check_api_client_configs CC=18 (limit:15)
 
-REFACTOR[2]:
-  1. split 2 high-CC methods  (CC>15)
-  2. break 1 circular dependencies
+REFACTOR[1]:
+  1. split 6 high-CC methods  (CC>15)
 
-PIPELINES[23]:
-  [1] Src [main]: main → fetch_json
+PIPELINES[268]:
+  [1] Src [main]: main → fetch_json → pfix → get_config
       PURITY: 100% pure
-  [2] Src [main]: main → fetch_json
+  [2] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [3] Src [main]: main → cmd_run → configure
+  [3] Src [main]: main → fetch_json → pfix → get_config
       PURITY: 100% pure
-  [4] Src [__init__]: __init__ → get_config
+  [4] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
-  [5] Src [connect]: connect
+  [5] Src [build_multi_file_context]: build_multi_file_context
       PURITY: 100% pure
 
 LAYERS:
-  src/                            CC̄=5.1    ←in:0  →out:1
-  │ cli                        418L  0C    9m  CC=12     ←0
-  │ session                    269L  1C    8m  CC=10     ←1
-  │ decorator                  265L  0C    5m  CC=4      ←0
-  │ !! fixer                      219L  0C    7m  CC=20     ←5
-  │ mcp_server                 215L  0C    3m  CC=5      ←1
-  │ dependency                 205L  0C    7m  CC=12     ←5
-  │ config                     160L  1C    6m  CC=12     ←9
-  │ types                      159L  4C    1m  CC=11     ←0
-  │ dev_mode                   158L  0C    4m  CC=6      ←1
-  │ !! analyzer                   155L  0C    5m  CC=16     ←5
-  │ llm                        137L  1C    2m  CC=6      ←5
+  src/                            CC̄=4.0    ←in:0  →out:2
+  │ !! cli                        705L  0C   19m  CC=22     ←0
+  │ !! runtime_todo               567L  3C   25m  CC=9      ←1
+  │ !! imports                    444L  1C   12m  CC=17     ←0
+  │ decorator                  376L  0C   10m  CC=10     ←2
+  │ logging                    351L  5C   18m  CC=6      ←0
+  │ python_version             342L  1C   11m  CC=12     ←0
+  │ fixer                      338L  0C   18m  CC=10     ←7
+  │ production                 323L  4C   13m  CC=9      ←0
+  │ filesystem                 311L  1C   12m  CC=7      ←0
+  │ session                    308L  1C   13m  CC=10     ←2
+  │ memory                     305L  1C   10m  CC=6      ←0
+  │ mcp_server                 292L  0C    8m  CC=5      ←1
+  │ process                    280L  1C   10m  CC=8      ←0
+  │ explain                    267L  0C    4m  CC=5      ←1
+  │ diff_fixer                 258L  1C    6m  CC=12     ←0
+  │ network                    255L  1C    8m  CC=9      ←0
+  │ config_env                 254L  1C    9m  CC=12     ←0
+  │ multi_fix                  253L  1C    4m  CC=14     ←0
+  │ paths                      250L  1C   10m  CC=6      ←0
+  │ analyzer                   246L  0C   14m  CC=12     ←7
+  │ !! __init__                   238L  1C    6m  CC=19     ←0
+  │ config                     233L  1C   12m  CC=11     ←16
+  │ !! third_party                233L  1C    4m  CC=18     ←0
+  │ cache                      227L  1C   14m  CC=4      ←11
+  │ types                      225L  7C    1m  CC=11     ←0
+  │ rollback                   224L  0C    7m  CC=8      ←1
+  │ encoding                   220L  1C    7m  CC=6      ←0
+  │ init_wizard                217L  0C    6m  CC=14     ←1
+  │ auto_fix                   216L  0C   13m  CC=6      ←1
+  │ web                        216L  3C   10m  CC=5      ←0
+  │ dashboard                  206L  0C    5m  CC=13     ←1
+  │ dependency                 205L  0C    7m  CC=12     ←6
+  │ audit                      203L  1C    5m  CC=10     ←3
+  │ hardware                   193L  1C    8m  CC=5      ←0
+  │ validation                 192L  1C    4m  CC=6      ←0
+  │ llm                        175L  0C    4m  CC=7      ←9
+  │ telemetry                  168L  1C    7m  CC=12     ←1
+  │ serialization              168L  1C    6m  CC=8      ←0
+  │ _auto_activate             161L  0C    3m  CC=14     ←0
+  │ permissions                160L  0C    6m  CC=6      ←1
+  │ dev_mode                   158L  0C    4m  CC=6      ←2
+  │ concurrency                143L  1C    6m  CC=4      ←0
+  │ sentry                     112L  1C    4m  CC=9      ←0
+  │ precommit                  110L  0C    3m  CC=10     ←0
+  │ rules                      104L  1C    7m  CC=8      ←0
+  │ __init__                    98L  0C    1m  CC=10     ←0
+  │ !! syntax_error_handler        83L  0C    1m  CC=15     ←1
   │ mcp_client                  81L  2C    6m  CC=4      ←0
-  │ __init__                    76L  0C    1m  CC=8      ←0
+  │ __init__                    75L  2C    7m  CC=4      ←0
+  │ django                      55L  1C    3m  CC=7      ←0
+  │ pandas                      51L  1C    3m  CC=7      ←0
+  │ flask                       49L  1C    3m  CC=5      ←0
+  │ fastapi                     49L  1C    3m  CC=5      ←0
+  │ base                        43L  1C    3m  CC=1      ←1
+  │ pfix_python                 39L  0C    1m  CC=3      ←0
+  │ __init__                    39L  0C    0m  CC=0.0    ←0
   │
-  ./                              CC̄=0.0    ←in:0  →out:0
+  ./                              CC̄=1.0    ←in:0  →out:0
+  │ verify_runtime              55L  0C    1m  CC=1      ←0
   │ project.sh                  24L  0C    0m  CC=0.0    ←0
   │
 
 COUPLING:
-                 src  src.pfix
-       src        ──         1
-  src.pfix        ←1        ──
-  CYCLES: 1
+                        src.pfix             src  verify_runtime
+        src.pfix              ──              ←2              ←1
+             src               2              ──                
+  verify_runtime               1                              ──
+  CYCLES: none
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

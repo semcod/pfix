@@ -4,106 +4,164 @@
 
 - **Project**: /home/tom/github/semcod/pfix
 - **Primary Language**: python
-- **Languages**: python: 16, shell: 1
+- **Languages**: python: 61, shell: 1
 - **Analysis Mode**: static
-- **Total Functions**: 75
-- **Total Classes**: 9
-- **Modules**: 17
-- **Entry Points**: 25
+- **Total Functions**: 433
+- **Total Classes**: 55
+- **Modules**: 62
+- **Entry Points**: 287
 
 ## Architecture by Module
 
+### src.pfix.runtime_todo
+- **Functions**: 25
+- **Classes**: 3
+- **File**: `runtime_todo.py`
+
 ### src.pfix.cli
-- **Functions**: 9
+- **Functions**: 19
 - **File**: `cli.py`
 
+### src.pfix.fixer
+- **Functions**: 18
+- **File**: `fixer.py`
+
+### src.pfix.logging
+- **Functions**: 18
+- **Classes**: 5
+- **File**: `logging.py`
+
+### src.pfix.analyzer
+- **Functions**: 14
+- **File**: `analyzer.py`
+
+### src.pfix.cache
+- **Functions**: 14
+- **Classes**: 1
+- **File**: `cache.py`
+
 ### src.pfix.session
-- **Functions**: 8
+- **Functions**: 13
 - **Classes**: 1
 - **File**: `session.py`
 
-### src.pfix.fixer
-- **Functions**: 7
-- **File**: `fixer.py`
+### src.pfix.production
+- **Functions**: 13
+- **Classes**: 4
+- **File**: `production.py`
 
-### src.pfix.dependency
-- **Functions**: 7
-- **File**: `dependency.py`
-
-### src.pfix.decorator
-- **Functions**: 7
-- **File**: `decorator.py`
-
-### src.pfix.mcp_client
-- **Functions**: 6
-- **Classes**: 2
-- **File**: `mcp_client.py`
+### src.pfix.env_diagnostics.auto_fix
+- **Functions**: 13
+- **File**: `auto_fix.py`
 
 ### src.pfix.config
-- **Functions**: 6
+- **Functions**: 12
 - **Classes**: 1
 - **File**: `config.py`
 
-### src.pfix.analyzer
-- **Functions**: 5
-- **File**: `analyzer.py`
+### src.pfix.decorator
+- **Functions**: 12
+- **File**: `decorator.py`
 
-### examples.demo_auto
-- **Functions**: 4
-- **File**: `demo_auto.py`
+### src.pfix.env_diagnostics.filesystem
+- **Functions**: 12
+- **Classes**: 1
+- **File**: `filesystem.py`
 
-### examples.demo
-- **Functions**: 4
-- **File**: `demo.py`
+### src.pfix.env_diagnostics.imports
+- **Functions**: 12
+- **Classes**: 1
+- **File**: `imports.py`
 
-### src.pfix.dev_mode
-- **Functions**: 4
-- **File**: `dev_mode.py`
+### src.pfix.env_diagnostics.python_version
+- **Functions**: 11
+- **Classes**: 1
+- **File**: `python_version.py`
+
+### src.pfix.env_diagnostics.process
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `process.py`
+
+### src.pfix.env_diagnostics.memory
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `memory.py`
+
+### src.pfix.env_diagnostics.paths
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `paths.py`
+
+### src.pfix.integrations.web
+- **Functions**: 10
+- **Classes**: 3
+- **File**: `web.py`
+
+### src.pfix.env_diagnostics.config_env
+- **Functions**: 9
+- **Classes**: 1
+- **File**: `config_env.py`
 
 ### src.pfix.mcp_server
-- **Functions**: 3
+- **Functions**: 8
 - **File**: `mcp_server.py`
-
-### examples.complex_demo.main
-- **Functions**: 3
-- **File**: `main.py`
-
-### src.pfix.llm
-- **Functions**: 2
-- **Classes**: 1
-- **File**: `llm.py`
-
-### src.pfix
-- **Functions**: 1
-- **File**: `__init__.py`
-
-### src.pfix.types
-- **Functions**: 1
-- **Classes**: 4
-- **File**: `types.py`
 
 ## Key Entry Points
 
 Main execution flows into the system:
 
-### src.pfix.config.PfixConfig.from_env
-> Load config from .env + environment + pyproject.toml.
-- **Calls**: cls, cls._read_pyproject, pyproject.items, load_dotenv, shutil.which, Path.cwd, env_file.exists, os.getenv
+### src.pfix.cli.cmd_status
+> Show diagnostic status of pfix.
+- **Calls**: src.pfix.config.get_config, config.validate, console.print, console.print, Table, table.add_column, table.add_column, table.add_row
 
-### src.pfix.cli.main
-- **Calls**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument, run_p.add_argument, run_p.add_argument, run_p.add_argument
+### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports
+> Detect circular import patterns using module dependency graph.
+- **Calls**: project_root.rglob, src.pfix.cache.FixCache.set, pyfile.relative_to, visited.add, module_imports.get, str, None.replace, None.replace
 
-### src.pfix.decorator.pfix
-> Self-healing decorator. Catches errors, fixes code via LLM.
+### src.pfix.cli.cmd_enable
+> Enable pfix auto-activation and add config to pyproject.toml.
+- **Calls**: source_file.exists, pyproject.exists, console.print, console.print, console.print, console.print, console.print, console.print
+
+### src.pfix._auto_activate
+> Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true.
+- **Calls**: src.pfix.config.get_config, getattr, None.get, Path.cwd, env_file.exists, None.lower, None.lower, inspect.currentframe
+
+### src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic._check_api_client_configs
+> Check API client configurations in code.
+- **Calls**: project_root.rglob, str, pyfile.read_text, ast.parse, ast.walk, isinstance, isinstance, isinstance
+
+### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_dotenv
+> Check .env file.
+- **Calls**: env_file.exists, env_example.exists, results.append, env_file.read_text, enumerate, env_file.exists, DiagnosticResult, content.splitlines
+
+### src.pfix.env_diagnostics.EnvDiagnostics.generate_report
+> Generate formatted text report from results.
+- **Calls**: lines.append, None.join, lines.append, lines.append, lines.append, lines.append, lines.append, lines.append
+
+### src.pfix.multi_fix.find_related_files
+> Find files related to the error through imports.
 
 Args:
-    retries: Max fix attempts (default: config.max_retries).
-    auto_apply: Apply 
-- **Calls**: functools.wraps, decorator, src.pfix.config.get_config, range, fn, src.pfix.decorator._ensure_deps, fn, console.print
+    source_file: File where error occurred
+    error_ctx: Error context
+    max_depth: How man
+- **Calls**: src.pfix.cache.FixCache.set, src.pfix.cache.FixCache.set, sorted, to_process.pop, processed.add, current.exists, current.read_text, ast.parse
 
 ### src.pfix.session.PFixSession._handle_exception
 > Handle exception — analyze and fix. Returns True if fixed.
 - **Calls**: console.print, isinstance, src.pfix.analyzer.analyze_exception, src.pfix.analyzer.classify_error, console.print, src.pfix.llm.request_fix, src.pfix.fixer.apply_fix, src.pfix.dependency.detect_missing_from_error
+
+### src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check
+> Run all filesystem checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
+
+### src.pfix.cli.cmd_dev
+> Run with dependency development mode active.
+- **Calls**: None.resolve, src.pfix.config.configure, console.print, console.print, console.print, src.pfix.dev_mode.install_dev_mode_hook, importlib.util.spec_from_file_location, importlib.util.module_from_spec
+
+### src.pfix.cli.cmd_check
+- **Calls**: src.pfix.config.get_config, config.validate, Table, table.add_column, table.add_column, console.print, console.print, table.add_row
 
 ### src.pfix.decorator.apfix
 > Async version of @pfix.
@@ -114,181 +172,348 @@ Usage:
         ...
 - **Calls**: functools.wraps, decorator, src.pfix.config.get_config, kwargs.get, range, fn, console.print, src.pfix.decorator._try_quick_dep_fix
 
-### src.pfix.types.ErrorContext.to_prompt
-- **Calls**: parts.append, None.join, parts.append, parts.append, parts.append, parts.append, self.hints.items, list
+### src.pfix.multi_fix.parse_multi_file_response
+> Parse LLM response for multi-file fix.
 
-### examples.demo_auto.main
-- **Calls**: print, print, examples.demo_auto.fetch_json, print, print, examples.demo_auto.average, print, print
+Args:
+    raw: Raw LLM response text
 
-### examples.demo.main
-- **Calls**: print, print, examples.demo.fetch_json, print, print, examples.demo.average, print, print
+Returns:
+    MultiFileFixProposal or None if parsing fails
+- **Calls**: raw.strip, re.search, m.group, json.loads, MultiFileFixProposal, text.startswith, console.print, text.find
 
-### src.pfix.mcp_client.MCPClient.call_tool
-- **Calls**: MCPResult, resp.json, data.get, MCPResult, self._session.post, MCPResult, MCPResult, result.get
+### src.pfix.cli.cmd_diagnose
+> Run environment diagnostics.
+- **Calls**: EnvDiagnostics, diag.check_all, json.dumps, diag.generate_report, None.write_text, console.print, console.print, c.strip
 
-### src.pfix._auto_activate
-> Check .env and auto-enable pfix if PFIX_AUTO_APPLY=true.
-- **Calls**: Path.cwd, env_file.exists, None.lower, None.lower, inspect.currentframe, src.pfix.session.install_pfix_hook, load_dotenv, caller_globals.get
+### src.pfix.runtime_todo.RuntimeCollector._build_issue
+> Build RuntimeIssue from exception.
+- **Calls**: self._extract_frames, RuntimeIssue, ErrorFingerprint.compute, str, datetime.now, datetime.now, datetime.now, platform.python_version
 
-### examples.complex_demo.main.main
-- **Calls**: print, print, examples.complex_demo.main.load_and_process_data, print, print, examples.complex_demo.main.analyze_users, print, print
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_pyproject_requires
+> Check pyproject.toml requires-python vs current version.
+- **Calls**: pyproject.exists, None.get, open, tomllib.load, data.get, re.search, re.search, results.append
 
-### src.pfix.config.PfixConfig._read_pyproject
-- **Calls**: None.get, path.exists, open, tomllib.load, data.get
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_version_features
+> Check for version-specific features in code.
+- **Calls**: project_root.rglob, str, pyfile.read_text, ast.parse, ast.walk, isinstance, isinstance, results.append
 
-### src.pfix.session.PFixSession.__init__
-- **Calls**: src.pfix.config.get_config, inspect.currentframe, None.resolve, frame.f_back.f_globals.get, Path
+### src.pfix.decorator._handle_decorator_exception
+> Handle a single exception in the decorator loop. Returns True to retry. CC≤7.
+- **Calls**: console.print, src.pfix.decorator._try_quick_dep_fix, str, src.pfix.analyzer.analyze_exception, console.print, src.pfix.llm.request_fix, src.pfix.decorator._apply_decorator_fix, console.print
 
-### src.pfix.session.auto_pfix
-> Decorator that auto-fixes exceptions in wrapped function.
-- **Calls**: functools.wraps, decorator, inspect.getfile, PFixSession, fn
+### src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports
+> Check for imports that aren't installed.
+- **Calls**: src.pfix.cache.FixCache.set, project_root.rglob, hasattr, src.pfix.cache.FixCache.set, None.lower, str, self._extract_imports, all_imports.update
 
-### src.pfix.mcp_client.MCPClient.connect
-- **Calls**: httpx.AsyncClient, logger.warning
+### src.pfix.cli.cmd_run
+- **Calls**: None.resolve, src.pfix.config.configure, src.pfix.cli._install_excepthook, importlib.util.spec_from_file_location, importlib.util.module_from_spec, script.is_file, console.print, str
 
-### src.pfix.mcp_client.MCPClient.edit_file
-- **Calls**: MCPResult, self.call_tool
+### src.pfix.cli.cmd_disable
+> Disable pfix auto-activation.
+- **Calls**: dest_file.exists, site.getsitepackages, Path, Path, console.print, console.print, site.getusersitepackages, site_packages.exists
 
-### src.pfix.mcp_client.MCPClient.run_command
-- **Calls**: MCPResult, self.call_tool
+### src.pfix.config.PfixConfig.from_env
+> Load config from .env + environment + pyproject.toml.
+- **Calls**: src.pfix.config._load_env_values, cls, cls._read_pyproject_full, None.get, pyproject.items, load_dotenv, Path.cwd, env_file.exists
 
-### src.pfix.mcp_client.MCPClient.__init__
-- **Calls**: src.pfix.config.get_config
+### src.pfix._auto_activate._auto_activate_pfix
+> Auto-activate pfix if configured in pyproject.toml or .env.
+- **Calls**: src.pfix.config.get_config, Path.cwd, hasattr, None.lower, None.exists, any, src.pfix.session.install_pfix_hook, src.pfix._auto_activate._install_syntax_error_handler
 
-### src.pfix.mcp_client.MCPClient.disconnect
-- **Calls**: self._session.aclose
+### src.pfix.env_diagnostics.process.ProcessDiagnostic.check
+> Run all process/OS checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
-### src.pfix.config.PfixConfig.validate
-- **Calls**: warnings.append
+### src.pfix.env_diagnostics.memory.MemoryDiagnostic.check
+> Run all memory checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
-### src.pfix.session.PFixSession.__exit__
-> Handle exception if one occurred. Returns True if handled.
-- **Calls**: self._handle_exception
+### src.pfix.env_diagnostics.EnvDiagnostics.__init__
+- **Calls**: None.resolve, ImportDiagnostic, FilesystemDiagnostic, VenvDiagnostic, PythonVersionDiagnostic, MemoryDiagnostic, NetworkDiagnostic, ProcessDiagnostic
 
-### src.pfix.session.PFixSession.__call__
-> Run function with exception handling.
-- **Calls**: func
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check
+> Run all Python version checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
-### src.pfix.session.pfix_session
-> Create pfix session for file-level auto-healing.
-- **Calls**: PFixSession
+### src.pfix.env_diagnostics.paths.PathDiagnostic.check
+> Run all path checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
-### src.pfix.config.reset_config
-> Reset global config (useful in tests).
-
-### src.pfix.session.PFixSession.__enter__
+### src.pfix.env_diagnostics.imports.ImportDiagnostic.check
+> Run all import/dependency checks.
+- **Calls**: results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend, results.extend
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: from_env
+### Flow 1: cmd_status
 ```
-from_env [src.pfix.config.PfixConfig]
-```
-
-### Flow 2: main
-```
-main [src.pfix.cli]
-```
-
-### Flow 3: pfix
-```
-pfix [src.pfix.decorator]
+cmd_status [src.pfix.cli]
   └─ →> get_config
 ```
 
-### Flow 4: _handle_exception
+### Flow 2: _check_circular_imports
+```
+_check_circular_imports [src.pfix.env_diagnostics.imports.ImportDiagnostic]
+  └─ →> set
+      └─ →> _make_cache_key
+      └─ →> _proposal_to_json
+```
+
+### Flow 3: cmd_enable
+```
+cmd_enable [src.pfix.cli]
+```
+
+### Flow 4: _auto_activate
+```
+_auto_activate [src.pfix]
+  └─ →> get_config
+```
+
+### Flow 5: _check_api_client_configs
+```
+_check_api_client_configs [src.pfix.env_diagnostics.third_party.ThirdPartyDiagnostic]
+```
+
+### Flow 6: _check_dotenv
+```
+_check_dotenv [src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic]
+```
+
+### Flow 7: generate_report
+```
+generate_report [src.pfix.env_diagnostics.EnvDiagnostics]
+```
+
+### Flow 8: find_related_files
+```
+find_related_files [src.pfix.multi_fix]
+  └─ →> set
+      └─ →> _make_cache_key
+      └─ →> _proposal_to_json
+  └─ →> set
+      └─ →> _make_cache_key
+      └─ →> _proposal_to_json
+```
+
+### Flow 9: _handle_exception
 ```
 _handle_exception [src.pfix.session.PFixSession]
   └─ →> analyze_exception
+      └─> _fill_traceback_context
+          └─> _extract_frame_context
+      └─> _fill_function_context
   └─ →> classify_error
 ```
 
-### Flow 5: apfix
+### Flow 10: check
 ```
-apfix [src.pfix.decorator]
-  └─ →> get_config
-```
-
-### Flow 6: to_prompt
-```
-to_prompt [src.pfix.types.ErrorContext]
-```
-
-### Flow 7: call_tool
-```
-call_tool [src.pfix.mcp_client.MCPClient]
-```
-
-### Flow 8: _auto_activate
-```
-_auto_activate [src.pfix]
-```
-
-### Flow 9: _read_pyproject
-```
-_read_pyproject [src.pfix.config.PfixConfig]
-```
-
-### Flow 10: __init__
-```
-__init__ [src.pfix.session.PFixSession]
-  └─ →> get_config
+check [src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic]
 ```
 
 ## Key Classes
+
+### src.pfix.runtime_todo.RuntimeCollector
+> Captures runtime errors and writes to TODO.md.
+
+Collection modes:
+1. sys.excepthook — catches unhand
+- **Methods**: 13
+- **Key Methods**: src.pfix.runtime_todo.RuntimeCollector.__init__, src.pfix.runtime_todo.RuntimeCollector.capture, src.pfix.runtime_todo.RuntimeCollector._should_capture, src.pfix.runtime_todo.RuntimeCollector._build_issue, src.pfix.runtime_todo.RuntimeCollector._extract_frames, src.pfix.runtime_todo.RuntimeCollector._should_exclude_path, src.pfix.runtime_todo.RuntimeCollector._filepath_to_module, src.pfix.runtime_todo.RuntimeCollector._capture_locals, src.pfix.runtime_todo.RuntimeCollector._classify, src.pfix.runtime_todo.RuntimeCollector._severity
+
+### src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic
+> Diagnose filesystem-related problems.
+- **Methods**: 12
+- **Key Methods**: src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_disk_space, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_file_references, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_symlinks, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_large_files, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_writable, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_inodes, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_permissions, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_filename_encoding, src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic._check_case_conflicts
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.imports.ImportDiagnostic
+> Diagnose import and dependency problems.
+- **Methods**: 12
+- **Key Methods**: src.pfix.env_diagnostics.imports.ImportDiagnostic.check, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_circular_imports, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_shadow_stdlib, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_stale_bytecode, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_version_conflicts, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_missing_inits, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_deprecated_apis, src.pfix.env_diagnostics.imports.ImportDiagnostic._check_import_source, src.pfix.env_diagnostics.imports.ImportDiagnostic._extract_imports
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic
+> Diagnose Python version compatibility problems.
+- **Methods**: 11
+- **Key Methods**: src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_pyproject_requires, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_version_features, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_deprecated_imports, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._get_deprecated_version, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_eol_status, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_32bit_python, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_sys_executable_mismatch, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_optimization_flags, src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic._check_gil_status
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.process.ProcessDiagnostic
+> Diagnose process and OS-related problems.
+- **Methods**: 10
+- **Key Methods**: src.pfix.env_diagnostics.process.ProcessDiagnostic.check, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_ulimits, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_signal_handlers, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_tmp_writable, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_zombies, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_nice_priority, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_fd_usage, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_core_dumps, src.pfix.env_diagnostics.process.ProcessDiagnostic._check_parent_alive, src.pfix.env_diagnostics.process.ProcessDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.memory.MemoryDiagnostic
+> Diagnose memory-related problems.
+- **Methods**: 10
+- **Key Methods**: src.pfix.env_diagnostics.memory.MemoryDiagnostic.check, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_available_memory, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_recursion_limit, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_gc_pressure, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_object_count, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_swap_usage, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_ulimits, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_shm_usage, src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_process_memory, src.pfix.env_diagnostics.memory.MemoryDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.paths.PathDiagnostic
+> Diagnose path-related problems.
+- **Methods**: 10
+- **Key Methods**: src.pfix.env_diagnostics.paths.PathDiagnostic.check, src.pfix.env_diagnostics.paths.PathDiagnostic._check_sys_path, src.pfix.env_diagnostics.paths.PathDiagnostic._check_pythonpath, src.pfix.env_diagnostics.paths.PathDiagnostic._check_cwd_space, src.pfix.env_diagnostics.paths.PathDiagnostic._check_long_paths, src.pfix.env_diagnostics.paths.PathDiagnostic._check_cwd_deleted, src.pfix.env_diagnostics.paths.PathDiagnostic._check_root_permissions, src.pfix.env_diagnostics.paths.PathDiagnostic._check_tmp_writable, src.pfix.env_diagnostics.paths.PathDiagnostic._check_symlink_cycles, src.pfix.env_diagnostics.paths.PathDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic
+> Diagnose configuration and environment variable problems.
+- **Methods**: 9
+- **Key Methods**: src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_dotenv, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_required_vars, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_env_gitignore, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_pyproject_validity, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_pfix_config_missing, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_secret_exposure_env, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic._check_conflicting_manifests, src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.runtime_todo.TodoFile
+> Thread-safe, append-only manager for TODO.md.
+
+Features:
+- File locking (fcntl on Linux/Unix)
+- Appe
+- **Methods**: 8
+- **Key Methods**: src.pfix.runtime_todo.TodoFile.__init__, src.pfix.runtime_todo.TodoFile.append_issue, src.pfix.runtime_todo.TodoFile._file_lock, src.pfix.runtime_todo.TodoFile._load_existing_fingerprints, src.pfix.runtime_todo.TodoFile._increment_counter, src.pfix.runtime_todo.TodoFile._append_new_entry, src.pfix.runtime_todo.TodoFile._format_entry, src.pfix.runtime_todo.TodoFile.get_section_content
+
+### src.pfix.env_diagnostics.hardware.HardwareDiagnostic
+> Diagnose hardware-related problems.
+- **Methods**: 8
+- **Key Methods**: src.pfix.env_diagnostics.hardware.HardwareDiagnostic.check, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_gpu_availability, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_cpu_count, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_docker_limits, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_thermal_throttling, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_battery_status, src.pfix.env_diagnostics.hardware.HardwareDiagnostic._check_avx_support, src.pfix.env_diagnostics.hardware.HardwareDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.network.NetworkDiagnostic
+> Diagnose network-related problems.
+- **Methods**: 8
+- **Key Methods**: src.pfix.env_diagnostics.network.NetworkDiagnostic.check, src.pfix.env_diagnostics.network.NetworkDiagnostic._check_dns, src.pfix.env_diagnostics.network.NetworkDiagnostic._check_outbound, src.pfix.env_diagnostics.network.NetworkDiagnostic._check_ssl_certs, src.pfix.env_diagnostics.network.NetworkDiagnostic._check_proxy, src.pfix.env_diagnostics.network.NetworkDiagnostic._check_latency, src.pfix.env_diagnostics.network.NetworkDiagnostic._check_system_clock, src.pfix.env_diagnostics.network.NetworkDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.encoding.EncodingDiagnostic
+> Diagnose encoding-related problems.
+- **Methods**: 7
+- **Key Methods**: src.pfix.env_diagnostics.encoding.EncodingDiagnostic.check, src.pfix.env_diagnostics.encoding.EncodingDiagnostic._check_locale, src.pfix.env_diagnostics.encoding.EncodingDiagnostic._check_file_encoding, src.pfix.env_diagnostics.encoding.EncodingDiagnostic._check_line_endings, src.pfix.env_diagnostics.encoding.EncodingDiagnostic._check_stdio_encoding, src.pfix.env_diagnostics.encoding.EncodingDiagnostic._check_os_environ_encoding, src.pfix.env_diagnostics.encoding.EncodingDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
 
 ### src.pfix.mcp_client.MCPClient
 > Client for MCP servers (filesystem, editor tools).
 - **Methods**: 6
 - **Key Methods**: src.pfix.mcp_client.MCPClient.__init__, src.pfix.mcp_client.MCPClient.connect, src.pfix.mcp_client.MCPClient.disconnect, src.pfix.mcp_client.MCPClient.call_tool, src.pfix.mcp_client.MCPClient.edit_file, src.pfix.mcp_client.MCPClient.run_command
 
+### src.pfix.production.PfixMonitor
+> Production-safe error monitor. Never modifies code.
+- **Methods**: 6
+- **Key Methods**: src.pfix.production.PfixMonitor.__init__, src.pfix.production.PfixMonitor.watch, src.pfix.production.PfixMonitor.handle_exception, src.pfix.production.PfixMonitor._log_proposal, src.pfix.production.PfixMonitor._send_webhook, src.pfix.production.PfixMonitor.get_stats
+
+### src.pfix.cache.FixCache
+> Cache for fix proposals to avoid redundant LLM calls.
+- **Methods**: 6
+- **Key Methods**: src.pfix.cache.FixCache.__init__, src.pfix.cache.FixCache.get, src.pfix.cache.FixCache.set, src.pfix.cache.FixCache.clear, src.pfix.cache.FixCache.stats, src.pfix.cache.FixCache.close
+
+### src.pfix.env_diagnostics.EnvDiagnostics
+> Orchestrator for all environment diagnostics.
+- **Methods**: 6
+- **Key Methods**: src.pfix.env_diagnostics.EnvDiagnostics.__init__, src.pfix.env_diagnostics.EnvDiagnostics.check_all, src.pfix.env_diagnostics.EnvDiagnostics.diagnose_exception, src.pfix.env_diagnostics.EnvDiagnostics.generate_report, src.pfix.env_diagnostics.EnvDiagnostics._format_result, src.pfix.env_diagnostics.EnvDiagnostics.to_todo_issues
+
+### src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic
+> Diagnose concurrency-related problems.
+- **Methods**: 6
+- **Key Methods**: src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic.check, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_thread_count, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_asyncio_loop, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_thread_hangs, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic._check_async_lag, src.pfix.env_diagnostics.concurrency.ConcurrencyDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
+### src.pfix.env_diagnostics.serialization.SerializationDiagnostic
+> Diagnose serialization-related problems.
+- **Methods**: 6
+- **Key Methods**: src.pfix.env_diagnostics.serialization.SerializationDiagnostic.check, src.pfix.env_diagnostics.serialization.SerializationDiagnostic._check_pickle_protocol, src.pfix.env_diagnostics.serialization.SerializationDiagnostic._check_cache_files, src.pfix.env_diagnostics.serialization.SerializationDiagnostic._check_yaml_safety, src.pfix.env_diagnostics.serialization.SerializationDiagnostic._check_json_manifest_validity, src.pfix.env_diagnostics.serialization.SerializationDiagnostic.diagnose_exception
+- **Inherits**: BaseDiagnostic
+
 ### src.pfix.session.PFixSession
 > Session context that catches and auto-fixes exceptions.
 - **Methods**: 5
 - **Key Methods**: src.pfix.session.PFixSession.__init__, src.pfix.session.PFixSession.__enter__, src.pfix.session.PFixSession.__exit__, src.pfix.session.PFixSession.__call__, src.pfix.session.PFixSession._handle_exception
 
-### src.pfix.config.PfixConfig
-> Central configuration.
-- **Methods**: 3
-- **Key Methods**: src.pfix.config.PfixConfig.from_env, src.pfix.config.PfixConfig._read_pyproject, src.pfix.config.PfixConfig.validate
-
-### src.pfix.types.FixProposal
-> Structured fix from LLM.
-- **Methods**: 2
-- **Key Methods**: src.pfix.types.FixProposal.has_code_fix, src.pfix.types.FixProposal.has_dependency_fix
-
-### src.pfix.llm.FixProposal
-> Structured fix from LLM.
-- **Methods**: 2
-- **Key Methods**: src.pfix.llm.FixProposal.has_code_fix, src.pfix.llm.FixProposal.has_dependency_fix
-
-### src.pfix.types.ErrorContext
-> Structured error report for LLM consumption.
-- **Methods**: 1
-- **Key Methods**: src.pfix.types.ErrorContext.to_prompt
-
-### src.pfix.mcp_client.MCPResult
-- **Methods**: 0
-
-### src.pfix.types.PfixConfig
-> Runtime configuration for pfix.
-- **Methods**: 0
-
-### src.pfix.types.FixEvent
-> Structured log event for each fix operation.
-- **Methods**: 0
+### src.pfix.logging.SQLiteLogger
+> SQLite-based logger for FixEvents with querying capabilities.
+- **Methods**: 5
+- **Key Methods**: src.pfix.logging.SQLiteLogger.__init__, src.pfix.logging.SQLiteLogger._init_db, src.pfix.logging.SQLiteLogger.log, src.pfix.logging.SQLiteLogger.query, src.pfix.logging.SQLiteLogger.get_stats
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### src.pfix.fixer._validate_syntax
-- **Output to**: ast.parse
+### src.pfix.multi_fix.parse_multi_file_response
+> Parse LLM response for multi-file fix.
+
+Args:
+    raw: Raw LLM response text
+
+Returns:
+    MultiFile
+- **Output to**: raw.strip, re.search, m.group, json.loads, MultiFileFixProposal
+
+### src.pfix.cli._build_parser
+> Build and configure ArgumentParser for pfix CLI.
+- **Output to**: argparse.ArgumentParser, parser.add_subparsers, sub.add_parser, run_p.add_argument, run_p.add_argument
 
 ### src.pfix.config.PfixConfig.validate
 - **Output to**: warnings.append
+
+### src.pfix.fixer._confirm_and_validate
+> Check permissions, show diff, and get user confirmation. CC≤5.
+- **Output to**: src.pfix.permissions.check_all_permissions, src.pfix.fixer._display_diff, console.print, src.pfix.fixer._record_fix_telemetry, console.print
+
+### src.pfix.fixer._validate_syntax
+- **Output to**: ast.parse
+
+### src.pfix.diff_fixer.parse_unified_diff
+> Parse unified diff text into hunks.
+
+Returns list of (old_path, new_path, hunk_lines).
+- **Output to**: diff_text.splitlines, len, line.startswith, None.strip, None.strip
+
+### src.pfix.diff_fixer.parse_hunk_header
+> Parse hunk header like @@ -1,5 +1,7 @@.
+
+Returns (old_start, old_count, new_start, new_count).
+- **Output to**: re.match, int, int, DiffParseError, match.group
+
+### src.pfix.runtime_todo.TodoFile._format_entry
+> Format RuntimeIssue as markdown TODO entry.
+- **Output to**: enumerate, issue.timestamp.strftime, trace_parts.append, None.join, Path
+
+### src.pfix.session._restart_process
+> Restart current process. CC≤2.
+- **Output to**: console.print, os.execv, src.pfix.analyzer.analyze_exception, src.pfix.session._clear_pycache, Path
+
+### src.pfix.validation.validate_fix
+> Validate a fix by running tests.
+
+If tests fail and rollback is enabled, restore from backup.
+
+Args:
+- **Output to**: src.pfix.config.get_config, getattr, src.pfix.validation.run_tests, console.print, console.print
+
+### src.pfix.validation.quick_validate_syntax
+> Quick syntax validation for a single file.
+- **Output to**: filepath.read_text, ast.parse
+
+### src.pfix.validation.validate_with_fallback
+> Full validation workflow with fallback.
+
+1. Validate syntax
+2. Run tests
+3. Rollback if needed
+- **Output to**: Path, src.pfix.validation.validate_fix, console.print, ValidationResult, src.pfix.validation.quick_validate_syntax
+
+### src.pfix.env_diagnostics.memory.MemoryDiagnostic._check_process_memory
+> Check if current process occupies too much of system memory.
+- **Output to**: psutil.Process, proc.memory_info, os.getpid, psutil.virtual_memory, results.append
+
+### src.pfix.env_diagnostics.EnvDiagnostics._format_result
+> Format single result as markdown.
+- **Output to**: lines.append, lines.append, lines.append, None.join, lines.append
+
+### src.pfix.integrations.sentry.PfixSentryIntegration._process_event
+> Process Sentry event to add pfix context.
+- **Output to**: hint.get, src.pfix.analyzer.analyze_exception, src.pfix.llm.request_fix, len
 
 ### examples.complex_demo.main.load_and_process_data
 > Load CSV, process it, return statistics.
@@ -319,46 +544,46 @@ Key functions that process and transform data:
 
 Functions exposed as public API (no underscore prefix):
 
-- `src.pfix.config.PfixConfig.from_env` - 52 calls
-- `src.pfix.mcp_server.create_mcp_server` - 43 calls
-- `src.pfix.fixer.apply_fix` - 37 calls
+- `src.pfix.cli.cmd_status` - 54 calls
+- `src.pfix.init_wizard.init_wizard` - 42 calls
 - `src.pfix.cli.cmd_enable` - 36 calls
-- `src.pfix.cli.main` - 35 calls
-- `src.pfix.session.install_pfix_hook` - 34 calls
-- `src.pfix.decorator.pfix` - 27 calls
-- `src.pfix.analyzer.analyze_exception` - 22 calls
+- `src.pfix.dashboard.render_dashboard` - 32 calls
+- `src.pfix.dashboard.get_log_stats` - 25 calls
+- `src.pfix.syntax_error_handler.handle_syntax_error` - 22 calls
+- `src.pfix.env_diagnostics.EnvDiagnostics.generate_report` - 22 calls
+- `src.pfix.multi_fix.find_related_files` - 21 calls
+- `src.pfix.decorator.pfix` - 21 calls
+- `src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.check` - 20 calls
+- `src.pfix.cli.cmd_dev` - 19 calls
 - `src.pfix.cli.cmd_check` - 19 calls
-- `src.pfix.cli.cmd_dev` - 18 calls
+- `src.pfix.diff_fixer.parse_unified_diff` - 19 calls
+- `src.pfix.decorator.apfix` - 19 calls
+- `src.pfix.multi_fix.parse_multi_file_response` - 18 calls
+- `src.pfix.cli.cmd_diagnose` - 18 calls
+- `src.pfix.rollback.rollback_file` - 18 calls
 - `src.pfix.dependency.update_requirements_file` - 18 calls
+- `src.pfix.audit.print_audit_report` - 18 calls
+- `src.pfix.cli.cmd_run` - 16 calls
 - `src.pfix.cli.cmd_disable` - 16 calls
-- `src.pfix.decorator.apfix` - 16 calls
-- `src.pfix.cli.cmd_run` - 15 calls
+- `src.pfix.config.PfixConfig.from_env` - 16 calls
+- `src.pfix.runtime_todo.get_collector` - 16 calls
+- `src.pfix.env_diagnostics.process.ProcessDiagnostic.check` - 16 calls
+- `src.pfix.env_diagnostics.memory.MemoryDiagnostic.check` - 16 calls
+- `src.pfix.env_diagnostics.python_version.PythonVersionDiagnostic.check` - 16 calls
+- `src.pfix.env_diagnostics.paths.PathDiagnostic.check` - 16 calls
+- `src.pfix.env_diagnostics.imports.ImportDiagnostic.check` - 16 calls
+- `src.pfix.telemetry.get_telemetry_summary` - 15 calls
+- `src.pfix.validation.run_tests` - 15 calls
+- `src.pfix.rollback.show_history` - 15 calls
+- `src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic.diagnose_exception` - 15 calls
+- `src.pfix.integrations.precommit.check_imports` - 15 calls
+- `src.pfix.integrations.precommit.main` - 15 calls
+- `src.pfix.production.PfixMonitor.handle_exception` - 14 calls
+- `src.pfix.cache.FixCache.set` - 14 calls
+- `src.pfix.env_diagnostics.config_env.ConfigEnvDiagnostic.check` - 14 calls
+- `src.pfix.diff_fixer.apply_diff` - 13 calls
+- `src.pfix.runtime_todo.capture_exception` - 13 calls
 - `src.pfix.types.ErrorContext.to_prompt` - 13 calls
-- `src.pfix.cli.cmd_deps` - 12 calls
-- `src.pfix.dependency.install_packages` - 12 calls
-- `src.pfix.dependency.scan_project_deps` - 12 calls
-- `examples.demo_auto.main` - 11 calls
-- `examples.demo.main` - 11 calls
-- `src.pfix.mcp_client.MCPClient.call_tool` - 11 calls
-- `src.pfix.analyzer.scan_missing_deps` - 11 calls
-- `examples.complex_demo.main.main` - 9 calls
-- `src.pfix.dev_mode.install_dev_mode_hook` - 9 calls
-- `src.pfix.llm.request_fix` - 9 calls
-- `src.pfix.dependency.generate_requirements` - 7 calls
-- `src.pfix.dev_mode.wrap_module_functions` - 7 calls
-- `examples.complex_demo.main.load_and_process_data` - 6 calls
-- `src.pfix.session.auto_pfix` - 5 calls
-- `src.pfix.mcp_server.start_server` - 5 calls
-- `examples.demo.average` - 4 calls
-- `src.pfix.config.configure` - 4 calls
-- `src.pfix.dependency.detect_missing_from_error` - 4 calls
-- `src.pfix.cli.cmd_server` - 3 calls
-- `examples.complex_demo.main.analyze_users` - 3 calls
-- `examples.demo_auto.fetch_json` - 2 calls
-- `examples.demo_auto.average` - 2 calls
-- `examples.demo.fetch_json` - 2 calls
-- `src.pfix.mcp_client.MCPClient.connect` - 2 calls
-- `src.pfix.mcp_client.MCPClient.edit_file` - 2 calls
 
 ## System Interactions
 
@@ -366,36 +591,36 @@ How components interact:
 
 ```mermaid
 graph TD
-    from_env --> cls
-    from_env --> _read_pyproject
-    from_env --> items
-    from_env --> load_dotenv
-    from_env --> which
-    main --> ArgumentParser
-    main --> add_subparsers
-    main --> add_parser
-    main --> add_argument
-    pfix --> wraps
-    pfix --> decorator
-    pfix --> get_config
-    pfix --> range
-    pfix --> fn
-    _handle_exception --> print
-    _handle_exception --> isinstance
-    _handle_exception --> analyze_exception
-    _handle_exception --> classify_error
-    apfix --> wraps
-    apfix --> decorator
-    apfix --> get_config
-    apfix --> get
-    apfix --> range
-    to_prompt --> append
-    to_prompt --> join
-    main --> print
-    main --> fetch_json
-    call_tool --> MCPResult
-    call_tool --> json
-    call_tool --> get
+    cmd_status --> get_config
+    cmd_status --> validate
+    cmd_status --> print
+    cmd_status --> Table
+    _check_circular_impo --> rglob
+    _check_circular_impo --> set
+    _check_circular_impo --> relative_to
+    _check_circular_impo --> add
+    _check_circular_impo --> get
+    cmd_enable --> exists
+    cmd_enable --> print
+    _auto_activate --> get_config
+    _auto_activate --> getattr
+    _auto_activate --> get
+    _auto_activate --> cwd
+    _auto_activate --> exists
+    _check_api_client_co --> rglob
+    _check_api_client_co --> str
+    _check_api_client_co --> read_text
+    _check_api_client_co --> parse
+    _check_api_client_co --> walk
+    _check_dotenv --> exists
+    _check_dotenv --> append
+    _check_dotenv --> read_text
+    _check_dotenv --> enumerate
+    generate_report --> append
+    generate_report --> join
+    find_related_files --> set
+    find_related_files --> sorted
+    find_related_files --> pop
 ```
 
 ## Reverse Engineering Guidelines
