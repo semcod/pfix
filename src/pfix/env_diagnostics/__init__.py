@@ -120,41 +120,51 @@ class EnvDiagnostics:
 
         lines = ["# Environment Diagnostics Report", ""]
 
-        # Group by status
-        critical = [r for r in results if r.status == "critical"]
-        errors = [r for r in results if r.status == "error"]
-        warnings = [r for r in results if r.status == "warning"]
-        ok = [r for r in results if r.status == "ok"]
+        # Add sections by severity
+        lines.extend(self._format_severity_section(results, "critical", "🔴 Critical Issues"))
+        lines.extend(self._format_severity_section(results, "error", "❌ Errors"))
+        lines.extend(self._format_severity_section(results, "warning", "⚠️ Warnings"))
 
-        if critical:
-            lines.append("## 🔴 Critical Issues")
-            for r in critical:
-                lines.append(self._format_result(r))
+        # Add OK section summary
+        ok_count = sum(1 for r in results if r.status == "ok")
+        if ok_count > 0:
+            lines.append(f"## ✅ OK ({ok_count} checks passed)")
+            if ok_count < 10:
+                for r in results:
+                    if r.status == "ok":
+                        lines.append(f"- {r.category}/{r.check_name}")
             lines.append("")
 
-        if errors:
-            lines.append("## ❌ Errors")
-            for r in errors:
-                lines.append(self._format_result(r))
-            lines.append("")
-
-        if warnings:
-            lines.append("## ⚠️ Warnings")
-            for r in warnings:
-                lines.append(self._format_result(r))
-            lines.append("")
-
-        if ok and len(ok) < 10:  # Only show OK if few
-            lines.append("## ✅ OK")
-            for r in ok:
-                lines.append(f"- {r.category}/{r.check_name}")
-            lines.append("")
-
-        # Summary
-        lines.append(f"**Summary**: {len(critical)} critical, {len(errors)} errors, "
-                    f"{len(warnings)} warnings, {len(ok)} OK")
+        # Summary footer
+        lines.append(self._generate_summary_footer(results))
 
         return "\n".join(lines)
+
+    def _format_severity_section(self, results: list["DiagnosticResult"], status: str, title: str) -> list[str]:
+        """Format a section of results with given status."""
+        filtered = [r for r in results if r.status == status]
+        if not filtered:
+            return []
+
+        lines = [f"## {title}"]
+        for r in filtered:
+            lines.append(self._format_result(r))
+        lines.append("")
+        return lines
+
+    def _generate_summary_footer(self, results: list["DiagnosticResult"]) -> str:
+        """Generate summary line for the report."""
+        counts = {
+            "critical": 0,
+            "error": 0,
+            "warning": 0,
+            "ok": 0
+        }
+        for r in results:
+            counts[r.status] = counts.get(r.status, 0) + 1
+
+        return (f"**Summary**: {counts['critical']} critical, {counts['error']} errors, "
+                f"{counts['warning']} warnings, {counts['ok']} OK")
 
     def _format_result(self, r: "DiagnosticResult") -> str:
         """Format single result as markdown."""
