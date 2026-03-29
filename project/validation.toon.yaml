@@ -1,65 +1,172 @@
-# vallm batch | 43f | 11✓ 0⚠ 11✗ | 2026-03-28
+# vallm batch | 95f | 34✓ 1⚠ 38✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 43  passed: 11 (25.6%)  warnings: 0  errors: 11  unsupported: 21
+  scanned: 95  passed: 34 (35.8%)  warnings: 1  errors: 38  unsupported: 23
 
-ERRORS[11]{path,score}:
-  src/pfix/mcp_server.py,0.76
-    issues[8]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'mcp.server.fastmcp' not found,33
-      python.import.resolvable,error,Module 'llm' not found,56
-      python.import.resolvable,error,Module 'config' not found,85
-      python.import.resolvable,error,Module 'fixer' not found,86
-      python.import.resolvable,error,Module 'llm' not found,87
-      python.import.resolvable,error,Module 'dependency' not found,128
-      python.import.resolvable,error,Module 'dependency' not found,140
-      python.import.resolvable,error,Module 'dependency' not found,151
-  examples/complex_demo/main.py,0.79
+WARNINGS[1]{path,score}:
+  tests/test_new_modules.py,0.98
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pandas' not found,11
-  src/pfix/decorator.py,0.82
-    issues[5]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 15.6 (threshold: 20),
+
+ERRORS[38]{path,score}:
+  src/pfix/strategies/django.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,5
+  src/pfix/strategies/fastapi.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,5
+  src/pfix/strategies/flask.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,5
+  src/pfix/strategies/pandas.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,5
+  src/pfix/env_diagnostics/__init__.py,0.71
+    issues[14]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,28
+      python.import.resolvable,error,Module 'config_env' not found,29
+      python.import.resolvable,error,Module 'concurrency' not found,30
+      python.import.resolvable,error,Module 'encoding' not found,31
+      python.import.resolvable,error,Module 'filesystem' not found,32
+      python.import.resolvable,error,Module 'hardware' not found,33
+      python.import.resolvable,error,Module 'imports' not found,34
+      python.import.resolvable,error,Module 'memory' not found,35
+      python.import.resolvable,error,Module 'network' not found,36
+      python.import.resolvable,error,Module 'paths' not found,37
+      python.import.resolvable,error,Module 'process' not found,38
+      python.import.resolvable,error,Module 'python_version' not found,39
+      python.import.resolvable,error,Module 'serialization' not found,40
+      python.import.resolvable,error,Module 'third_party' not found,41
+  examples/demo.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'shared' not found,9
+  examples/demo_auto.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'shared' not found,12
+  src/pfix/integrations/__init__.py,0.79
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sentry' not found,15
+      python.import.resolvable,error,Module 'precommit' not found,28
+  src/pfix/decorator.py,0.80
+    issues[8]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,31
-      python.import.resolvable,error,Module 'config' not found,32
       python.import.resolvable,error,Module 'dependency' not found,33
       python.import.resolvable,error,Module 'fixer' not found,34
       python.import.resolvable,error,Module 'llm' not found,35
-  src/pfix/__init__.py,0.83
-    issues[4]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,21
-      python.import.resolvable,error,Module 'decorator' not found,22
-      python.import.resolvable,error,Module 'session' not found,23
-      python.import.resolvable,error,Module 'session' not found,54
-  src/pfix/session.py,0.85
+      python.import.resolvable,error,Module 'analyzer' not found,312
+      python.import.resolvable,error,Module 'llm' not found,313
+      python.import.resolvable,error,Module 'fixer' not found,314
+      python.import.resolvable,error,Module 'runtime_todo' not found,44
+  src/pfix/mcp_server.py,0.80
+    issues[7]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llm' not found,68
+      python.import.resolvable,error,Module 'fixer' not found,101
+      python.import.resolvable,error,Module 'llm' not found,102
+      python.import.resolvable,error,Module 'dependency' not found,146
+      python.import.resolvable,error,Module 'dependency' not found,158
+      python.import.resolvable,error,Module 'dependency' not found,169
+      python.import.resolvable,error,Module 'env_diagnostics' not found,195
+  src/pfix/session.py,0.86
     issues[5]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'analyzer' not found,37
-      python.import.resolvable,error,Module 'config' not found,38
       python.import.resolvable,error,Module 'dependency' not found,39
       python.import.resolvable,error,Module 'fixer' not found,40
       python.import.resolvable,error,Module 'llm' not found,41
-  src/pfix/llm.py,0.89
+      python.import.resolvable,error,Module 'analyzer' not found,294
+  src/pfix/integrations/sentry.py,0.88
     issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'analyzer' not found,12
-      python.import.resolvable,error,Module 'config' not found,13
-  src/pfix/fixer.py,0.91
+      python.import.resolvable,error,Module 'sentry_sdk.integrations' not found,33
+      python.import.resolvable,error,Module 'sentry_sdk' not found,97
+  src/pfix/__init__.py,0.89
     issues[3]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,18
-      python.import.resolvable,error,Module 'dependency' not found,19
-      python.import.resolvable,error,Module 'git' not found,273
-  src/pfix/mcp_client.py,0.93
+      python.import.resolvable,error,Module 'session' not found,23
+      python.import.resolvable,error,Module 'session' not found,54
+      python.import.resolvable,error,Module 'runtime_todo' not found,76
+  src/pfix/env_diagnostics/auto_fix.py,0.89
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'dependency' not found,61
+      python.import.resolvable,error,Module 'dependency' not found,196
+  src/pfix/strategies/__init__.py,0.89
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,14
-  src/pfix/config.py,0.95
+      python.import.resolvable,error,Module 'analyzer' not found,12
+  src/pfix/dashboard.py,0.91
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'textual.app' not found,27
+      python.import.resolvable,error,Module 'textual.widgets' not found,28
+      python.import.resolvable,error,Module 'textual.containers' not found,29
+  src/pfix/fixer.py,0.91
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'dependency' not found,21
+      python.import.resolvable,error,Module 'permissions' not found,23
+      python.import.resolvable,error,Module 'audit' not found,24
+      python.import.resolvable,error,Module 'telemetry' not found,25
+  src/pfix/production.py,0.91
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,23
+      python.import.resolvable,error,Module 'cache' not found,24
+      python.import.resolvable,error,Module 'llm' not found,26
+  src/pfix/explain.py,0.95
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'tomli' not found,119
-  src/pfix/dependency.py,0.96
+      python.import.resolvable,error,Module 'llm' not found,21
+  src/pfix/rollback.py,0.95
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,22
-  tests/test_pfix.py,0.98
+      python.import.resolvable,error,Module 'audit' not found,21
+  src/pfix/env_diagnostics/third_party.py,0.96
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pytest' not found,6
+      python.import.resolvable,error,Module 'base' not found,16
+  src/pfix/llm.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,14
+  src/pfix/logging.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sentry_sdk' not found,246
+  src/pfix/multi_fix.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'analyzer' not found,16
+  src/pfix/env_diagnostics/concurrency.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,11
+  src/pfix/env_diagnostics/config_env.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,11
+  src/pfix/env_diagnostics/encoding.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,11
+  src/pfix/env_diagnostics/hardware.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,11
+  src/pfix/env_diagnostics/paths.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,12
+  src/pfix/env_diagnostics/serialization.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,10
+  src/pfix/env_diagnostics/venv.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,12
+  src/pfix/env_diagnostics/filesystem.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,12
+  src/pfix/env_diagnostics/imports.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,13
+  src/pfix/env_diagnostics/memory.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,13
+  src/pfix/env_diagnostics/network.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,12
+  src/pfix/env_diagnostics/process.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,12
+  src/pfix/env_diagnostics/python_version.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'base' not found,12
+  src/pfix/cli.py,0.99
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'env_diagnostics.auto_fix' not found,683
 
 UNSUPPORTED[3]{bucket,count}:
   *.md,9
-  *.txt,1
-  other,11
+  *.txt,2
+  other,12

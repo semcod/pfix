@@ -111,9 +111,78 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
 
         return results
 
+    def _check_hardcoded_key(
+        self, node: ast.Constant, pyfile: Path
+    ) -> "DiagnosticResult" | None:
+        """Check if a string constant contains a hardcoded API key.
+
+        Returns:
+            DiagnosticResult if hardcoded key found, None otherwise
+        """
+        from ..types import DiagnosticResult
+
+        val = node.value
+        if not isinstance(val, str):
+            return None
+
+        if not any(keyword in val.lower() for keyword in ["api_key", "apikey", "token"]):
+            return None
+
+        if len(val) <= 20:  # Too short to be a real key
+            return None
+
+        return DiagnosticResult(
+            category=self.category,
+            check_name="hardcoded_api_key",
+            status="critical",
+            message=f"Possible hardcoded API key in {pyfile.name}",
+            details={"file": str(pyfile), "line": getattr(node, 'lineno', None)},
+            suggestion="Move API keys to environment variables",
+            auto_fixable=False,
+            abs_path=str(pyfile),
+            line_number=getattr(node, 'lineno', None),
+        )
+
+    def _check_missing_timeout(
+        self, node: ast.Call, pyfile: Path
+    ) -> "DiagnosticResult" | None:
+        """Check if an HTTP request call is missing timeout parameter.
+
+        Returns:
+            DiagnosticResult if timeout missing, None otherwise
+        """
+        from ..types import DiagnosticResult
+
+        func_name = ""
+        if isinstance(node.func, ast.Attribute):
+            func_name = node.func.attr
+        elif isinstance(node.func, ast.Name):
+            func_name = node.func.id
+
+        if func_name not in ("get", "post", "put", "delete", "request"):
+            return None
+
+        # Check if timeout is in keywords
+        has_timeout = any(
+            kw.arg == "timeout" for kw in node.keywords if isinstance(kw.arg, str)
+        )
+        if has_timeout:
+            return None
+
+        return DiagnosticResult(
+            category=self.category,
+            check_name="missing_timeout",
+            status="warning",
+            message=f"HTTP request without timeout in {pyfile.name}",
+            details={"file": str(pyfile), "line": getattr(node, 'lineno', None)},
+            suggestion="Add timeout parameter to prevent hanging",
+            auto_fixable=False,
+            abs_path=str(pyfile),
+            line_number=getattr(node, 'lineno', None),
+        )
+
     def _check_api_client_configs(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check API client configurations in code."""
-        from ..types import DiagnosticResult
         import ast
 
         results = []
@@ -129,47 +198,16 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
 
                 for node in ast.walk(tree):
                     # Check for hardcoded API keys
-                    if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                        val = node.value
-                        if any(keyword in val.lower() for keyword in ["api_key", "apikey", "token"]):
-                            if len(val) > 20:  # Likely a real key
-                                results.append(DiagnosticResult(
-                                    category=self.category,
-                                    check_name="hardcoded_api_key",
-                                    status="critical",
-                                    message=f"Possible hardcoded API key in {pyfile.name}",
-                                    details={"file": str(pyfile), "line": getattr(node, 'lineno', None)},
-                                    suggestion="Move API keys to environment variables",
-                                    auto_fixable=False,
-                                    abs_path=str(pyfile),
-                                    line_number=getattr(node, 'lineno', None),
-                                ))
+                    if isinstance(node, ast.Constant):
+                        result = self._check_hardcoded_key(node, pyfile)
+                        if result:
+                            results.append(result)
 
                     # Check for requests without timeout
                     if isinstance(node, ast.Call):
-                        func_name = ""
-                        if isinstance(node.func, ast.Attribute):
-                            func_name = node.func.attr
-                        elif isinstance(node.func, ast.Name):
-                            func_name = node.func.id
-
-                        if func_name in ("get", "post", "put", "delete", "request"):
-                            # Check if timeout is in keywords
-                            has_timeout = any(
-                                kw.arg == "timeout" for kw in node.keywords if isinstance(kw.arg, str)
-                            )
-                            if not has_timeout:
-                                results.append(DiagnosticResult(
-                                    category=self.category,
-                                    check_name="missing_timeout",
-                                    status="warning",
-                                    message=f"HTTP request without timeout in {pyfile.name}",
-                                    details={"file": str(pyfile), "line": getattr(node, 'lineno', None)},
-                                    suggestion="Add timeout parameter to prevent hanging",
-                                    auto_fixable=False,
-                                    abs_path=str(pyfile),
-                                    line_number=getattr(node, 'lineno', None),
-                                ))
+                        result = self._check_missing_timeout(node, pyfile)
+                        if result:
+                            results.append(result)
 
             except SyntaxError:
                 pass

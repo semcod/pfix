@@ -84,16 +84,19 @@ class ImportDiagnostic(BaseDiagnostic):
 
         return results
 
-    def _check_circular_imports(self, project_root: Path) -> list["DiagnosticResult"]:
-        """Detect circular import patterns using module dependency graph."""
-        from ..types import DiagnosticResult
-        import ast
+    def _build_import_graph(
+        self, project_root: Path
+    ) -> tuple[dict[str, set[str]], dict[str, Path]]:
+        """Build import dependency graph from project files.
 
-        results = []
+        Returns:
+            Tuple of (module_imports, module_paths) where:
+            - module_imports: dict mapping module name to set of imported modules
+            - module_paths: dict mapping module name to file path
+        """
         module_imports: dict[str, set[str]] = {}
         module_paths: dict[str, Path] = {}
 
-        # Build import graph
         for pyfile in project_root.rglob("*.py"):
             if "__pycache__" in str(pyfile):
                 continue
@@ -132,45 +135,84 @@ class ImportDiagnostic(BaseDiagnostic):
             except (SyntaxError, UnicodeDecodeError):
                 pass
 
-        # Find cycles using DFS
-        def find_cycle(start: str, visited: set[str], path: list[str]) -> list[str] | None:
-            if start in path:
-                return path[path.index(start):] + [start]
-            if start in visited:
-                return None
-            visited.add(start)
-            for imp in module_imports.get(start, set()):
-                if imp in module_imports:
-                    cycle = find_cycle(imp, visited, path + [start])
-                    if cycle:
-                        return cycle
-            return None
+        return module_imports, module_paths
 
+    def _find_cycle_dfs(
+        self, start: str, visited: set[str], path: list[str], module_imports: dict[str, set[str]]
+    ) -> list[str] | None:
+        """Find a cycle starting from a module using DFS.
+
+        Args:
+            start: Starting module name
+            visited: Set of already visited modules
+            path: Current path being explored
+            module_imports: Import graph dict
+
+        Returns:
+            Cycle path if found, None otherwise
+        """
+        if start in path:
+            return path[path.index(start):] + [start]
+        if start in visited:
+            return None
+        visited.add(start)
+        for imp in module_imports.get(start, set()):
+            if imp in module_imports:
+                cycle = self._find_cycle_dfs(imp, visited, path + [start], module_imports)
+                if cycle:
+                    return cycle
+        return None
+
+    def _create_cycle_result(
+        self, cycle: list[str], module_paths: dict[str, Path], checked: set
+    ) -> "DiagnosticResult" | None:
+        """Create a DiagnosticResult for a detected cycle.
+
+        Returns:
+            DiagnosticResult if new cycle, None if already reported
+        """
+        from ..types import DiagnosticResult
+
+        # Check if we already reported this cycle
+        cycle_key = tuple(sorted(cycle[:-1]))
+        if cycle_key in checked:
+            return None
+        checked.add(cycle_key)
+
+        cycle_str = " -> ".join(cycle)
+        file_path = str(module_paths.get(cycle[0], "unknown"))
+
+        return DiagnosticResult(
+            category=self.category,
+            check_name="circular_import",
+            status="error",
+            message=f"Circular import detected: {cycle_str}",
+            details={
+                "cycle": cycle,
+                "modules_involved": len(cycle) - 1,
+            },
+            suggestion="Refactor to break the cycle (use interface classes or lazy imports)",
+            auto_fixable=False,
+            abs_path=file_path if file_path != "unknown" else None,
+            line_number=None,
+        )
+
+    def _check_circular_imports(self, project_root: Path) -> list["DiagnosticResult"]:
+        """Detect circular import patterns using module dependency graph."""
+        results = []
         checked = set()
+
+        # Build import graph
+        module_imports, module_paths = self._build_import_graph(project_root)
+
+        # Find cycles using DFS
         for module in module_imports:
             if module not in checked:
-                cycle = find_cycle(module, set(), [])
+                cycle = self._find_cycle_dfs(module, set(), [], module_imports)
                 if cycle and len(cycle) > 1:
-                    # Check if we already reported this cycle
-                    cycle_key = tuple(sorted(cycle[:-1]))
-                    if cycle_key not in checked:
-                        checked.add(cycle_key)
-                        cycle_str = " -> ".join(cycle)
-                        file_path = str(module_paths.get(cycle[0], "unknown"))
-                        results.append(DiagnosticResult(
-                            category=self.category,
-                            check_name="circular_import",
-                            status="error",
-                            message=f"Circular import detected: {cycle_str}",
-                            details={
-                                "cycle": cycle,
-                                "modules_involved": len(cycle) - 1,
-                            },
-                            suggestion="Refactor to break the cycle (use interface classes or lazy imports)",
-                            auto_fixable=False,
-                            abs_path=file_path if file_path != "unknown" else None,
-                            line_number=None,
-                        ))
+                    result = self._create_cycle_result(cycle, module_paths, checked)
+                    if result:
+                        results.append(result)
 
         return results
 

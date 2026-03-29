@@ -383,21 +383,10 @@ def cmd_disable() -> int:
         return 0
 
 
-def cmd_status() -> int:
-    """Show diagnostic status of pfix."""
-    from pfix import __version__
-    from pfix.config import get_config
+def _get_installation_status_table(config) -> tuple[Table, Path | None]:
+    """Build the installation status table. Returns (table, pth_file)."""
     import site
-    import sys
 
-    config = get_config()
-    warnings = config.validate()
-
-    # Header
-    console.print(f"\n[bold cyan]pfix {__version__}[/bold cyan]")
-    console.print("[dim]Self-healing Python — fix code & deps via LLM + MCP[/]\n")
-
-    # Installation Status
     table = Table(title="Installation Status", show_header=False)
     table.add_column("Item", style="cyan")
     table.add_column("Status")
@@ -439,30 +428,29 @@ def cmd_status() -> int:
     else:
         table.add_row("Environment", "[yellow]⚠ no .env file[/]")
 
-    console.print(table)
+    return table, pth_file
 
-    # Configuration Status
-    console.print()
-    cfg_table = Table(title="Configuration", show_header=False)
-    cfg_table.add_column("Setting", style="cyan")
-    cfg_table.add_column("Value")
 
-    cfg_table.add_row("Model", config.llm_model)
-    cfg_table.add_row("API Key", "[green]✓ set[/]" if config.llm_api_key else "[red]✗ missing[/]")
-    cfg_table.add_row("API Base", config.llm_api_base)
-    cfg_table.add_row("Pkg Manager", config.pkg_manager)
-    cfg_table.add_row("Python", sys.version.split()[0])
-    cfg_table.add_row("Working Directory", str(Path.cwd()))
+def _get_config_table(config) -> Table:
+    """Build the configuration status table."""
+    import sys
 
-    console.print(cfg_table)
+    table = Table(title="Configuration", show_header=False)
+    table.add_column("Setting", style="cyan")
+    table.add_column("Value")
 
-    # Warnings and issues
-    if warnings:
-        console.print()
-        for w in warnings:
-            console.print(f"[yellow]⚠ {w}[/]")
+    table.add_row("Model", config.llm_model)
+    table.add_row("API Key", "[green]✓ set[/]" if config.llm_api_key else "[red]✗ missing[/]")
+    table.add_row("API Base", config.llm_api_base)
+    table.add_row("Pkg Manager", config.pkg_manager)
+    table.add_row("Python", sys.version.split()[0])
+    table.add_row("Working Directory", str(Path.cwd()))
 
-    # Summary
+    return table
+
+
+def _print_status_summary(warnings: list, pth_file: Path | None, config) -> int:
+    """Print status summary and return exit code."""
     console.print()
     if not warnings and (pth_file and pth_file.exists()):
         console.print("[green]✓ pfix is properly configured and ready[/]")
@@ -476,6 +464,36 @@ def cmd_status() -> int:
 
     console.print()
     return 0 if not warnings else 1
+
+
+def cmd_status() -> int:
+    """Show diagnostic status of pfix."""
+    from pfix import __version__
+    from pfix.config import get_config
+
+    config = get_config()
+    warnings = config.validate()
+
+    # Header
+    console.print(f"\n[bold cyan]pfix {__version__}[/bold cyan]")
+    console.print("[dim]Self-healing Python — fix code & deps via LLM + MCP[/]\n")
+
+    # Installation Status
+    inst_table, pth_file = _get_installation_status_table(config)
+    console.print(inst_table)
+
+    # Configuration Status
+    console.print()
+    cfg_table = _get_config_table(config)
+    console.print(cfg_table)
+
+    # Warnings and issues
+    if warnings:
+        console.print()
+        for w in warnings:
+            console.print(f"[yellow]⚠ {w}[/]")
+
+    return _print_status_summary(warnings, pth_file, config)
 
 
 def cmd_deps(args) -> int:
@@ -628,23 +646,11 @@ def cmd_explain(args) -> int:
     return 0
 
 
-def cmd_diagnose(args) -> int:
-    """Run environment diagnostics."""
-    from pfix.env_diagnostics import EnvDiagnostics
-
-    # Parse categories filter
-    categories = None
-    if args.category:
-        categories = [c.strip() for c in args.category.split(",")]
-
-    # Run diagnostics
-    diag = EnvDiagnostics()
-    results = diag.check_all(categories=categories)
-
-    # Output format
-    if args.json:
+def _format_diagnostic_results(results, diag, json_output: bool) -> str:
+    """Format diagnostic results for output (JSON or text)."""
+    if json_output:
         import json
-        output = json.dumps([
+        return json.dumps([
             {
                 "category": r.category,
                 "check_name": r.check_name,
@@ -659,46 +665,79 @@ def cmd_diagnose(args) -> int:
             for r in results
         ], indent=2)
     else:
-        output = diag.generate_report(results)
+        return diag.generate_report(results)
 
-    # Output to file or console
-    if args.output:
+
+def _output_diagnostic_results(output: str, output_path: str | None) -> None:
+    """Output results to file or console."""
+    if output_path:
         from pathlib import Path
-        Path(args.output).write_text(output)
-        console.print(f"[green]✓ Report written to {args.output}[/]")
+        Path(output_path).write_text(output)
+        console.print(f"[green]✓ Report written to {output_path}[/]")
     else:
         console.print(output)
 
-    # Auto-fix if requested
-    if args.fix:
-        from .env_diagnostics.auto_fix import can_auto_fix, apply_auto_fix
 
-        fixable = [r for r in results if can_auto_fix(r)]
-        if fixable:
-            console.print(f"\n[cyan]🔧 Attempting to fix {len(fixable)} issues...[/]")
-            fixed = 0
-            failed = 0
+def _apply_diagnostic_fixes(results, project_root) -> tuple[int, int]:
+    """Apply auto-fixes to diagnostic results. Returns (fixed_count, failed_count)."""
+    from .env_diagnostics.auto_fix import can_auto_fix, apply_auto_fix
 
-            for r in fixable:
-                success, msg = apply_auto_fix(r, diag.project_root)
-                if success:
-                    console.print(f"  [green]✓[/] [{r.category}/{r.check_name}] {msg}")
-                    fixed += 1
-                else:
-                    console.print(f"  [yellow]⚠[/] [{r.category}/{r.check_name}] {msg}")
-                    failed += 1
+    fixable = [r for r in results if can_auto_fix(r)]
+    if not fixable:
+        console.print("\n[dim]No auto-fixable issues found[/]")
+        return 0, 0
 
-            console.print(f"\n[green]Fixed: {fixed}[/] | [yellow]Failed: {failed}[/]")
+    console.print(f"\n[cyan]🔧 Attempting to fix {len(fixable)} issues...[/]")
+    fixed = 0
+    failed = 0
+
+    for r in fixable:
+        success, msg = apply_auto_fix(r, project_root)
+        if success:
+            console.print(f"  [green]✓[/] [{r.category}/{r.check_name}] {msg}")
+            fixed += 1
         else:
-            console.print("\n[dim]No auto-fixable issues found[/]")
+            console.print(f"  [yellow]⚠[/] [{r.category}/{r.check_name}] {msg}")
+            failed += 1
 
-    # Determine exit code
-    if args.check:
+    console.print(f"\n[green]Fixed: {fixed}[/] | [yellow]Failed: {failed}[/]")
+    return fixed, failed
+
+
+def _get_diagnose_exit_code(results, check_mode: bool) -> int:
+    """Determine exit code based on results and check mode."""
+    if check_mode:
         critical_errors = [r for r in results if r.status in ("critical", "error")]
         if critical_errors:
             return 1
-
     return 0
+
+
+def cmd_diagnose(args) -> int:
+    """Run environment diagnostics."""
+    from pfix.env_diagnostics import EnvDiagnostics
+
+    # Parse categories filter
+    categories = None
+    if args.category:
+        categories = [c.strip() for c in args.category.split(",")]
+
+    # Run diagnostics
+    diag = EnvDiagnostics()
+    results = diag.check_all(categories=categories)
+
+    # Output format
+    output = _format_diagnostic_results(results, diag, args.json)
+
+    # Output to file or console
+    _output_diagnostic_results(output, args.output)
+
+    # Auto-fix if requested
+    if args.fix:
+        _apply_diagnostic_fixes(results, diag.project_root)
+
+    # Determine exit code
+    return _get_diagnose_exit_code(results, args.check)
 
 
 if __name__ == "__main__":
