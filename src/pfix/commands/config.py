@@ -50,7 +50,7 @@ def cmd_check(args) -> int:
     return 0
 
 
-def cmd_status() -> int:
+def cmd_status(args=None) -> int:
     """Show diagnostic status of pfix."""
     from pfix import __version__
     from pfix.config import get_config

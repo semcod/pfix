@@ -148,13 +148,12 @@ def _dispatch(args: argparse.Namespace) -> int:
 
     handler = commands.get(args.command)
     if handler:
-        if args.command in ("enable", "disable", "init", "dashboard"):
+        if args.command in ("enable", "disable", "init", "dashboard", "status"):
             return handler()  # No args
         return handler(args)
 
     _build_parser().print_help()
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
