@@ -1,13 +1,17 @@
 # 🔧 pfix
 
 [![PyPI version](https://badge.fury.io/py/pfix.svg)](https://pypi.org/project/pfix/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/pfix.svg)](https://pypi.org/project/pfix/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Examples: 56](https://img.shields.io/badge/examples-56-blue)](examples/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.
 
-Strategia użycia małego narzędzia, przy wykrywaniu bęłdów w pojedynczej bibliotece w pojedynczym pliku pozwala na szybkie usunięcie usterki, zanim jeszcze napiszemy prompt, gdyż cały kontekst znajduje się w pliku błędu. To pozwala odciążyć duże i kosztowne modele, które powinny być używane tam, gdzie małe nie są wystarczające, pozwalając na planowanie i stworzenie strategii dla całej biblioteki, zamiast zajmować się pojedynczymi błedami, np w plikach testów projektu
-można też wykorzystać automatyke CI/GitOps z udostepnionymi kluczami API do dostawcy LLM w celu naprawy napotkanych błędów na etapie testowania w całym eskosystemie
+The strategy of using a small tool for detecting errors in a single library or file enables quick bug fixes before writing a prompt, since all context is contained in the error file. This offloads large and expensive models that should be used where smaller ones are insufficient—allowing them to plan and create strategy for the entire library instead of handling individual errors, like in test files.
+
+This automation can also be leveraged via CI/GitOps with provided API keys to the LLM provider for fixing encountered errors during testing across the entire ecosystem.
 
 
 > 💡 **New in 0.1.5**: Zero-configuration mode! Just `import pfix` with `PFIX_AUTO_APPLY=true` in `.env` and any exception triggers automatic repair.
@@ -66,9 +70,27 @@ After installation, examples can be run from any directory:
 ```bash
 # From project root
 cd /path/to/pfix/examples
-python demo_auto.py
+
+# Run all examples with auto-reset (recommended for testing)
+python run_all.py
+
+# Run a single example category
+cd types && python main.py
+cd data && python main.py
+
+# Reset all examples to original buggy state
+python reset.py
 
 # The .env file in project root is automatically found
+```
+
+**Example workflow:**
+```bash
+cd examples
+python run_all.py              # Run all 12 categories, auto-reset at end
+python run_all.py --dry-run      # Preview what would run
+python run_all.py --no-reset     # Keep fixed versions for inspection
+python reset.py                  # Manual reset when needed
 ```
 
 ## Quick Start (3 Ways)
