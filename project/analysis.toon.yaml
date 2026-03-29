@@ -1,20 +1,20 @@
-# code2llm | 67f 12405L | python:66,shell:1 | 2026-03-29
-# CC̄=3.6 | critical:0/633 | dups:0 | cycles:0
+# code2llm | 67f 12441L | python:66,shell:1 | 2026-03-29
+# CC̄=3.6 | critical:0/636 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
-PIPELINES[394]:
-  [1] Src [crash_me]: crash_me → pfix → get_config
+PIPELINES[396]:
+  [1] Src [main]: main → run_git_checkout
       PURITY: 100% pure
-  [2] Src [main]: main → run_git_checkout
+  [2] Src [main]: main → reset_examples
       PURITY: 100% pure
-  [3] Src [main]: main → reset_examples
+  [3] Src [crash_me]: crash_me → pfix → get_config
       PURITY: 100% pure
-  [4] Src [find_related_files]: find_related_files → set → _make_cache_key
+  [4] Src [main]: main → _build_parser
       PURITY: 100% pure
-  [5] Src [build_multi_file_context]: build_multi_file_context
+  [5] Src [find_related_files]: find_related_files → set → _make_cache_key
       PURITY: 100% pure
 
 LAYERS:
@@ -24,22 +24,22 @@ LAYERS:
   │ python_version             342L  1C   15m  CC=11     ←0
   │ fixer                      338L  0C   18m  CC=10     ←7
   │ production                 323L  4C   13m  CC=9      ←0
+  │ collector                  314L  1C   16m  CC=6      ←0
   │ filesystem                 311L  1C   12m  CC=7      ←0
   │ session                    308L  1C   13m  CC=10     ←2
   │ memory                     305L  1C   10m  CC=6      ←0
   │ mcp_server                 292L  0C    8m  CC=5      ←1
-  │ collector                  288L  1C   13m  CC=9      ←0
   │ process                    280L  1C   10m  CC=8      ←0
   │ decorator                  278L  0C    9m  CC=10     ←25
   │ third_party                271L  1C    6m  CC=10     ←0
   │ explain                    267L  0C    4m  CC=5      ←1
+  │ __init__                   258L  1C    8m  CC=8      ←0
   │ config_env                 256L  1C   12m  CC=9      ←0
   │ network                    255L  1C    8m  CC=9      ←0
   │ dependency                 253L  0C   12m  CC=6      ←6
   │ multi_fix                  252L  1C    6m  CC=8      ←0
   │ paths                      250L  1C   10m  CC=6      ←0
   │ init_wizard                249L  0C   14m  CC=4      ←1
-  │ __init__                   248L  1C    8m  CC=8      ←0
   │ config                     247L  1C   15m  CC=5      ←17
   │ analyzer                   245L  0C   15m  CC=12     ←7
   │ diff_fixer                 236L  1C    9m  CC=9      ←0

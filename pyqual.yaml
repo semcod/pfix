@@ -1,0 +1,17 @@
+pipeline:
+  name: pfix-quality-loop
+
+  # Quality gates — pipeline iterates until ALL pass
+  metrics:
+    coverage_min: 25     # test coverage (%) - pfix current: ~29%
+
+  # Pipeline stages — executed in order
+  stages:
+    - name: test
+      run: pytest tests/ -v --cov=src/pfix --cov-report=json:.pyqual/coverage.json
+      when: always
+
+  # Loop behavior
+  loop:
+    max_iterations: 1
+    on_fail: report

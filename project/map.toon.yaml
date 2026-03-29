@@ -1,7 +1,7 @@
-# pfix | 67f 12405L | python:66,shell:1 | 2026-03-29
-# stats: 496 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
-# alerts[5]: fan-out EnvDiagnostics.__init__=16; fan-out RuntimeCollector._build_issue=15; fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13
-# hotspots[5]: EnvDiagnostics.__init__ fan=16; RuntimeCollector._build_issue fan=15; FixCache.set fan=14; parse_multi_file_response fan=13; render_dashboard fan=13
+# pfix | 67f 12441L | python:66,shell:1 | 2026-03-29
+# stats: 499 func | 0 cls | 67 mod | CC̄=3.6 | critical:0 | cycles:0
+# alerts[5]: fan-out FixCache.set=14; fan-out PfixMonitor.handle_exception=13; fan-out PythonVersionDiagnostic._check_deprecated_imports=13; fan-out _replace_function=13; fan-out cmd_dev=13
+# hotspots[5]: FixCache.set fan=14; render_dashboard fan=13; parse_multi_file_response fan=13; _replace_function fan=13; PfixMonitor.handle_exception fan=13
 # evolution: CC̄ 3.6→3.6 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[67]:
@@ -24,7 +24,7 @@ M[67]:
   src/pfix/dependency.py,253
   src/pfix/dev_mode.py,158
   src/pfix/diff_fixer.py,236
-  src/pfix/env_diagnostics/__init__.py,248
+  src/pfix/env_diagnostics/__init__.py,258
   src/pfix/env_diagnostics/auto_fix.py,216
   src/pfix/env_diagnostics/base.py,43
   src/pfix/env_diagnostics/concurrency.py,143
@@ -58,7 +58,7 @@ M[67]:
   src/pfix/rollback.py,224
   src/pfix/rules.py,104
   src/pfix/runtime_todo/__init__.py,59
-  src/pfix/runtime_todo/collector.py,288
+  src/pfix/runtime_todo/collector.py,314
   src/pfix/runtime_todo/fingerprint.py,48
   src/pfix/runtime_todo/todo_file.py,174
   src/pfix/session.py,308
@@ -200,11 +200,6 @@ D:
     e: PfixSentryIntegration,init_sentry
     PfixSentryIntegration: __init__(2),setup_once(2),_process_event(2)  # Sentry integration that adds pfix diagnosis to error events...
     init_sentry(dsn;auto_analyze;min_confidence)
-  src/pfix/runtime_todo/collector.py:
-    e: RuntimeCollector
-    RuntimeCollector: __init__(9),capture(2),_should_capture(1),_build_issue(2),_extract_frames(1),_should_exclude_path(1),_filepath_to_module(1),_capture_locals(1),_classify(1),_severity(1),_flush(0),install_excepthook(0),shutdown(0)  # Captures runtime errors and writes to TODO.md.
-
-Collection m...
   src/pfix/multi_fix.py:
     e: MultiFileFixProposal,find_related_files,_extract_imports_from_file,_resolve_import_path,build_multi_file_context,parse_multi_file_response,apply_multi_file_fix
     MultiFileFixProposal:  # Fix proposal affecting multiple files...
@@ -306,13 +301,6 @@ Collection m...
     render_dashboard()
     run_console_dashboard()
     run_dashboard()
-  src/pfix/validation.py:
-    e: ValidationResult,run_tests,validate_fix,quick_validate_syntax,validate_with_fallback
-    ValidationResult:  # Result of test validation...
-    run_tests(command;timeout;cwd)
-    validate_fix(source_file;proposal;backup_path;command)
-    quick_validate_syntax(filepath)
-    validate_with_fallback(ctx;proposal;backup_path)
   src/pfix/logging.py:
     e: FixEvent,JsonLinesLogger,SQLiteLogger,SentryIntegration,Logger,get_logger,log_fix
     FixEvent: to_dict(0),to_json(0)  # Structured log event for each fix operation...
@@ -322,6 +310,13 @@ Collection m...
     Logger: __init__(3),log(6),get_stats(0)  # Main logger combining multiple backends...
     get_logger()
     log_fix(ctx;proposal;fix_applied;duration_ms)
+  src/pfix/validation.py:
+    e: ValidationResult,run_tests,validate_fix,quick_validate_syntax,validate_with_fallback
+    ValidationResult:  # Result of test validation...
+    run_tests(command;timeout;cwd)
+    validate_fix(source_file;proposal;backup_path;command)
+    quick_validate_syntax(filepath)
+    validate_with_fallback(ctx;proposal;backup_path)
   src/pfix/permissions.py:
     e: get_environment,check_auto_apply_allowed,check_complexity_approval,check_blocked_path,check_all_permissions,get_permissions_summary
     get_environment()
@@ -362,12 +357,12 @@ Collection m...
   src/pfix/env_diagnostics/memory.py:
     e: MemoryDiagnostic
     MemoryDiagnostic(BaseDiagnostic): check(1),_check_available_memory(0),_check_recursion_limit(0),_check_gc_pressure(0),_check_object_count(0),_check_swap_usage(0),_check_ulimits(0),_check_shm_usage(0),_check_process_memory(0),diagnose_exception(2)  # Diagnose memory-related problems...
-  src/pfix/env_diagnostics/paths.py:
-    e: PathDiagnostic
-    PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
   src/pfix/env_diagnostics/encoding.py:
     e: EncodingDiagnostic
     EncodingDiagnostic(BaseDiagnostic): check(1),_check_locale(0),_check_file_encoding(1),_check_line_endings(1),_check_stdio_encoding(0),_check_os_environ_encoding(0),diagnose_exception(2)  # Diagnose encoding-related problems...
+  src/pfix/env_diagnostics/paths.py:
+    e: PathDiagnostic
+    PathDiagnostic(BaseDiagnostic): check(1),_check_sys_path(0),_check_pythonpath(0),_check_cwd_space(0),_check_long_paths(1),_check_cwd_deleted(0),_check_root_permissions(1),_check_tmp_writable(0),_check_symlink_cycles(1),diagnose_exception(2)  # Diagnose path-related problems...
   src/pfix/env_diagnostics/auto_fix.py:
     e: can_auto_fix,apply_auto_fix,_fix_stale_bytecode,_fix_missing_requirement,_fix_utf8_bom,_fix_mixed_line_endings,_fix_large_log_file,_fix_api_key_placeholder,_fix_missing_dotenv,_fix_env_not_gitignored,_fix_missing_init,_fix_hidden_pollution,_fix_no_manifest
     can_auto_fix(result)
@@ -383,6 +378,11 @@ Collection m...
     _fix_missing_init(result;project_root)
     _fix_hidden_pollution(result;project_root)
     _fix_no_manifest(result;project_root)
+  src/pfix/runtime_todo/collector.py:
+    e: RuntimeCollector
+    RuntimeCollector: __init__(9),capture(2),_should_capture(1),_build_issue(2),_get_location_info(1),_get_system_info(0),_get_timestamps(0),_extract_frames(1),_should_exclude_path(1),_filepath_to_module(1),_capture_locals(1),_classify(1),_severity(1),_flush(0),install_excepthook(0),shutdown(0)  # Captures runtime errors and writes to TODO.md.
+
+Collection m...
   src/pfix/explain.py:
     e: explain_last,explain_exception_type,_generate_explanation,explain
     explain_last()

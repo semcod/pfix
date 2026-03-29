@@ -1,7 +1,7 @@
-# vallm batch | 167f | 73✓ 0⚠ 57✗ | 2026-03-29
+# vallm batch | 169f | 75✓ 0⚠ 57✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 167  passed: 73 (43.7%)  warnings: 0  errors: 57  unsupported: 37
+  scanned: 169  passed: 75 (44.4%)  warnings: 0  errors: 57  unsupported: 37
 
 ERRORS[57]{path,score}:
   src/pfix/runtime_todo.py,0.57
