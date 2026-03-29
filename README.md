@@ -6,7 +6,9 @@
 
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.
 
-Strategia użycia małego narzędzia, przy wykrywaniu bęłdów w pojedynczej bibliotece w pojedynczym pliku pozwala na szybkie usunięcie usterki, zanim jeszcze napiszemy prompt, gdyż cały kontekst znajduje się w pliku błędu. To pozwala odciążyć duże i kosztowne modele, które powinny być używane tam, gdzie małe nie są wystarczające, pozwalając na planowanie i stworzenie strategii dla całej biblioteki, zamiast zajmować się pojedynczymi błedami
+Strategia użycia małego narzędzia, przy wykrywaniu bęłdów w pojedynczej bibliotece w pojedynczym pliku pozwala na szybkie usunięcie usterki, zanim jeszcze napiszemy prompt, gdyż cały kontekst znajduje się w pliku błędu. To pozwala odciążyć duże i kosztowne modele, które powinny być używane tam, gdzie małe nie są wystarczające, pozwalając na planowanie i stworzenie strategii dla całej biblioteki, zamiast zajmować się pojedynczymi błedami, np w plikach testów projektu
+można też wykorzystać automatyke CI/GitOps z udostepnionymi kluczami API do dostawcy LLM w celu naprawy napotkanych błędów na etapie testowania w całym eskosystemie
+
 
 > 💡 **New in 0.1.5**: Zero-configuration mode! Just `import pfix` with `PFIX_AUTO_APPLY=true` in `.env` and any exception triggers automatic repair.
 
