@@ -7,12 +7,6 @@ Demonstrates environment-related errors: missing env vars, venv detection, Pytho
 - `env_var_errors.py` — Missing env vars, wrong types, boolean parsing
 - `venv_issues.py` — Venv detection, sys.path problems, version checks
 
-## Usage
-
-```bash
-# Run all environment tests
-python main.py
-
 # Or run individual files
 python env_var_errors.py
 python venv_issues.py

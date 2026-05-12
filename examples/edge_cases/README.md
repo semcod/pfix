@@ -8,12 +8,6 @@ Demonstrates advanced edge cases: class inheritance, closures, decorators, and d
 - `python_gotchas.py` — Context managers, properties, staticmethod issues, generators
 - `tricky_errors.py` — Lambda errors, closures, stacked decorators, `__getattr__`
 
-## Usage
-
-```bash
-# Run all edge case tests
-python main.py
-
 # Or run individual files
 python class_errors.py
 python python_gotchas.py

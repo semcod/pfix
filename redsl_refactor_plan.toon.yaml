@@ -1,0 +1,26 @@
+# redsl | refactor | 2026-04-20
+# mode=dry-run | files=145 | lines=17594
+# CC̄=5.4 | critical=5 | decisions=5
+
+STATUS[planned]
+
+DECISIONS[5]:
+  1. split_module → tests/test_new_modules.py (score=1.62) God module — zbyt duży plik z za dużą liczbą funkcji
+  2. split_module → tests/test_pfix.py (score=1.17) God module — zbyt duży plik z za dużą liczbą funkcji
+  3. simplify_conditionals → src/pfix/env_diagnostics/python_version.py (score=0.85) Głęboko zagnieżdżone warunki — guard clauses
+  4. simplify_conditionals → src/pfix/env_diagnostics/python_version.py (score=0.85) Głęboko zagnieżdżone warunki — guard clauses
+  5. reduce_fan_out → src/pfix/env_diagnostics/__init__.py (score=0.65) Wysoki fan-out — uprość zależności
+
+METRICS[10]:
+  🟢 verify_runtime.py::None CC=1 LOC=55
+  🟢 examples/shared.py::None CC=2 LOC=28
+  🟢 examples/reset.py::None CC=2 LOC=110
+  🟢 examples/run_all.py::None CC=8 LOC=197
+  🟢 tests/cache_tests.py::None CC=3 LOC=10
+  🟢 tests/test_pfix.py::None CC=6 LOC=451
+  🟢 tests/test_serialization_diagnostic.py::None CC=5 LOC=15
+  🟢 tests/test_decorator.py::None CC=5 LOC=37
+  🟢 tests/test_rollback.py::None CC=3 LOC=12
+  🟢 tests/test_hardware_diagnostic.py::None CC=6 LOC=36
+
+LOG: /home/tom/github/semcod/pfix/logs/redsl_20260420_110227.log

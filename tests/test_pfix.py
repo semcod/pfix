@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
-import textwrap
 import pytest
 
 from pfix.analyzer import ErrorContext, analyze_exception, classify_error, _extract_imports
 from pfix.config import PfixConfig, configure, reset_config
 from pfix.dependency import resolve_package_name, detect_missing_from_error
 from pfix.llm import FixProposal, _parse_response
+
+CONSTANT_3 = 3
+CONSTANT_5 = 5
+CONSTANT_7 = 7
+CONSTANT_42 = 42
+
 
 
 # ── Config ──────────────────────────────────────────────────────────

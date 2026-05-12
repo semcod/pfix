@@ -9,8 +9,6 @@
 **License:** Apache-2.0[(LICENSE)](./LICENSE)  
 **Repository:** [https://github.com/semcod/pfix](https://github.com/semcod/pfix)
 
-## Installation
-
 ### From PyPI
 
 ```bash
@@ -39,14 +37,6 @@ pip install pfix[dev]    # development tools
 pip install pfix[diagnostics]    # diagnostics features
 pip install pfix[all]    # all optional features
 ```
-
-## Quick Start
-
-### CLI Usage
-
-```bash
-# Generate full documentation for your project
-pfix ./my-project
 
 # Only regenerate README
 pfix ./my-project --readme-only
@@ -156,8 +146,6 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 ```
 pfix/
     ├── shared    ├── run_all├── verify_runtime    ├── reset        ├── dashboard        ├── explain        ├── multi_fix        ├── cli        ├── mcp_client        ├── runtime_todo/        ├── fixer        ├── diff_fixer    ├── pfix/        ├── classifiers        ├── config        ├── telemetry        ├── logging        ├── validation        ├── session        ├── production        ├── permissions        ├── analyzer        ├── rollback        ├── types        ├── _auto_activate        ├── dev_mode        ├── init_wizard        ├── pfix_python        ├── cache        ├── dependency        ├── syntax_error_handler        ├── mcp_server        ├── audit        ├── rules            ├── activation        ├── commands/            ├── config            ├── run            ├── others            ├── diagnose            ├── base            ├── process            ├── memory            ├── config_env            ├── import_diagnostic            ├── python_version        ├── env_diagnostics/            ├── hardware            ├── encoding            ├── paths            ├── auto_fix        ├── decorator            ├── concurrency            ├── filesystem            ├── network            ├── serialization            ├── django            ├── flask            ├── pandas            ├── fastapi        ├── strategies/            ├── third_party            ├── fingerprint            ├── todo_file            ├── sentry        ├── integrations/            ├── precommit            ├── imports/            ├── web                ├── extractor        ├── main        ├── main                ├── checks        ├── main        ├── main            ├── collector        ├── degradation        ├── main        ├── main        ├── api_patterns        ├── main        ├── codec_errors        ├── unicode_errors        ├── main        ├── file_errors        ├── class_errors        ├── main        ├── python_gotchas        ├── package_traps        ├── tricky_errors        ├── main        ├── env_var_errors        ├── version_conflicts        ├── main        ├── cascading_errors        ├── main        ├── race_conditions        ├── async_mistakes        ├── missing_module        ├── shadowing        ├── main        ├── circular        ├── platform_specific        ├── wrong_names        ├── numeric_errors        ├── parse_errors├── project        ├── main        ├── llm```
-
-## API Overview
 
 ### Classes
 
@@ -612,21 +600,14 @@ pfix/
 - Tom Softreck <tom@sapletta.com>
 - Tom Sapletta <tom-sapletta-com@users.noreply.github.com>
 
-We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [CONTRIBUTING.md](https://github.com/wronai/pfix/blob/main/CONTRIBUTING.md) for guidelines.
 
-### Development Setup
-
-```bash
 # Clone the repository
 git clone https://github.com/semcod/pfix
 cd pfix
 
 # Install in development mode
 pip install -e ".[dev]"
-
-# Run tests
-pytest
-```
 
 ## Documentation
 
@@ -641,15 +622,15 @@ pytest
 | Output | Description | Link |
 |--------|-------------|------|
 | `README.md` | Project overview (this file) | — |
-| `docs/api.md` | Consolidated API reference | [View](./docs/api.md) |
-| `docs/modules.md` | Module reference with metrics | [View](./docs/modules.md) |
-| `docs/architecture.md` | Architecture with diagrams | [View](./docs/architecture.md) |
-| `docs/dependency-graph.md` | Dependency graphs | [View](./docs/dependency-graph.md) |
-| `docs/coverage.md` | Docstring coverage report | [View](./docs/coverage.md) |
-| `docs/getting-started.md` | Getting started guide | [View](./docs/getting-started.md) |
-| `docs/configuration.md` | Configuration reference | [View](./docs/configuration.md) |
-| `docs/api-changelog.md` | API change tracking | [View](./docs/api-changelog.md) |
-| `CONTRIBUTING.md` | Contribution guidelines | [View](./CONTRIBUTING.md) |
+| `docs/api.md` | Consolidated API reference | [View](https://github.com/wronai/pfix/blob/main/docs/api.md) |
+| `docs/modules.md` | Module reference with metrics | [View](https://github.com/wronai/pfix/blob/main/docs/modules.md) |
+| `docs/architecture.md` | Architecture with diagrams | [View](https://github.com/wronai/pfix/blob/main/docs/architecture.md) |
+| `docs/dependency-graph.md` | Dependency graphs | [View](https://github.com/wronai/pfix/blob/main/docs/dependency-graph.md) |
+| `docs/coverage.md` | Docstring coverage report | [View](https://github.com/wronai/pfix/blob/main/docs/coverage.md) |
+| `docs/getting-started.md` | Getting started guide | [View](https://github.com/wronai/pfix/blob/main/docs/getting-started.md) |
+| `docs/configuration.md` | Configuration reference | [View](https://github.com/wronai/pfix/blob/main/docs/configuration.md) |
+| `docs/api-changelog.md` | API change tracking | [View](https://github.com/wronai/pfix/blob/main/docs/api-changelog.md) |
+| `CONTRIBUTING.md` | Contribution guidelines | [View](https://github.com/wronai/pfix/blob/main/CONTRIBUTING.md) |
 | `examples/` | Usage examples | [Browse](./examples) |
 | `mkdocs.yml` | MkDocs configuration | — |
 

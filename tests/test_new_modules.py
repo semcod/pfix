@@ -3,19 +3,24 @@
 from __future__ import annotations
 
 import json
-import os
-import tempfile
 from datetime import datetime
 from pathlib import Path
 
-import pytest
 
-from pfix.audit import AuditEntry, log_fix_audit, read_audit_log, get_audit_summary
-from pfix.permissions import check_auto_apply_allowed, check_blocked_path, get_environment
-from pfix.telemetry import TelemetryEvent, is_telemetry_enabled, record_event, get_telemetry_summary
+from pfix.audit import AuditEntry
+from pfix.permissions import check_blocked_path, get_environment
+from pfix.telemetry import TelemetryEvent, is_telemetry_enabled
 from pfix.rollback import find_backup_dir, list_backups
 from pfix.rules import ProjectRules
 from pfix.cache import FixCache
+
+CONSTANT_3 = 3
+CONSTANT_20 = 20
+CONSTANT_30 = 30
+CONSTANT_42 = 42
+CONSTANT_1234 = 1234
+CONSTANT_1500 = 1500
+
 
 
 # ── Audit Tests ──────────────────────────────────────────────────────
@@ -119,7 +124,7 @@ class TestTelemetry:
             duration_ms=1500,
         )
         assert event.event_type == "fix_applied"
-        assert event.duration_ms == 1500
+        assert event.duration_ms == CONSTANT_1500
 
 
 # ── Rollback Tests ────────────────────────────────────────────────────

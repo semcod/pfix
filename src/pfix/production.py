@@ -17,14 +17,12 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Optional
-from urllib.parse import urlparse
+from typing import Callable, Optional
 
 from .analyzer import analyze_exception
 from .cache import get_cached_fix, cache_fix
-from .config import get_config
 from .llm import request_fix
-from .types import ErrorContext, FixProposal
+from .types import FixProposal
 
 
 @dataclass

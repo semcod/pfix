@@ -1,0 +1,119 @@
+version: '1'
+name: pfix
+description: Minimal Taskfile
+variables:
+  APP_NAME: pfix
+environments:
+  local:
+    container_runtime: docker
+    compose_command: docker compose
+pipeline:
+  python_version: "3.12"
+  runner_image: ubuntu-latest
+  branches: [main]
+  cache: [~/.cache/pip]
+  artifacts: [dist/]
+
+  stages:
+    - name: lint
+      tasks: [lint]
+
+    - name: test
+      tasks: [test]
+
+    - name: build
+      tasks: [build]
+      when: "branch:main"
+
+tasks:
+  install:
+    desc: Install Python dependencies (editable)
+    cmds:
+    - pip install -e .[dev]
+  test:
+    desc: Run pytest suite
+    cmds:
+    - pytest -q
+  lint:
+    desc: Run ruff lint check
+    cmds:
+    - ruff check .
+  fmt:
+    desc: Auto-format with ruff
+    cmds:
+    - ruff format .
+  build:
+    desc: Build wheel + sdist
+    cmds:
+    - python -m build
+  clean:
+    desc: Remove build artefacts
+    cmds:
+    - rm -rf build/ dist/ *.egg-info
+  help:
+    desc: '[imported from Makefile] help'
+    cmds:
+    - echo "Available commands:"
+    - echo "  make install      - Install the package (production)"
+    - echo "  make install-dev  - Install with dev dependencies"
+    - echo "  make install-all  - Install with all optional dependencies"
+    - echo "  make test         - Run pytest with coverage"
+    - echo "  make lint         - Run ruff linter"
+    - echo "  make format       - Run ruff formatter"
+    - echo "  make clean        - Remove build artifacts"
+    - echo "  make build        - Build wheel and sdist"
+    - echo "  make upload       - Upload to PyPI (requires credentials)"
+    - echo "  make check        - Run pfix check"
+    - echo "  make server       - Start MCP server"
+    - echo "  make example      - Run example script"
+    - echo "  make check-env    - Check if .env exists"
+  install-dev:
+    desc: '[imported from Makefile] install-dev'
+    cmds:
+    - pip install -e ".[dev]"
+  install-all:
+    desc: '[imported from Makefile] install-all'
+    cmds:
+    - pip install -e ".[all]"
+  format:
+    desc: '[imported from Makefile] format'
+    cmds:
+    - ruff check --fix src tests
+    - ruff format src tests
+  upload:
+    desc: '[imported from Makefile] upload'
+    cmds:
+    - python -m twine upload dist/*
+  check:
+    desc: '[imported from Makefile] check'
+    cmds:
+    - pfix check
+  server:
+    desc: '[imported from Makefile] server'
+    cmds:
+    - pfix server
+  example:
+    desc: '[imported from Makefile] example'
+    cmds:
+    - python examples/example.py || echo "Run 'make check-env' first if it fails"
+  check-env:
+    desc: '[imported from Makefile] check-env'
+    cmds:
+    - "test -f .env || (echo \"\u26A0\uFE0F  .env file not found! Copy .env.example\
+      \ to .env and set OPENROUTER_API_KEY\" && exit 1)"
+    - "echo \"\u2705 .env file exists\""
+  health:
+    desc: '[from doql] workflow: health'
+    cmds:
+    - docker compose ps
+    - docker compose exec app echo "Health check passed"
+  import-makefile-hint:
+    desc: '[from doql] workflow: import-makefile-hint'
+    cmds:
+    - 'echo ''Run: taskfile import Makefile to import existing targets.'''
+  all:
+    desc: Run install, lint, test
+    cmds:
+    - taskfile run install
+    - taskfile run lint
+    - taskfile run test

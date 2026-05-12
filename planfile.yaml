@@ -1,0 +1,397 @@
+schema: '1.0'
+project: pfix
+version: 0.0.0
+generated: '2026-04-20'
+generator: redsl planfile sync
+sources:
+- project/analysis.toon.yaml
+- project/duplication.toon.yaml
+stats:
+  total: 28
+  todo: 28
+  done: 0
+tasks:
+- id: Q01
+  title: 'reduce_complexity: python_version (CC=11)'
+  description: Module 'python_version' has cyclomatic complexity CC=11 (342 lines,
+    1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/env_diagnostics/python_version.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-11
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q02
+  title: 'reduce_complexity: fixer (CC=10)'
+  description: Module 'fixer' has cyclomatic complexity CC=10 (338 lines, 0 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/fixer.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-10
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q03
+  title: 'reduce_complexity: session (CC=10)'
+  description: Module 'session' has cyclomatic complexity CC=10 (308 lines, 1 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/session.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-10
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q04
+  title: 'reduce_complexity: decorator (CC=10)'
+  description: Module 'decorator' has cyclomatic complexity CC=10 (278 lines, 0 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/decorator.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-10
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q05
+  title: 'reduce_complexity: third_party (CC=10)'
+  description: Module 'third_party' has cyclomatic complexity CC=10 (271 lines, 1
+    complex functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/env_diagnostics/third_party.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-10
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q06
+  title: 'reduce_complexity: checks (CC=11)'
+  description: Module 'checks' has cyclomatic complexity CC=11 (250 lines, 0 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/env_diagnostics/imports/checks.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-11
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q07
+  title: 'reduce_complexity: types (CC=11)'
+  description: Module 'types' has cyclomatic complexity CC=11 (225 lines, 7 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/types.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-11
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q08
+  title: 'reduce_complexity: audit (CC=10)'
+  description: Module 'audit' has cyclomatic complexity CC=10 (203 lines, 1 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/audit.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-10
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: Q09
+  title: 'reduce_complexity: precommit (CC=10)'
+  description: Module 'precommit' has cyclomatic complexity CC=10 (110 lines, 0 complex
+    functions). Apply guard clauses, extract helpers, reduce nesting.
+  file: src/pfix/integrations/precommit.py
+  action: reduce_complexity
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - complexity
+  - cc-10
+  source: project/analysis.toon.yaml
+  priority_label: medium
+- id: R01
+  title: 'extract_function: main.py'
+  description: 3 occurrences of 15-line block across 3 files — saves 30 lines
+  file: examples/utils/main.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R03
+  title: 'extract_function: enhance_prompt.py'
+  description: 2 occurrences of 18-line block across 2 files — saves 18 lines
+  file: src/pfix/strategies/utils/enhance_prompt.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R04
+  title: 'extract_function: _clear_pycache.py'
+  description: 2 occurrences of 16-line block across 2 files — saves 16 lines
+  file: src/pfix/utils/_clear_pycache.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R05
+  title: 'extract_function: get_priority.py'
+  description: 4 occurrences of 4-line block across 4 files — saves 12 lines
+  file: src/pfix/strategies/utils/get_priority.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R06
+  title: 'extract_function: detect.py'
+  description: 2 occurrences of 12-line block across 2 files — saves 12 lines
+  file: src/pfix/strategies/utils/detect.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R07
+  title: 'extract_function: get_logger.py'
+  description: 2 occurrences of 9-line block across 2 files — saves 9 lines
+  file: src/pfix/utils/get_logger.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R08
+  title: 'extract_function: is_module_available.py'
+  description: 2 occurrences of 9-line block across 2 files — saves 9 lines
+  file: src/pfix/utils/is_module_available.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R09
+  title: 'extract_function: start_application.py'
+  description: 2 occurrences of 9-line block across 2 files — saves 9 lines
+  file: examples/production/utils/start_application.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R10
+  title: 'extract_function: start_mcp_server.py'
+  description: 2 occurrences of 8-line block across 2 files — saves 8 lines
+  file: examples/utils/start_mcp_server.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: R11
+  title: 'extract_function: legacy_json_parse.py'
+  description: 2 occurrences of 7-line block across 2 files — saves 7 lines
+  file: examples/utils/legacy_json_parse.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: D12
+  title: 'extract_function: main (saves 30L)'
+  description: 'Duplicated ''main'': 3 occurrences, 15 lines each, saves 30 lines.
+    Files: examples/encoding/main.py, examples/concurrency/main.py, examples/deps/main.py'
+  file: examples/encoding/main.py
+  action: extract_function
+  priority: 2
+  effort: low
+  status: todo
+  labels:
+  - refactor
+  - duplication
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: high
+- id: D13
+  title: 'extract_function: main (saves 19L)'
+  description: 'Duplicated ''main'': 2 occurrences, 19 lines each, saves 19 lines.
+    Files: examples/production/main.py, examples/edge_cases/main.py'
+  file: examples/production/main.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - duplication
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: D14
+  title: 'extract_function: enhance_prompt (saves 18L)'
+  description: 'Duplicated ''enhance_prompt'': 2 occurrences, 18 lines each, saves
+    18 lines. Files: src/pfix/strategies/flask.py, src/pfix/strategies/fastapi.py'
+  file: src/pfix/strategies/flask.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - duplication
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: D15
+  title: 'extract_function: _clear_pycache (saves 16L)'
+  description: 'Duplicated ''_clear_pycache'': 2 occurrences, 16 lines each, saves
+    16 lines. Files: src/pfix/session.py, src/pfix/fixer.py'
+  file: src/pfix/session.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - duplication
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: D16
+  title: 'extract_function: get_priority (saves 12L)'
+  description: 'Duplicated ''get_priority'': 4 occurrences, 4 lines each, saves 12
+    lines. Files: src/pfix/strategies/django.py, src/pfix/strategies/flask.py, src/pfix/strategies/pandas.py'
+  file: src/pfix/strategies/django.py
+  action: extract_function
+  priority: 3
+  effort: medium
+  status: todo
+  labels:
+  - refactor
+  - duplication
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: medium
+- id: refactor-2026-04-20-025
+  title: 'split_module: test_new_modules.py'
+  status: todo
+  action: split_module
+  file: tests/test_new_modules.py
+  priority: 3
+  score: 1.62
+  created_at: '2026-04-20T09:27:24.111695+00:00'
+  source: redsl:dry_run
+  description: God module — zbyt duży plik z za dużą liczbą funkcji
+  rule: split_god_module
+- id: refactor-2026-04-20-027
+  title: 'split_module: test_pfix.py'
+  status: todo
+  action: split_module
+  file: tests/test_pfix.py
+  priority: 3
+  score: 1.17
+  created_at: '2026-04-20T09:27:24.111695+00:00'
+  source: redsl:dry_run
+  description: God module — zbyt duży plik z za dużą liczbą funkcji
+  rule: split_god_module
+- id: refactor-2026-04-20-029
+  title: 'simplify_conditionals: python_version.py'
+  status: todo
+  action: simplify_conditionals
+  file: src/pfix/env_diagnostics/python_version.py
+  priority: 3
+  score: 0.85
+  created_at: '2026-04-20T09:27:24.111695+00:00'
+  source: redsl:dry_run
+  description: Głęboko zagnieżdżone warunki — guard clauses
+  rule: simplify_deep_nesting
+- id: refactor-2026-04-20-031
+  title: 'reduce_fan_out: __init__.py'
+  status: todo
+  action: reduce_fan_out
+  file: src/pfix/env_diagnostics/__init__.py
+  priority: 3
+  score: 0.65
+  created_at: '2026-04-20T09:27:24.111695+00:00'
+  source: redsl:dry_run
+  description: Wysoki fan-out — uprość zależności
+  rule: reduce_fan_out

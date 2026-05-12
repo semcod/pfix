@@ -8,12 +8,6 @@ Demonstrates production scenarios: API patterns, cascading errors, graceful degr
 - `cascading_errors.py` — Error chains, partial failures, retry logic
 - `degradation.py` — Missing fallbacks, retry storms, schema changes
 
-## Usage
-
-```bash
-# Run all production tests
-python main.py
-
 # Or run individual files
 python api_patterns.py
 python cascading_errors.py

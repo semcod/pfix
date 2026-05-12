@@ -7,12 +7,6 @@ Demonstrates memory-related issues: RecursionError, resource leaks, unbounded gr
 - `recursion_and_alloc.py` — Infinite recursion, exponential fibonacci, O(n²) string concat
 - `resource_leaks.py` — File reading, large list allocation, circular references
 
-## Usage
-
-```bash
-# Run all memory tests
-python main.py
-
 # Or run individual files
 python recursion_and_alloc.py
 python resource_leaks.py

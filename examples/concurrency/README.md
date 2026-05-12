@@ -7,12 +7,6 @@ Demonstrates common concurrency errors: race conditions, async/await mistakes, a
 - `async_mistakes.py` — Missing `await`, sync calls in async, wrong event loop usage
 - `race_conditions.py` — Dict/list modification during iteration, thread-unsafe counters
 
-## Usage
-
-```bash
-# Run all concurrency tests
-python main.py
-
 # Or run individual files
 python async_mistakes.py
 python race_conditions.py

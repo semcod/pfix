@@ -7,12 +7,6 @@ Demonstrates common data processing errors: parsing failures, numeric errors, an
 - `numeric_errors.py` — Division by zero, float precision, NaN propagation, overflow
 - `parse_errors.py` — KeyError, IndexError, ValueError, JSON/CSV parsing
 
-## Usage
-
-```bash
-# Run all data processing tests
-python main.py
-
 # Or run individual files
 python numeric_errors.py
 python parse_errors.py

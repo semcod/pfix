@@ -1,5 +1,3 @@
-# TODO
-
 ## Runtime Errors (Production)
 
 - [x] /home/tom/github/semcod/pfix/verify_runtime.py:20 - ZeroDivisionError: division by zero

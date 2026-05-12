@@ -1,0 +1,130 @@
+app {
+  name: "pfix";
+  version: "0.1.72";
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="pfix"] {
+
+}
+
+workflow[name="install"] {
+  trigger: "manual";
+  step-1: run cmd=pip install -e .;
+}
+
+workflow[name="install-dev"] {
+  trigger: "manual";
+  step-1: run cmd=pip install -e ".[dev]";
+}
+
+workflow[name="install-all"] {
+  trigger: "manual";
+  step-1: run cmd=pip install -e ".[all]";
+}
+
+workflow[name="test"] {
+  trigger: "manual";
+  step-1: run cmd=pytest -v --cov=src/pfix --cov-report=term-missing;
+}
+
+workflow[name="lint"] {
+  trigger: "manual";
+  step-1: run cmd=ruff check src tests;
+}
+
+workflow[name="format"] {
+  trigger: "manual";
+  step-1: run cmd=ruff check --fix src tests;
+  step-2: run cmd=ruff format src tests;
+}
+
+workflow[name="clean"] {
+  trigger: "manual";
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info .pytest_cache .coverage .pfix_backups/;
+  step-2: run cmd=find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true;
+  step-3: run cmd=find . -type f -name "*.pyc" -delete 2>/dev/null || true;
+}
+
+workflow[name="build"] {
+  trigger: "manual";
+  step-1: run cmd=python -m build;
+}
+
+workflow[name="upload"] {
+  trigger: "manual";
+  step-1: run cmd=python -m twine upload dist/*;
+}
+
+workflow[name="check"] {
+  trigger: "manual";
+  step-1: run cmd=pfix check;
+}
+
+workflow[name="server"] {
+  trigger: "manual";
+  step-1: run cmd=pfix server;
+}
+
+workflow[name="example"] {
+  trigger: "manual";
+  step-1: run cmd=python examples/example.py || echo "Run 'make check-env' first if it fails";
+}
+
+workflow[name="check-env"] {
+  trigger: "manual";
+  step-1: run cmd=test -f .env || (echo "⚠️  .env file not found! Copy .env.example to .env and set OPENROUTER_API_KEY" && exit 1);
+  step-2: run cmd=echo "✅ .env file exists";
+}
+
+workflow[name="fmt"] {
+  trigger: "manual";
+  step-1: run cmd=ruff format .;
+}
+
+workflow[name="health"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: "manual";
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="help"] {
+  trigger: "manual";
+  step-1: run cmd=echo "Available commands:";
+  step-2: run cmd=echo "  make install      - Install the package (production)";
+  step-3: run cmd=echo "  make install-dev  - Install with dev dependencies";
+  step-4: run cmd=echo "  make install-all  - Install with all optional dependencies";
+  step-5: run cmd=echo "  make test         - Run pytest with coverage";
+  step-6: run cmd=echo "  make lint         - Run ruff linter";
+  step-7: run cmd=echo "  make format       - Run ruff formatter";
+  step-8: run cmd=echo "  make clean        - Remove build artifacts";
+  step-9: run cmd=echo "  make build        - Build wheel and sdist";
+  step-10: run cmd=echo "  make upload       - Upload to PyPI (requires credentials)";
+  step-11: run cmd=echo "  make check        - Run pfix check";
+  step-12: run cmd=echo "  make server       - Start MCP server";
+  step-13: run cmd=echo "  make example      - Run example script";
+  step-14: run cmd=echo "  make check-env    - Check if .env exists";
+}
+
+deploy {
+  target: makefile;
+}
+
+environment[name="local"] {
+  runtime: makefile;
+  env_file: ".env";
+}
+
+workflow[name="all"] {
+  trigger: "manual";
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}

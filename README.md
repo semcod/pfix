@@ -13,17 +13,15 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.72-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$14.53-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-17.1h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.73-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$2.65-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-12.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $14.5287 (75 commits)
-- 👤 **Human dev:** ~$1712 (17.1h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $2.6490 (76 commits)
+- 👤 **Human dev:** ~$1246 (12.5h @ $100/h, 30min dedup)
 
-Generated on 2026-03-29 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
+Generated on 2026-05-12 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
 ---
-
-
 
 **Self-healing Python** — catches runtime errors and fixes source code + dependencies via LLM + MCP.
 
@@ -48,8 +46,6 @@ This automation can also be leveraged via CI/GitOps with provided API keys to th
 - **Interactive diff** — unified diff with confirmation before applying
 - **Backup system** — timestamped backups in `.pfix_backups/` (can be disabled)
 - **Async support** — `@apfix` for async functions
-
-## Installation
 
 ### From PyPI (Users)
 
@@ -89,15 +85,9 @@ After installation, examples can be run from any directory:
 # From project root
 cd /path/to/pfix/examples
 
-# Run all examples with auto-reset (recommended for testing)
-python run_all.py
-
 # Run a single example category
 cd types && python main.py
 cd data && python main.py
-
-# Reset all examples to original buggy state
-python reset.py
 
 # The .env file in project root is automatically found
 ```
@@ -110,8 +100,6 @@ python run_all.py --dry-run      # Preview what would run
 python run_all.py --no-reset     # Keep fixed versions for inspection
 python reset.py                  # Manual reset when needed
 ```
-
-## Quick Start (3 Ways)
 
 ### Option 1: Zero Configuration (Recommended)
 
@@ -176,8 +164,6 @@ def fetch_events(url: str):
     return [parse(e["ts"]) for e in requests.get(url).json()["events"]]
 ```
 
-## Usage Patterns
-
 ### Pattern A: Development Mode (Interactive)
 
 ```python
@@ -219,8 +205,6 @@ def unstable_api_call():
 with pfix_session(__file__):
     untrusted_code()
 ```
-
-## Library Behavior
 
 ### How It Works
 
@@ -503,10 +487,6 @@ configure(
     mcp_transport="stdio",
 )
 
-# Now import pfix to activate with these settings
-import pfix
-```
-
 ### Configuration Reference
 
 | Variable | Type | Default | Description |
@@ -559,8 +539,6 @@ Run models locally for zero cost and complete privacy.
 
 **Setup:**
 ```bash
-# Install Ollama: https://ollama.ai
-
 # Pull a code-capable model
 ollama pull codellama:7b
 ollama pull qwen2.5-coder:7b
@@ -584,20 +562,14 @@ PFIX_API_BASE=http://localhost:11434
 | `ollama/codellama:13b` | 13B | Medium | Excellent |
 | `ollama/qwen2.5-coder:14b` | 14B | Medium | Excellent |
 
-### OpenAI
-
-```bash
 # .env
 PFIX_MODEL=gpt-4o
 PFIX_API_KEY=sk-...
 PFIX_API_BASE=https://api.openai.com/v1
 ```
 
-**Models:** `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `gpt-3.5-turbo`
+**Models:** `gpt-4o`, `gpt-5.4-mini`, `gpt-4-turbo`, `gpt-3.5-turbo`
 
-### Anthropic (Direct)
-
-```bash
 # .env
 PFIX_MODEL=anthropic/claude-3-sonnet-20241022
 PFIX_API_KEY=sk-ant-...
@@ -605,18 +577,12 @@ PFIX_API_KEY=sk-ant-...
 
 **Models:** `claude-3-opus`, `claude-3-sonnet`, `claude-3-haiku`
 
-### Azure OpenAI
-
-```bash
 # .env
 PFIX_MODEL=azure/<your-deployment-name>
 PFIX_API_KEY=...
 PFIX_API_BASE=https://<resource>.openai.azure.com
 ```
 
-### Google Vertex AI / Gemini
-
-```bash
 # .env
 PFIX_MODEL=vertex_ai/gemini-1.5-pro
 # or
@@ -705,8 +671,6 @@ pfix diagnose --fix              # Auto-fix what can be fixed
   continue-on-error: true
 ```
 
-## Advanced Usage
-
 ### Custom Error Handlers
 
 ```python
@@ -763,8 +727,6 @@ See [`examples/`](examples/) directory for working examples:
 4. **Set `PFIX_AUTO_RESTART=true`** for long-running processes
 5. **Add hints** to decorators for better LLM context: `@pfix(hint="Processes CSV files")`
 
-## Troubleshooting
-
 ### "LLM confidence too low"
 - Increase context with `@pfix(hint="...")`
 - Check your API key is valid
@@ -798,3 +760,17 @@ See [`examples/`](examples/) directory for working examples:
 ## License
 
 Licensed under Apache-2.0.
+## Status
+
+_Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:42 UTC_
+
+| Metric | Value |
+|---|---|
+| HEAD | `6ddd51f` |
+| Coverage | — |
+| Failing tests | — |
+| Commits in last cycle | 50 |
+
+> Introduced a deep code analysis engine and a configuration management system, plus a number of documentation/refactor updates and CLI/config fixes across the project.
+
+<!-- taskill:status:end -->

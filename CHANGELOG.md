@@ -1,13 +1,55 @@
 # Changelog
 
+## [Unreleased]
+
+## [0.1.73] - 2026-05-12
+
+### Docs
+- Update CHANGELOG.md
+- Update LIBRARY_INTEGRATION.md
+- Update README.md
+- Update TODO.md
+- Update docs/README.md
+- Update examples/README.md
+- Update examples/complex_demo/README.md
+- Update examples/concurrency/README.md
+- Update examples/data/README.md
+- Update examples/deps/README.md
+- ... and 14 more files
+
+### Test
+- Update tests/__init__.py
+- Update tests/audit_tests.py
+- Update tests/cache_tests.py
+- Update tests/hardware_diagnostic_tests.py
+- Update tests/permissions_tests.py
+- Update tests/rollback_tests.py
+- Update tests/rules_tests.py
+- Update tests/telemetry_tests.py
+- Update tests/test_analyzer.py
+- Update tests/test_audit.py
+- ... and 22 more files
+
+### Other
+- Update .pyqual/llx_history.jsonl
+- Update .pyqual/pipeline.db
+- Update .redsl/chat.jsonl
+- Update .redsl/history.jsonl
+- Update .taskill/state.json
+- Update Taskfile.yml
+- Update app.doql.css
+- Update planfile.yaml
+- Update prefact.yaml
+- Update redsl_refactor_plan.toon.yaml
+- ... and 3 more files
+
+
+## [Unreleased]
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-## [0.1.72] - 2026-03-29
 
 ### Docs
 - Update TODO.md
@@ -28,10 +70,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/index.html
 - ... and 4 more files
 
-## [0.1.71] - 2026-03-29
-
-## [0.1.70] - 2026-03-29
-
 ### Docs
 - Update README.md
 - Update docs/README.md
@@ -48,8 +86,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/map.toon.yaml
 - Update project/project.toon.yaml
 
-## [0.1.69] - 2026-03-29
-
 ### Docs
 - Update docs/README.md
 - Update project/context.md
@@ -65,8 +101,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/map.toon.yaml
 - Update project/project.toon.yaml
 
-## [0.1.68] - 2026-03-29
-
 ### Docs
 - Update docs/README.md
 
@@ -76,10 +110,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/duplication.toon.yaml
 - Update project/index.html
 - Update project/map.toon.yaml
-
-## [0.1.67] - 2026-03-29
-
-## [0.1.66] - 2026-03-29
 
 ### Docs
 - Update docs/README.md
@@ -99,23 +129,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/flow.png
 - ... and 5 more files
 
-## [0.1.65] - 2026-03-29
-
-### Docs
-- Update README.md
-
-## [0.1.64] - 2026-03-29
-
-### Docs
-- Update README.md
-
-## [0.1.63] - 2026-03-29
-
-### Docs
-- Update README.md
-
-## [0.1.62] - 2026-03-29
-
 ### Docs
 - Update TODO.md
 - Update docs/README.md
@@ -132,10 +145,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/map.toon.yaml
 - Update project/project.toon.yaml
 
-## [0.1.61] - 2026-03-29
-
-## [0.1.60] - 2026-03-29
-
 ### Docs
 - Update docs/README.md
 
@@ -145,8 +154,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/duplication.toon.yaml
 - Update project/evolution.toon.yaml
 - Update project/index.html
-
-## [0.1.59] - 2026-03-29
 
 ### Docs
 - Update docs/README.md
@@ -162,8 +169,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/prompt.txt
 - Update project/validation.toon.yaml
 
-## [0.1.58] - 2026-03-29
-
 ### Docs
 - Update project/context.md
 
@@ -178,48 +183,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/flow.png
 - Update project/map.toon.yaml
 
-## [0.1.57] - 2026-03-29
-
 ### Docs
 - Update docs/README.md
 - Update project/README.md
 - Update project/context.md
-
-### Other
-- Update project/analysis.toon.yaml
-- Update project/calls.mmd
-- Update project/calls.png
-- Update project/compact_flow.mmd
-- Update project/compact_flow.png
-- Update project/duplication.toon.yaml
-- Update project/evolution.toon.yaml
-- Update project/flow.mmd
-- Update project/flow.png
-- Update project/index.html
-- ... and 4 more files
-
-## [0.1.56] - 2026-03-29
 
 ### Docs
 - Update README.md
 - Update docs/README.md
 - Update project/README.md
 - Update project/context.md
-
-### Other
-- Update project/analysis.toon.yaml
-- Update project/calls.mmd
-- Update project/calls.png
-- Update project/compact_flow.mmd
-- Update project/compact_flow.png
-- Update project/duplication.toon.yaml
-- Update project/evolution.toon.yaml
-- Update project/flow.mmd
-- Update project/flow.png
-- Update project/index.html
-- ... and 4 more files
-
-## [0.1.55] - 2026-03-29
 
 ### Docs
 - Update README.md
@@ -228,27 +201,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other
 - Update examples/run_all.py
 
-## [0.1.54] - 2026-03-29
-
 ### Other
 - Update diag_report.json
 - Update examples/reset.py
 
-## [0.1.53] - 2026-03-29
-
 ### Other
 - Update diag_report.json
-
-## [0.1.52] - 2026-03-29
-
-### Docs
-- Update TODO.md
 
 ### Other
 - Update TODO.lock
 - Update diag_report.json
-
-## [0.1.51] - 2026-03-29
 
 ### Docs
 - Update examples/README1.md
@@ -267,8 +229,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/getting_started/pyproject.toml
 - Update examples/memory/main.py
 - ... and 8 more files
-
-## [0.1.50] - 2026-03-29
 
 ### Docs
 - Update docs/README.md
@@ -296,13 +256,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/encoding/main.py
 - ... and 23 more files
 
-## [0.1.49] - 2026-03-29
-
 ### Other
 - Update diag_report.json
 - Update project/validation.toon.yaml
-
-## [0.1.48] - 2026-03-29
 
 ### Docs
 - Update docs/README.md
@@ -321,8 +277,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/index.html
 - Update project/map.toon.yaml
 - ... and 2 more files
-
-## [0.1.47] - 2026-03-29
 
 ### Docs
 - Update docs/README.md
@@ -344,8 +298,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/edge_cases/class_errors.py
 - ... and 33 more files
 
-## [0.1.46] - 2026-03-29
-
 ### Docs
 - Update docs/README.md
 
@@ -353,8 +305,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update diag_report.json
 - Update project/duplication.toon.yaml
 - Update project/validation.toon.yaml
-
-## [0.1.45] - 2026-03-29
 
 ### Docs
 - Update project/README.md
@@ -373,12 +323,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/index.html
 - ... and 4 more files
 
-## [0.1.44] - 2026-03-29
-
 ### Other
 - Update diag_report.json
-
-## [0.1.43] - 2026-03-29
 
 ### Other
 - Update .vallm.yaml
@@ -387,93 +333,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/demo_auto.py
 - Update examples/shared.py
 
-## [0.1.42] - 2026-03-29
-
-### Docs
-- Update TODO.md
-
 ### Other
 - Update diag_report.json
 - Update verify_runtime.py
 
-## [0.1.41] - 2026-03-29
-
 ### Other
 - Update diag_report.json
 - Update verify_runtime.py
-
-## [0.1.40] - 2026-03-28
-
-## [0.1.39] - 2026-03-28
-
-### Docs
-- Update README.md
 
 ### Test
 - Update tests/test_new_modules.py
-
-## [0.1.38] - 2026-03-28
 
 ### Other
 - Update requirements.txt
 
-## [0.1.37] - 2026-03-28
-
 ### Test
 - Update tests/test_new_modules.py
 
 ### Other
 - Update src/pfix/auto_activate.pth
 
-## [0.1.36] - 2026-03-28
-
-## [0.1.35] - 2026-03-28
-
 ### Test
 - Update tests/test_new_modules.py
 
-## [0.1.34] - 2026-03-28
-
-### Docs
-- Update README.md
-
 ### Test
 - Update tests/test_new_modules.py
-
-## [0.1.33] - 2026-03-28
-
-## [0.1.32] - 2026-03-28
-
-### Docs
-- Update README.md
 
 ### Test
 - Update tests/test_pfix.py
 
-## [0.1.31] - 2026-03-28
-
-## [0.1.30] - 2026-03-28
-
-## [0.1.29] - 2026-03-28
-
-## [0.1.28] - 2026-03-28
-
 ### Other
 - Update src/pfix/auto_activate.pth
-
-## [0.1.27] - 2026-03-28
 
 ### Other
 - Update .pre-commit-hooks.yaml
 
-## [0.1.26] - 2026-03-28
-
-## [0.1.25] - 2026-03-28
-
 ### Docs
 - Update examples/README.md
-
-## [0.1.24] - 2026-03-28
 
 ### Docs
 - Update docs/README.md
@@ -493,10 +389,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/map.toon.yaml
 - ... and 4 more files
 
-## [0.1.23] - 2026-03-28
-
-## [0.1.22] - 2026-03-28
-
 ### Docs
 - Update docs/README.md
 - Update project/README.md
@@ -515,10 +407,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update project/flow.png
 - ... and 5 more files
 
-## [0.1.21] - 2026-03-28
-
-## [0.1.20] - 2026-03-28
-
 ### Docs
 - Update LIBRARY_INTEGRATION.md
 - Update README.md
@@ -529,17 +417,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update PKG-INFO
 - Update src/pfix/auto_activate.pth
 
-## [0.1.19] - 2026-03-28
-
 ### Other
 - Update examples/complex_demo/main.py
 
-## [0.1.18] - 2026-03-28
-
 ### Docs
 - Update examples/complex_demo/README.md
-
-## [0.1.17] - 2026-03-28
 
 ### Docs
 - Update examples/complex_demo/README.md
@@ -549,8 +431,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/complex_demo/main.py
 - Update examples/complex_demo/pyproject.toml
 
-## [0.1.16] - 2026-03-28
-
 ### Docs
 - Update examples/complex_demo/README.md
 
@@ -558,36 +438,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/complex_demo/data/users.csv
 - Update examples/complex_demo/main.py
 
-## [0.1.15] - 2026-03-28
-
 ### Other
 - Update .env.example
 
-## [0.1.14] - 2026-03-28
-
-### Docs
-- Update README.md
-
-## [0.1.13] - 2026-03-28
-
-### Docs
-- Update README.md
-
-## [0.1.12] - 2026-03-28
-
-### Docs
-- Update README.md
-
 ### Other
 - Update .env.example
-
-## [0.1.11] - 2026-03-28
-
-## [0.1.10] - 2026-03-28
-
-## [0.1.9] - 2026-03-28
-
-## [0.1.8] - 2026-03-28
 
 ### Docs
 - Update README.md
@@ -597,13 +452,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/.pfix_backups/demo_auto.py.20260328_194608.bak
 - Update examples/.pfix_backups/demo_auto.py.20260328_194631.bak
 
-## [0.1.7] - 2026-03-28
-
 ### Docs
 - Update README.md
 - Update examples/README.md
-
-## [0.1.6] - 2026-03-28
 
 ### Docs
 - Update examples/README.md
@@ -618,14 +469,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/.pfix_backups/demo_auto.py.20260328_194144.bak
 - Update examples/.pfix_backups/demo_auto.py.20260328_194219.bak
 
-## [0.1.5] - 2026-03-28
-
 ### Other
 - Update examples/.pfix_backups/demo_auto.py.20260328_194144.bak
 - Update examples/.pfix_backups/demo_auto.py.20260328_194219.bak
 - Update examples/demo_auto.py
-
-## [0.1.4] - 2026-03-28
 
 ### Other
 - Update examples/.pfix_backups/demo.py.20260328_192530.bak
@@ -636,21 +483,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update examples/.pfix_backups/demo.py.20260328_194024.bak
 - Update examples/demo.py
 
-## [0.1.3] - 2026-03-28
-
 ### Test
 - Update tests/test_pfix.py
-
-## [0.1.2] - 2026-03-28
 
 ### Other
 - Update .env.example
 - Update Makefile
-
-## [0.1.1] - 2026-03-28
-
-### Docs
-- Update README.md
 
 ### Test
 - Update tests/test_pfix.py
@@ -663,4 +501,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update PKG-INFO
 - Update examples/demo.py
 - Update mcp-config.json
+
+- feat(None): deep code analysis engine with 3 supporting modules
+- feat(config): add configuration management system
+- fix(config): multiple fixes to configuration management system
+- feat(docs): CLI interface improvements and documentation updates
+- chore(config): new API capabilities
+- feat(tests): add tests for configuration management system
+- fix(goal): CLI interface and commit message generator fixes
+- refactor(docs/examples): refactor code analysis engine and changelog generation
 

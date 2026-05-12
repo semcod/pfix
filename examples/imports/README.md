@@ -10,12 +10,6 @@ Demonstrates common import issues: missing modules, circular imports, shadowing,
 - `shadowing.py` — Local names shadowing stdlib modules
 - `wrong_names.py` — Import typos and wrong package names
 
-## Usage
-
-```bash
-# Run all import tests
-python main.py
-
 # Or run individual files
 python missing_module.py
 python circular.py

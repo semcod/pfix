@@ -20,8 +20,6 @@ auto_install_deps = true
 auto_restart = true
 ```
 
-## Configuration
-
 ### pyproject.toml (behavior settings)
 
 Non-sensitive pfix behavior configuration:
@@ -79,9 +77,6 @@ pip install -e .
 Use `pfix-python` wrapper - works like normal `python` but with pfix auto-activated:
 
 ```bash
-# Instead of:
-python main.py
-
 # Use:
 pfix-python main.py
 ```

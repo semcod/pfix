@@ -7,12 +7,6 @@ This guide shows how to add pfix auto-healing capabilities to your own Python li
 **Install pfix and enable auto-activation:**
 
 ```bash
-# 1. Install pfix
-pip install pfix
-
-# 2. Enable auto-activation for your venv
-pfix enable
-
 # 3. Add config to pyproject.toml
 echo '
 [tool.pfix]
@@ -53,9 +47,6 @@ git_auto_commit = false
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-## Disabling Auto-Activation
-
-```bash
 # Temporary (per session)
 export PFIX_DISABLE_AUTO=true
 python your_script.py
@@ -63,8 +54,6 @@ python your_script.py
 # Permanent (uninstall)
 rm $(python -c "import site; print(site.getsitepackages()[0])")/pfix_auto.pth
 ```
-
-## Recommended: Full Setup
 
 ### 1. Add pfix as Optional Dependency
 
@@ -101,8 +90,6 @@ git_auto_commit = false
 ```bash
 # Copy to .env and fill in your key
 OPENROUTER_API_KEY=sk-or-v1-...
-# Or for local models:
-# PFIX_MODEL=ollama/codellama:7b
 # PFIX_API_BASE=http://localhost:11434
 ```
 
@@ -188,8 +175,6 @@ Make it executable:
 chmod +x scripts/pfix-cli
 ```
 
-## Usage Patterns
-
 ### For Library Users (No Changes to Their Code)
 
 User installs your library with pfix:
@@ -210,17 +195,12 @@ import your_library  # pfix auto-activates
 your_library.do_something_risky()  # Auto-fixed on error!
 ```
 
-### For Library Development (Testing)
-
-```bash
 # Run tests with auto-healing
 pfix-cli -m pytest tests/
 
 # Or use the dev script
 python scripts/dev-mode.py
 ```
-
-## Best Practices
 
 ### 1. Don't Force pfix on Users
 
@@ -279,8 +259,6 @@ Add to your CI config:
     # Run with dry-run to catch issues
     PFIX_DRY_RUN=true python -m your_library.tests
 ```
-
-## Configuration Templates
 
 ### Template 1: Research/Experimentation (Aggressive)
 
@@ -358,16 +336,11 @@ def test_user_can_enable():
         del os.environ['PFIX_AUTO_APPLY']
 ```
 
-## Common Issues
-
 ### Issue: "pfix activates when I don't want it"
 
 **Solution:** Only import pfix in development entry points, not in `__init__.py`:
 
 ```python
-# your_library/__init__.py
-# DON'T: import pfix here
-
 # your_library/__main__.py
 if __name__ == "__main__":
     import pfix  # Only for CLI usage

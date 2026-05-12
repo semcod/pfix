@@ -9,13 +9,25 @@ from __future__ import annotations
 
 import json
 import sqlite3
-import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
 from .types import ErrorContext, FixProposal
+
+CONSTANT_3 = 3
+CONSTANT_4 = 4
+CONSTANT_5 = 5
+CONSTANT_6 = 6
+CONSTANT_7 = 7
+CONSTANT_8 = 8
+CONSTANT_9 = 9
+CONSTANT_11 = 11
+CONSTANT_12 = 12
+CONSTANT_13 = 13
+CONSTANT_14 = 14
+
 
 DEFAULT_LOG_DIR = Path(".pfix_logs")
 
@@ -69,7 +81,7 @@ class JsonLinesLogger:
         with open(log_file, "a", encoding="utf-8") as f:
             f.write(event.to_json() + "\n")
 
-    def read_events(self, days: int = 7) -> list[FixEvent]:
+    def read_events(self, days: int = CONSTANT_7) -> list[FixEvent]:
         """Read events from last N days."""
         events = []
         for i in range(days):
@@ -193,18 +205,18 @@ class SQLiteLogger:
             events.append(FixEvent(
                 timestamp=row[1],
                 exception_type=row[2],
-                exception_message=row[3],
-                source_file=row[4],
-                function_name=row[5],
-                error_category=row[6],
-                diagnosis=row[7],
-                fix_applied=bool(row[8]),
-                confidence=row[9],
+                exception_message=row[CONSTANT_3],
+                source_file=row[CONSTANT_4],
+                function_name=row[CONSTANT_5],
+                error_category=row[CONSTANT_6],
+                diagnosis=row[CONSTANT_7],
+                fix_applied=bool(row[CONSTANT_8]),
+                confidence=row[CONSTANT_9],
                 duration_ms=row[10],
-                llm_model=row[11],
-                llm_tokens_used=row[12],
-                dependencies_installed=json.loads(row[13]) if row[13] else [],
-                cost_usd=row[14],
+                llm_model=row[CONSTANT_11],
+                llm_tokens_used=row[CONSTANT_12],
+                dependencies_installed=json.loads(row[CONSTANT_13]) if row[CONSTANT_13] else [],
+                cost_usd=row[CONSTANT_14],
             ))
         return events
 

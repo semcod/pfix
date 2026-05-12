@@ -1,5 +1,3 @@
-# System Architecture Analysis
-
 ## Overview
 
 - **Project**: /home/tom/github/semcod/pfix
@@ -10,8 +8,6 @@
 - **Total Classes**: 61
 - **Modules**: 109
 - **Entry Points**: 411
-
-## Architecture by Module
 
 ### src.pfix.fixer
 - **Functions**: 18
@@ -295,8 +291,6 @@ _check_file_encoding [src.pfix.env_diagnostics.encoding.EncodingDiagnostic]
 diagnose_exception [src.pfix.env_diagnostics.filesystem.FilesystemDiagnostic]
 ```
 
-## Key Classes
-
 ### src.pfix.runtime_todo.collector.RuntimeCollector
 > Captures runtime errors and writes to TODO.md.
 
@@ -531,8 +525,6 @@ Args:
 
 ### examples.production.degradation.parse_api_v2_response
 - **Output to**: src.pfix.decorator.pfix
-
-## Behavioral Patterns
 
 ### state_machine_MCPClient
 - **Type**: state_machine

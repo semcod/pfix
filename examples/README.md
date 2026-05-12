@@ -7,8 +7,6 @@ Run any script with pfix to test auto-repair:
 pfix run examples/imports/missing_module.py --auto --dry-run
 ```
 
-## Quick Start: Run All Examples
-
 ### Run all tests and auto-reset
 
 ```bash

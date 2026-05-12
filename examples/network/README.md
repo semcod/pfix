@@ -6,12 +6,6 @@ Demonstrates network-related errors: connection refused, DNS failures, timeouts,
 
 - `connection_errors.py` — Connection refused, DNS failures, timeouts, bad URLs
 
-## Usage
-
-```bash
-# Run all network tests
-python main.py
-
 # Or run individual files
 python connection_errors.py
 ```

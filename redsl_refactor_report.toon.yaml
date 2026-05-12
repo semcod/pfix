@@ -1,0 +1,39 @@
+# redsl | refactor | 2026-04-20
+# mode=executed | files=145 | lines=17594
+# CC̄=5.4 | critical=5 | decisions=5
+
+STATUS[partial]
+
+DECISIONS[5]:
+  1. split_module → tests/test_new_modules.py (score=1.62) God module — zbyt duży plik z za dużą liczbą funkcji
+  2. split_module → tests/test_pfix.py (score=1.17) God module — zbyt duży plik z za dużą liczbą funkcji
+  3. simplify_conditionals → src/pfix/env_diagnostics/python_version.py (score=0.85) Głęboko zagnieżdżone warunki — guard clauses
+  4. simplify_conditionals → src/pfix/env_diagnostics/python_version.py (score=0.85) Głęboko zagnieżdżone warunki — guard clauses
+  5. reduce_fan_out → src/pfix/env_diagnostics/__init__.py (score=0.65) Wysoki fan-out — uprość zależności
+
+EXECUTION[applied=1, rejected=4, rate=1.0:
+  ✗ split_module: tests/test_new_modules.py
+  ✓ split_module: tests/test_pfix.py
+  ✗ simplify_conditionals: src/pfix/env_diagnostics/python_version.py
+  ✗ direct_refactor: N/A
+  ✗ reduce_fan_out: src/pfix/env_diagnostics/__init__.py
+
+ERRORS[4]:
+  ! Syntax error in tests/test_concurrency_diagnostic.py: invalid syntax (test_concurrency_diagnostic.py, line 17)
+  ! Syntax error in src/pfix/env_diagnostics/python_version.py: unexpected indent (python_version.py, line 1)
+  ! Duplicate proposal blocked (time-window): simplify_conditionals on src/pfix/env_diagnostics/python_version.py was already proposed in the last 24h
+  ! Syntax error in src/pfix/env_diagnostics/__init__.py: '(' was never closed (__init__.py, line 197)
+
+METRICS[10]:
+  🟢 verify_runtime.py::None CC=1 LOC=55
+  🟢 examples/shared.py::None CC=2 LOC=28
+  🟢 examples/reset.py::None CC=2 LOC=110
+  🟢 examples/run_all.py::None CC=8 LOC=197
+  🟢 tests/cache_tests.py::None CC=3 LOC=10
+  🟢 tests/test_pfix.py::None CC=6 LOC=451
+  🟢 tests/test_serialization_diagnostic.py::None CC=5 LOC=15
+  🟢 tests/test_decorator.py::None CC=5 LOC=37
+  🟢 tests/test_rollback.py::None CC=3 LOC=12
+  🟢 tests/test_hardware_diagnostic.py::None CC=6 LOC=36
+
+LOG: /home/tom/github/semcod/pfix/logs/redsl_20260420_110734.log

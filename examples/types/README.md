@@ -8,12 +8,6 @@ Demonstrates common type-related errors: type mismatches, attribute errors, None
 - `pattern_errors.py` — f-string formatting, sorting, unpacking, dict merge
 - `type_errors.py` — String/concat errors, calling None, unhashable types
 
-## Usage
-
-```bash
-# Run all type tests
-python main.py
-
 # Or run individual files
 python attribute_errors.py
 python pattern_errors.py

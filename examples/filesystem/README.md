@@ -6,12 +6,6 @@ Demonstrates common filesystem errors: missing files, wrong paths, relative vs a
 
 - `file_errors.py` — FileNotFoundError, wrong extensions, unexpanded paths
 
-## Usage
-
-```bash
-# Run all filesystem tests
-python main.py
-
 # Or run individual files
 python file_errors.py
 ```

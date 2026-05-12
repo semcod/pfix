@@ -7,12 +7,6 @@ Demonstrates encoding issues: UnicodeDecodeError, wrong codecs, BOM handling, by
 - `codec_errors.py` — Subprocess encoding, binary/text mode mismatch, locale issues
 - `unicode_errors.py` — Wrong file encoding, bytes/str confusion, Unicode in URLs
 
-## Usage
-
-```bash
-# Run all encoding tests
-python main.py
-
 # Or run individual files
 python codec_errors.py
 python unicode_errors.py
