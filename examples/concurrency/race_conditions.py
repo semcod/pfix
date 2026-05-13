@@ -61,14 +61,10 @@ def parallel_count() -> int:
 
 if __name__ == "__main__":
     tests = [
-        ("1. Dict modified during iteration",
-         lambda: filter_dict_inplace({"a": 1, "b": None, "c": 3, "d": None})),
-        ("2. List modified during iteration",
-         lambda: remove_negatives([1, -2, 3, -4, 5, -6])),
-        ("3. asyncio.run() conflict",
-         lambda: fetch_async_in_sync()),
-        ("4. Thread-unsafe counter",
-         lambda: parallel_count()),
+        ("1. Dict modified during iteration", lambda: filter_dict_inplace({"a": 1, "b": None, "c": 3, "d": None})),
+        ("2. List modified during iteration", lambda: remove_negatives([1, -2, 3, -4, 5, -6])),
+        ("3. asyncio.run() conflict", lambda: fetch_async_in_sync()),
+        ("4. Thread-unsafe counter", lambda: parallel_count()),
     ]
     for label, fn in tests:
         print(f"{label}:")

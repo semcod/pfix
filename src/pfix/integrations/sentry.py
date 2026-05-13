@@ -10,7 +10,6 @@ from typing import Any, Optional
 
 from pfix.analyzer import analyze_exception
 from pfix.llm import request_fix
-from pfix.types import ErrorContext, FixProposal
 
 
 class PfixSentryIntegration:
@@ -30,7 +29,6 @@ class PfixSentryIntegration:
 
     def setup_once(self, sentry_sdk: Any, hub: Any) -> None:
         """Called by Sentry SDK during initialization."""
-        from sentry_sdk.integrations import Integration
 
         # Register event processor
         scope = sentry_sdk.get_global_scope()
@@ -96,10 +94,7 @@ def init_sentry(
     try:
         import sentry_sdk
     except ImportError:
-        raise ImportError(
-            "Sentry integration requires sentry-sdk. "
-            "Install with: pip install pfix[sentry]"
-        )
+        raise ImportError("Sentry integration requires sentry-sdk. Install with: pip install pfix[sentry]")
 
     # Add pfix integration
     integrations = kwargs.pop("integrations", [])

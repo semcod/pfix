@@ -30,9 +30,11 @@ def validate_positive(func):
         if result < 0:
             raise ValueError(f"Result must be positive, got {result}")
         return result
+
     wrapper.__name__ = func.__name__
     wrapper.__qualname__ = func.__qualname__
     return wrapper
+
 
 @pfix(hint="Inner decorator validate_positive raises ValueError for negative result")
 @validate_positive

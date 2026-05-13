@@ -15,7 +15,6 @@ Configuration:
 from __future__ import annotations
 
 import subprocess
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -61,6 +60,7 @@ def run_tests(
     timeout_val = timeout or getattr(config, "test_timeout", 60)
 
     import time
+
     start = time.time()
 
     try:
@@ -139,6 +139,7 @@ def validate_fix(
         try:
             # Restore from backup
             import shutil
+
             shutil.copy2(backup_path, source_file)
             console.print(f"[green]  ✓ Rolled back to {backup_path.name}[/]")
             result.rollback_performed = True
@@ -151,6 +152,7 @@ def validate_fix(
 def quick_validate_syntax(filepath: Path) -> bool:
     """Quick syntax validation for a single file."""
     import ast
+
     try:
         content = filepath.read_text(encoding="utf-8")
         ast.parse(content)
@@ -178,6 +180,7 @@ def validate_with_fallback(
         console.print("[red]✗ Syntax error in fixed file - rolling back[/]")
         if backup_path and backup_path.exists():
             import shutil
+
             shutil.copy2(backup_path, source_file)
         return ValidationResult(
             success=False,

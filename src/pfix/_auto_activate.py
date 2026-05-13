@@ -14,13 +14,14 @@ def _auto_activate_pfix():
     """Auto-activate pfix if configured in pyproject.toml or .env."""
     try:
         from pfix.config import get_config
+
         config = get_config()
 
         if not _should_auto_activate(config):
             return
 
         # Auto-activate based on configuration
-        if config.auto_apply or os.getenv('PFIX_AUTO_APPLY', '').lower() in ('true', '1', 'yes'):
+        if config.auto_apply or os.getenv("PFIX_AUTO_APPLY", "").lower() in ("true", "1", "yes"):
             _install_hooks(config)
 
     except ImportError:
@@ -31,16 +32,15 @@ def _auto_activate_pfix():
 
 def _should_auto_activate(config) -> bool:
     """Check if auto-activation should proceed."""
-    if hasattr(config, 'enabled') and not config.enabled:
+    if hasattr(config, "enabled") and not config.enabled:
         return False
 
-    if os.getenv('PFIX_DISABLE_AUTO', '').lower() in ('true', '1', 'yes'):
+    if os.getenv("PFIX_DISABLE_AUTO", "").lower() in ("true", "1", "yes"):
         return False
 
     project_root = Path.cwd()
-    has_config = (
-        (project_root / "pyproject.toml").exists() or
-        any((p / ".env").exists() for p in [project_root] + list(project_root.parents))
+    has_config = (project_root / "pyproject.toml").exists() or any(
+        (p / ".env").exists() for p in [project_root] + list(project_root.parents)
     )
     return has_config
 
@@ -48,27 +48,32 @@ def _should_auto_activate(config) -> bool:
 def _install_hooks(config):
     """Install core pfix hooks."""
     from pfix.session import install_pfix_hook
+
     install_pfix_hook(auto_apply=config.auto_apply)
 
     _install_syntax_error_handler()
 
-    if os.getenv('PFIX_DEV_MODE', '').lower() == 'true':
+    if os.getenv("PFIX_DEV_MODE", "").lower() == "true":
         from pfix.dev_mode import install_dev_mode_hook
+
         install_dev_mode_hook()
 
 
 def _install_syntax_error_handler():
     """Install import hook to catch SyntaxError during module loading."""
     try:
+
         def _pfix_import(name, *args, **kwargs):
             try:
                 import builtins
+
                 return builtins.__import__(name, *args, **kwargs)
             except SyntaxError as e:
                 _handle_syntax_error(e)
                 raise
 
         import builtins
+
         builtins.__import__ = _pfix_import
 
     except Exception:
@@ -79,12 +84,14 @@ def _handle_syntax_error(exc: SyntaxError):
     """Handle SyntaxError by calling pfix to fix it."""
     try:
         from pfix.config import get_config
+
         config = get_config()
 
         if not config.auto_apply:
             return
 
         from rich.console import Console
+
         console = Console(stderr=True)
         console.print(f"\n[red]💥 pfix: SyntaxError detected: {exc}[/]")
 
@@ -98,13 +105,14 @@ def _handle_syntax_error(exc: SyntaxError):
 def _build_error_context(exc: SyntaxError) -> "ErrorContext":
     """Build ErrorContext from SyntaxError."""
     from pfix.types import ErrorContext
+
     ctx = ErrorContext(
         exception_type="SyntaxError",
         exception_message=str(exc),
         source_file=exc.filename or "",
         line_number=exc.lineno or 0,
         failing_line=exc.text or "",
-        python_version=sys.version.split()[0]
+        python_version=sys.version.split()[0],
     )
 
     if ctx.source_file:

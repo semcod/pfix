@@ -14,7 +14,6 @@ import traceback
 from pathlib import Path
 from typing import Any, Optional
 
-from .classifiers import classify_error
 from .types import ErrorContext
 
 
@@ -110,10 +109,7 @@ def _format_local_vars(local_vars: Optional[dict]) -> dict[str, str]:
     """Anonymize and repr local variables."""
     if not local_vars:
         return {}
-    return {
-        k: _safe_repr(v) for k, v in local_vars.items()
-        if not k.startswith("__")
-    }
+    return {k: _safe_repr(v) for k, v in local_vars.items() if not k.startswith("__")}
 
 
 def _extract_function_source(func: Optional[Any]) -> dict:
@@ -172,6 +168,7 @@ def scan_missing_deps(project_dir: Path) -> list[str]:
     """Use pipreqs to detect imports that aren't installed."""
     try:
         from pipreqs import pipreqs
+
         imports = pipreqs.get_all_imports(str(project_dir))
         pkg_info = pipreqs.get_pkg_names(imports)
         # Compare with installed
@@ -182,6 +179,7 @@ def scan_missing_deps(project_dir: Path) -> list[str]:
     missing = []
     try:
         from pipreqs import pipreqs
+
         all_imports = pipreqs.get_all_imports(str(project_dir))
         for imp in all_imports:
             top = imp.split(".")[0].lower()

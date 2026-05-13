@@ -6,7 +6,9 @@ from pfix import pfix
 
 @pfix(hint="File has latin-1 encoding but opened as utf-8")
 def read_legacy_file() -> str:
-    import tempfile, os
+    import tempfile
+    import os
+
     # Create a file with latin-1 encoded content
     path = tempfile.mktemp(suffix=".txt")
     with open(path, "wb") as f:
@@ -37,7 +39,7 @@ def build_search_url(query: str) -> str:
 
 @pfix(hint="CSV with BOM marker causes wrong first column name")
 def read_bom_csv() -> list:
-    import csv, tempfile, os
+    import csv
     from io import StringIO
 
     # Simulate BOM-prefixed CSV

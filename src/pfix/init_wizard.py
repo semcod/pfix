@@ -14,7 +14,6 @@ Guides through:
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -69,12 +68,13 @@ def init_wizard() -> None:
 
 
 def _show_welcome():
-    console.print(Panel(
-        "Welcome to pfix setup!\n"
-        "This wizard will configure pfix for your project.",
-        title="🔧 pfix init",
-        border_style="green",
-    ))
+    console.print(
+        Panel(
+            "Welcome to pfix setup!\nThis wizard will configure pfix for your project.",
+            title="🔧 pfix init",
+            border_style="green",
+        )
+    )
 
 
 def _step_select_model() -> str:
@@ -160,18 +160,20 @@ def _step_auto_activation():
 
 
 def _show_summary(selected_model: str, auto_apply: bool):
-    console.print(Panel(
-        f"[bold]Setup Complete![/]\n\n"
-        f"Model: {selected_model}\n"
-        f"Auto-apply: {'yes' if auto_apply else 'no'}\n"
-        f"\n"
-        f"Next steps:\n"
-        f"1. {'Add OPENROUTER_API_KEY to .env' if 'openrouter' in selected_model else 'Start Ollama: ollama run codellama'}\n"
-        f"2. Test with: python -c \"1/0\"\n"
-        f"3. Read docs: https://github.com/softreck/pfix",
-        title="pfix init",
-        border_style="green",
-    ))
+    console.print(
+        Panel(
+            f"[bold]Setup Complete![/]\n\n"
+            f"Model: {selected_model}\n"
+            f"Auto-apply: {'yes' if auto_apply else 'no'}\n"
+            f"\n"
+            f"Next steps:\n"
+            f"1. {'Add OPENROUTER_API_KEY to .env' if 'openrouter' in selected_model else 'Start Ollama: ollama run codellama'}\n"
+            f'2. Test with: python -c "1/0"\n'
+            f"3. Read docs: https://github.com/softreck/pfix",
+            title="pfix init",
+            border_style="green",
+        )
+    )
 
 
 def update_pyproject(pyproject: Path, model: str, auto_apply: bool) -> None:

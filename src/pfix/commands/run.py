@@ -39,6 +39,7 @@ def cmd_run(args) -> int:
     except SyntaxError as e:
         # Handle SyntaxError with pfix
         from pfix.syntax_error_handler import handle_syntax_error
+
         handle_syntax_error(e, auto_apply=args.auto)
         return 1
     except SystemExit as e:
@@ -86,6 +87,7 @@ def cmd_dev(args) -> int:
     except SyntaxError as e:
         # Handle SyntaxError with pfix
         from pfix.syntax_error_handler import handle_syntax_error
+
         handle_syntax_error(e, auto_apply=args.auto)
         return 1
     except SystemExit as e:
@@ -99,6 +101,7 @@ def cmd_dev(args) -> int:
 def _install_excepthook():
     """Install global exception hook with pfix auto-fix."""
     from pfix.config import get_config
+
     config = get_config()
     hook = _create_excepthook(sys.excepthook, config)
     sys.excepthook = hook
@@ -138,7 +141,7 @@ def _create_excepthook(original_hook, config):
 
         if proposal.confidence > 0.1:
             fixed = apply_fix(ctx, proposal, confirm=True)
-            
+
             # Restart process if fix applied and auto_restart enabled
             if fixed and config.auto_restart:
                 if ctx.source_file:

@@ -1,8 +1,7 @@
 import json
 from datetime import datetime
-from pathlib import Path
-import pytest
-from pfix.audit import AuditEntry, log_fix_audit, read_audit_log
+from pfix.audit import AuditEntry
+
 
 class TestAudit:
     def test_audit_entry_creation(self):

@@ -19,14 +19,23 @@ def render_dashboard(features: dict) -> str:
     sections.append(render_footer())
     return "\n".join(sections)
 
-def render_header(): return "<header>Dashboard</header>"
-def render_footer(): return "<footer>© 2026</footer>"
-def render_analytics_v2(): return "<div>Analytics V2</div>"
+
+def render_header():
+    return "<header>Dashboard</header>"
+
+
+def render_footer():
+    return "<footer>© 2026</footer>"
+
+
+def render_analytics_v2():
+    return "<div>Analytics V2</div>"
 
 
 @pfix(hint="Retry without backoff or max attempts — infinite retry storm")
 def fetch_with_bad_retry(url: str) -> dict:
     import time
+
     attempts = 0
     while True:
         attempts += 1

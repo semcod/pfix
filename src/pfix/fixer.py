@@ -42,7 +42,7 @@ def apply_fix(
     if proposal.has_code_fix:
         source_file = Path(ctx.source_file)
         new_content, diff = _prepare_code_change(ctx, proposal, source_file)
-        
+
         if new_content and _confirm_and_validate(ctx, proposal, new_content, diff, confirm, config):
             if _write_fix(source_file, new_content, config.create_backups):
                 _post_fix(source_file, proposal.fix_description, config.git_auto_commit)
@@ -129,9 +129,7 @@ def _confirm_and_validate(
 
 def _show_diagnosis(diagnosis: str):
     """Display diagnosis panel. CC≤2."""
-    console.print(
-        Panel(diagnosis, title="[blue]🔍 Diagnosis[/]", border_style="blue")
-    )
+    console.print(Panel(diagnosis, title="[blue]🔍 Diagnosis[/]", border_style="blue"))
 
 
 def _log_skipped_fix(ctx, proposal, config):
@@ -281,12 +279,14 @@ def _replace_function(source: str, func_name: str, new_func: str) -> Optional[st
 
 
 def _make_diff(old: str, new: str, filename: str) -> str:
-    return "".join(difflib.unified_diff(
-        old.splitlines(keepends=True),
-        new.splitlines(keepends=True),
-        fromfile=f"a/{filename}",
-        tofile=f"b/{filename}",
-    ))
+    return "".join(
+        difflib.unified_diff(
+            old.splitlines(keepends=True),
+            new.splitlines(keepends=True),
+            fromfile=f"a/{filename}",
+            tofile=f"b/{filename}",
+        )
+    )
 
 
 def _validate_syntax(code: str) -> bool:
@@ -326,6 +326,7 @@ def _git_commit(filepath: Path, message: str):
     config = get_config()
     try:
         import git
+
         repo = git.Repo(filepath.parent, search_parent_directories=True)
         repo.index.add([str(filepath)])
         repo.index.commit(f"{config.git_commit_prefix}{message}")

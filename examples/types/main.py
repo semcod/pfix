@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Types — demonstrates fixing various TypeErrors and AttributeErrors."""
 
-import pfix
 
 def attribute_error_test():
     """Accessing non-existent attribute."""
@@ -28,13 +27,13 @@ def pattern_error_test():
 
 if __name__ == "__main__":
     print("=== pfix Types Examples ===")
-    
+
     tests = [
         ("1. AttributeError (dict as object)", attribute_error_test),
         ("2. TypeError (str + int)", type_error_test),
         ("3. Pattern Error (None check)", pattern_error_test),
     ]
-    
+
     for label, fn in tests:
         print(f"\n{label}:")
         try:

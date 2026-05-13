@@ -7,6 +7,7 @@ from pfix import pfix
 @pfix(hint="subprocess output has non-UTF-8 bytes — locale dependent")
 def run_system_command() -> str:
     import subprocess
+
     result = subprocess.run(
         ["echo", "Héllo wörld"],
         capture_output=True,
@@ -19,6 +20,7 @@ def run_system_command() -> str:
 @pfix(hint="Writing bytes to text-mode file")
 def write_binary_to_text():
     import tempfile
+
     with tempfile.NamedTemporaryFile(mode="w", suffix=".bin", delete=False) as f:
         f.write(b"\x89PNG\r\n")  # TypeError: write() str, not bytes
         return f.name
@@ -26,7 +28,6 @@ def write_binary_to_text():
 
 @pfix(hint="repr() vs str() confusion with non-ASCII")
 def log_user_input(text: str) -> str:
-    import logging
     # Accidentally using ascii() which escapes everything
     sanitized = ascii(text)  # 'caf\\xe9' instead of 'café'
     return f"User said: {sanitized}"

@@ -91,17 +91,20 @@ class EnvDiagnostics:
                 results.extend(diag.check(self.project_root))
             except Exception as e:
                 from ..types import DiagnosticResult
-                results.append(DiagnosticResult(
-                    category=diag.category,
-                    check_name="_diagnostic_error",
-                    status="warning",
-                    message=f"Diagnostic {diag.category} failed: {e}",
-                    details={},
-                    suggestion="",
-                    auto_fixable=False,
-                    abs_path=None,
-                    line_number=None,
-                ))
+
+                results.append(
+                    DiagnosticResult(
+                        category=diag.category,
+                        check_name="_diagnostic_error",
+                        status="warning",
+                        message=f"Diagnostic {diag.category} failed: {e}",
+                        details={},
+                        suggestion="",
+                        auto_fixable=False,
+                        abs_path=None,
+                        line_number=None,
+                    )
+                )
 
         return results
 
@@ -164,17 +167,14 @@ class EnvDiagnostics:
 
     def _generate_summary_footer(self, results: list["DiagnosticResult"]) -> str:
         """Generate summary line for the report."""
-        counts = {
-            "critical": 0,
-            "error": 0,
-            "warning": 0,
-            "ok": 0
-        }
+        counts = {"critical": 0, "error": 0, "warning": 0, "ok": 0}
         for r in results:
             counts[r.status] = counts.get(r.status, 0) + 1
 
-        return (f"**Summary**: {counts['critical']} critical, {counts['error']} errors, "
-                f"{counts['warning']} warnings, {counts['ok']} OK")
+        return (
+            f"**Summary**: {counts['critical']} critical, {counts['error']} errors, "
+            f"{counts['warning']} warnings, {counts['ok']} OK"
+        )
 
     def _format_result(self, r: "DiagnosticResult") -> str:
         """Format single result as markdown."""
@@ -224,12 +224,16 @@ class EnvDiagnostics:
                 module_name=r.category,
                 exception_type=r.check_name,
                 exception_message=r.message,
-                traceback_frames=[TraceFrame(
-                    filepath=r.abs_path or "",
-                    line_number=r.line_number or 0,
-                    function_name=r.check_name,
-                    code_line=r.message,
-                )] if r.abs_path else [],
+                traceback_frames=[
+                    TraceFrame(
+                        filepath=r.abs_path or "",
+                        line_number=r.line_number or 0,
+                        function_name=r.check_name,
+                        code_line=r.message,
+                    )
+                ]
+                if r.abs_path
+                else [],
                 category=r.category,
                 severity=severity_map.get(r.status, "low"),
             )

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
 
 from pfix.dependency import resolve_package_name, detect_missing_from_error
 
 
 # ── Dependency ──────────────────────────────────────────────────────
+
 
 class TestDependency:
     def test_resolve_known(self):

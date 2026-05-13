@@ -47,17 +47,19 @@ class NetworkDiagnostic(BaseDiagnostic):
         try:
             socket.getaddrinfo("pypi.org", None)
         except socket.gaierror as e:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="dns_failure",
-                status="error",
-                message=f"DNS resolution failed: {e}",
-                details={"error": str(e)},
-                suggestion="Check network connection and DNS settings",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="dns_failure",
+                    status="error",
+                    message=f"DNS resolution failed: {e}",
+                    details={"error": str(e)},
+                    suggestion="Check network connection and DNS settings",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
 
         return results
 
@@ -72,17 +74,19 @@ class NetworkDiagnostic(BaseDiagnostic):
                 sock = socket.create_connection((host, port), timeout=5)
                 sock.close()
             except (socket.timeout, ConnectionRefusedError, OSError) as e:
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name=f"connect_{host}",
-                    status="warning",
-                    message=f"Cannot reach {name} ({host}:{port}): {e}",
-                    details={"host": host, "port": port, "error": str(e)},
-                    suggestion="Check firewall and network connectivity",
-                    auto_fixable=False,
-                    abs_path=None,
-                    line_number=None,
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name=f"connect_{host}",
+                        status="warning",
+                        message=f"Cannot reach {name} ({host}:{port}): {e}",
+                        details={"host": host, "port": port, "error": str(e)},
+                        suggestion="Check firewall and network connectivity",
+                        auto_fixable=False,
+                        abs_path=None,
+                        line_number=None,
+                    )
+                )
 
         return results
 
@@ -98,29 +102,33 @@ class NetworkDiagnostic(BaseDiagnostic):
                 with context.wrap_socket(sock, server_hostname="pypi.org") as ssock:
                     cert = ssock.getpeercert()
                     if not cert:
-                        results.append(DiagnosticResult(
-                            category=self.category,
-                            check_name="ssl_no_cert",
-                            status="error",
-                            message="SSL certificate missing from pypi.org",
-                            details={},
-                            suggestion="Check system CA certificates",
-                            auto_fixable=False,
-                            abs_path=None,
-                            line_number=None,
-                        ))
+                        results.append(
+                            DiagnosticResult(
+                                category=self.category,
+                                check_name="ssl_no_cert",
+                                status="error",
+                                message="SSL certificate missing from pypi.org",
+                                details={},
+                                suggestion="Check system CA certificates",
+                                auto_fixable=False,
+                                abs_path=None,
+                                line_number=None,
+                            )
+                        )
         except ssl.SSLError as e:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="ssl_error",
-                status="error",
-                message=f"SSL error: {e}",
-                details={"error": str(e)},
-                suggestion="Update CA certificates or check system clock",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="ssl_error",
+                    status="error",
+                    message=f"SSL error: {e}",
+                    details={"error": str(e)},
+                    suggestion="Update CA certificates or check system clock",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
         except Exception:
             pass
 
@@ -141,17 +149,19 @@ class NetworkDiagnostic(BaseDiagnostic):
             try:
                 socket.create_connection(("pypi.org", 443), timeout=5)
             except Exception as e:
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="proxy_issue",
-                    status="warning",
-                    message=f"Proxy configured but connectivity issues: {e}",
-                    details={"proxies": proxies},
-                    suggestion="Verify proxy settings or unset proxy vars",
-                    auto_fixable=False,
-                    abs_path=None,
-                    line_number=None,
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="proxy_issue",
+                        status="warning",
+                        message=f"Proxy configured but connectivity issues: {e}",
+                        details={"proxies": proxies},
+                        suggestion="Verify proxy settings or unset proxy vars",
+                        auto_fixable=False,
+                        abs_path=None,
+                        line_number=None,
+                    )
+                )
 
         return results
 
@@ -167,14 +177,16 @@ class NetworkDiagnostic(BaseDiagnostic):
                 latency = (time.time() - start) * 1000
 
             if latency > 500:  # > 500ms
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="high_latency",
-                    status="warning",
-                    message=f"High network latency: {latency:.1f}ms",
-                    details={"latency_ms": latency},
-                    suggestion="Check your internet connection or use a local mirror",
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="high_latency",
+                        status="warning",
+                        message=f"High network latency: {latency:.1f}ms",
+                        details={"latency_ms": latency},
+                        suggestion="Check your internet connection or use a local mirror",
+                    )
+                )
         except Exception:
             pass
         return results
@@ -190,13 +202,15 @@ class NetworkDiagnostic(BaseDiagnostic):
         # but we can check if it's before a 'sane' date (e.g. 2024-01-01)
         sane_date = datetime(2024, 1, 1).timestamp()
         if time.time() < sane_date:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="stale_clock",
-                status="critical",
-                message=f"System clock seems wrong: {datetime.now()}",
-                suggestion="Update system clock using NTP",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="stale_clock",
+                    status="critical",
+                    message=f"System clock seems wrong: {datetime.now()}",
+                    suggestion="Update system clock using NTP",
+                )
+            )
         return results
 
     def diagnose_exception(
@@ -209,6 +223,7 @@ class NetworkDiagnostic(BaseDiagnostic):
 
         if isinstance(exc, ConnectionRefusedError):
             import re
+
             msg = str(exc)
             # Try to extract host:port
             match = re.search(r"\[([^\]]+)\]:(\d+)", msg) or re.search(r"(\S+):(\d+)", msg)

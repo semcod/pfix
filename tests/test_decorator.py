@@ -11,6 +11,7 @@ from pfix.config import reset_config
 
 # ── Decorator ───────────────────────────────────────────────────────
 
+
 class TestDecorator:
     def setup_method(self):
         reset_config()

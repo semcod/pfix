@@ -6,10 +6,9 @@ Provides automatic fixes for issues marked as auto_fixable=True.
 
 from __future__ import annotations
 
-import os
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..types import DiagnosticResult
@@ -147,7 +146,7 @@ def _fix_missing_dotenv(result: "DiagnosticResult", project_root: Path) -> tuple
         return False, ".env already exists"
 
     shutil.copy2(example, env_file)
-    return True, f"Created .env from .env.example"
+    return True, "Created .env from .env.example"
 
 
 def _fix_env_not_gitignored(result: "DiagnosticResult", project_root: Path) -> tuple[bool, str]:
@@ -173,32 +172,36 @@ def _fix_missing_init(result: "DiagnosticResult", project_root: Path) -> tuple[b
     path = result.abs_path
     if not path:
         return False, "No path specified"
-    
+
     file_path = Path(path)
     if file_path.exists():
         return False, f"{file_path.name} already exists"
-    
+
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.touch()
     return True, f"Created {file_path}"
+
 
 def _fix_hidden_pollution(result: "DiagnosticResult", project_root: Path) -> tuple[bool, str]:
     """Remove hidden pollution files."""
     path = result.abs_path
     if not path or not Path(path).exists():
         return False, "File not found"
-    
+
     Path(path).unlink()
     return True, f"Removed {Path(path).name}"
+
 
 def _fix_no_manifest(result: "DiagnosticResult", project_root: Path) -> tuple[bool, str]:
     """Generate requirements.txt."""
     from ..dependency import generate_requirements
+
     try:
         generate_requirements()
         return True, "Generated requirements.txt"
     except Exception as e:
         return False, f"Failed to generate: {e}"
+
 
 # Registry of auto-fix handlers
 _FIX_HANDLERS: dict[str, callable] = {

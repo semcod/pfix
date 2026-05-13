@@ -99,9 +99,7 @@ class ImportDiagnostic(BaseDiagnostic):
             if module not in checked:
                 cycle = find_cycle_dfs(module, set(), [], module_imports)
                 if cycle and len(cycle) > 1:
-                    result = create_cycle_result(
-                        cycle, module_paths, checked, self.category
-                    )
+                    result = create_cycle_result(cycle, module_paths, checked, self.category)
                     if result:
                         results.append(result)
 

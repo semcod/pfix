@@ -55,7 +55,6 @@ class PythonVersionDiagnostic(BaseDiagnostic):
 
     def _check_pyproject_requires(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check pyproject.toml requires-python vs current version."""
-        from ..types import DiagnosticResult
 
         results = []
         pyproject = project_root / "pyproject.toml"
@@ -73,18 +72,25 @@ class PythonVersionDiagnostic(BaseDiagnostic):
             max_ver = self._parse_version_requirement(r"<\s*(\d+)\.(\d+)", requires)
 
             if min_ver and current < min_ver:
-                results.append(self._create_version_error(
-                    "python_version_too_low",
-                    f"Python {current[0]}.{current[1]} < required {min_ver[0]}.{min_ver[1]}",
-                    requires, str(pyproject)
-                ))
+                results.append(
+                    self._create_version_error(
+                        "python_version_too_low",
+                        f"Python {current[0]}.{current[1]} < required {min_ver[0]}.{min_ver[1]}",
+                        requires,
+                        str(pyproject),
+                    )
+                )
 
             if max_ver and current >= max_ver:
-                results.append(self._create_version_error(
-                    "python_version_too_high",
-                    f"Python {current[0]}.{current[1]} >= max {max_ver[0]}.{max_ver[1]}",
-                    requires, str(pyproject), status="warning"
-                ))
+                results.append(
+                    self._create_version_error(
+                        "python_version_too_high",
+                        f"Python {current[0]}.{current[1]} >= max {max_ver[0]}.{max_ver[1]}",
+                        requires,
+                        str(pyproject),
+                        status="warning",
+                    )
+                )
         except Exception:
             pass
 
@@ -110,20 +116,24 @@ class PythonVersionDiagnostic(BaseDiagnostic):
     def _parse_version_requirement(self, pattern: str, requires: str) -> Optional[tuple[int, int]]:
         """Parse version numbers from a requirement string."""
         import re
+
         if match := re.search(pattern, requires):
             return (int(match[1]), int(match[2]))
         return None
 
-    def _create_version_error(self, name: str, msg: str, requires: str, path: str, status: str = "error") -> "DiagnosticResult":
+    def _create_version_error(
+        self, name: str, msg: str, requires: str, path: str, status: str = "error"
+    ) -> "DiagnosticResult":
         """Create a version-related DiagnosticResult."""
         from ..types import DiagnosticResult
+
         return DiagnosticResult(
             category=self.category,
             check_name=name,
             status=status,
             message=msg,
             details={"required": requires},
-            suggestion=f"Adjust Python version or requirements",
+            suggestion="Adjust Python version or requirements",
             auto_fixable=False,
             abs_path=path,
         )
@@ -149,33 +159,38 @@ class PythonVersionDiagnostic(BaseDiagnostic):
     def _check_file_features(self, tree: ast.AST, current_ver: tuple[int, int], path: str) -> list["DiagnosticResult"]:
         """Check an AST for version-specific features."""
         from ..types import DiagnosticResult
+
         results = []
         for node in ast.walk(tree):
             # Check match statements (Python 3.10+)
             if isinstance(node, ast.Match) and current_ver < (3, 10):
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="match_requires_py310",
-                    status="error",
-                    message=f"match/case requires Python 3.10+, have {current_ver[0]}.{current_ver[1]}",
-                    details={"feature": "match/case", "file": path},
-                    suggestion="Upgrade Python or avoid match/case",
-                    abs_path=path,
-                    line_number=getattr(node, 'lineno', None),
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="match_requires_py310",
+                        status="error",
+                        message=f"match/case requires Python 3.10+, have {current_ver[0]}.{current_ver[1]}",
+                        details={"feature": "match/case", "file": path},
+                        suggestion="Upgrade Python or avoid match/case",
+                        abs_path=path,
+                        line_number=getattr(node, "lineno", None),
+                    )
+                )
 
             # Check walrus operator (Python 3.8+)
             if isinstance(node, ast.NamedExpr) and current_ver < (3, 8):
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="walrus_requires_py38",
-                    status="error",
-                    message=f"Walrus operator requires Python 3.8+, have {current_ver[0]}.{current_ver[1]}",
-                    details={"feature": "walrus :=", "file": path},
-                    suggestion="Upgrade Python or use traditional assignment",
-                    abs_path=path,
-                    line_number=getattr(node, 'lineno', None),
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="walrus_requires_py38",
+                        status="error",
+                        message=f"Walrus operator requires Python 3.8+, have {current_ver[0]}.{current_ver[1]}",
+                        details={"feature": "walrus :=", "file": path},
+                        suggestion="Upgrade Python or use traditional assignment",
+                        abs_path=path,
+                        line_number=getattr(node, "lineno", None),
+                    )
+                )
         return results
 
     def _check_deprecated_imports(self, project_root: Path) -> list["DiagnosticResult"]:
@@ -205,20 +220,22 @@ class PythonVersionDiagnostic(BaseDiagnostic):
                     if isinstance(node, ast.Import):
                         for alias in node.names:
                             if alias.name in deprecated:
-                                results.append(DiagnosticResult(
-                                    category=self.category,
-                                    check_name="deprecated_import",
-                                    status="warning",
-                                    message=f"Deprecated module: {alias.name}",
-                                    details={
-                                        "module": alias.name,
-                                        "deprecated_since": self._get_deprecated_version(alias.name),
-                                    },
-                                    suggestion=f"Replace {alias.name} with modern alternative",
-                                    auto_fixable=False,
-                                    abs_path=str(pyfile),
-                                    line_number=getattr(node, 'lineno', None),
-                                ))
+                                results.append(
+                                    DiagnosticResult(
+                                        category=self.category,
+                                        check_name="deprecated_import",
+                                        status="warning",
+                                        message=f"Deprecated module: {alias.name}",
+                                        details={
+                                            "module": alias.name,
+                                            "deprecated_since": self._get_deprecated_version(alias.name),
+                                        },
+                                        suggestion=f"Replace {alias.name} with modern alternative",
+                                        auto_fixable=False,
+                                        abs_path=str(pyfile),
+                                        line_number=getattr(node, "lineno", None),
+                                    )
+                                )
 
             except Exception:
                 pass
@@ -235,102 +252,119 @@ class PythonVersionDiagnostic(BaseDiagnostic):
     def _check_eol_status(self) -> list["DiagnosticResult"]:
         """Check if Python version is End-of-Life (EOL)."""
         from ..types import DiagnosticResult
+
         results = []
         current = sys.version_info[:2]
-        
+
         # Current EOL dates (approximate)
         # 3.8: 2024-10
         # 3.7: 2023-06
         # 3.6: 2021-12
         if current < (3, 9):
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="python_eol",
-                status="critical" if current < (3, 8) else "error",
-                message=f"Python {current[0]}.{current[1]} is End-of-Life (EOL)",
-                suggestion="Upgrade to Python 3.10+ (security risk)",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="python_eol",
+                    status="critical" if current < (3, 8) else "error",
+                    message=f"Python {current[0]}.{current[1]} is End-of-Life (EOL)",
+                    suggestion="Upgrade to Python 3.10+ (security risk)",
+                )
+            )
         elif current < (3, 10):
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="python_near_eol",
-                status="warning",
-                message=f"Python {current[0]}.{current[1]} is nearing End-of-Life",
-                suggestion="Plan upgrade to Python 3.11+",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="python_near_eol",
+                    status="warning",
+                    message=f"Python {current[0]}.{current[1]} is nearing End-of-Life",
+                    suggestion="Plan upgrade to Python 3.11+",
+                )
+            )
         return results
 
     def _check_32bit_python(self) -> list["DiagnosticResult"]:
         """Check for 32-bit Python on 64-bit platform."""
         from ..types import DiagnosticResult
+
         results = []
         import platform
-        
-        is_64bit_os = platform.machine() in ('x86_64', 'AMD64', 'arm64', 'aarch64')
+
+        is_64bit_os = platform.machine() in ("x86_64", "AMD64", "arm64", "aarch64")
         is_32bit_py = sys.maxsize <= 2**31 - 1
-        
+
         if is_64bit_os and is_32bit_py:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="32bit_python",
-                status="warning",
-                message="Running 32-bit Python on a 64-bit OS",
-                suggestion="Switch to 64-bit Python for better performance and memory addressing",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="32bit_python",
+                    status="warning",
+                    message="Running 32-bit Python on a 64-bit OS",
+                    suggestion="Switch to 64-bit Python for better performance and memory addressing",
+                )
+            )
         return results
 
     def _check_sys_executable_mismatch(self) -> list["DiagnosticResult"]:
         """Check if sys.executable matches what's in PATH."""
         from ..types import DiagnosticResult
+
         results = []
         import shutil
-        
+
         path_py = shutil.which("python") or shutil.which("python3")
         if path_py:
             path_py = str(Path(path_py).resolve())
             sys_py = str(Path(sys.executable).resolve())
-            
+
             if path_py != sys_py and not os.environ.get("VIRTUAL_ENV"):
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="python_path_mismatch",
-                    status="warning",
-                    message="Python executable in PATH different from sys.executable",
-                    details={"path_python": path_py, "sys_executable": sys_py},
-                    suggestion="Verify PATH order and virtualenv activation",
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="python_path_mismatch",
+                        status="warning",
+                        message="Python executable in PATH different from sys.executable",
+                        details={"path_python": path_py, "sys_executable": sys_py},
+                        suggestion="Verify PATH order and virtualenv activation",
+                    )
+                )
         return results
 
     def _check_optimization_flags(self) -> list["DiagnosticResult"]:
         """Check for Python optimization flags (-O, -OO)."""
         from ..types import DiagnosticResult
+
         results = []
         if sys.flags.optimize > 0:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="python_optimization_active",
-                status="warning",
-                message=f"Python optimization level {sys.flags.optimize} active",
-                details={"level": sys.flags.optimize},
-                suggestion="Avoid -O/-OO in development as it removes asserts/docstrings",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="python_optimization_active",
+                    status="warning",
+                    message=f"Python optimization level {sys.flags.optimize} active",
+                    details={"level": sys.flags.optimize},
+                    suggestion="Avoid -O/-OO in development as it removes asserts/docstrings",
+                )
+            )
         return results
 
     def _check_gil_status(self) -> list["DiagnosticResult"]:
         """Check GIL status (relevant for Python 3.13+)."""
         from ..types import DiagnosticResult
+
         results = []
         # Check if sys.getsizeof() etc. can tell us something or sys._is_gil_enabled() in 3.13
         if hasattr(sys, "_is_gil_enabled"):
             enabled = sys._is_gil_enabled()
             if not enabled:
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="no_gil_mode",
-                    status="warning",
-                    message="Python is running in experimental No-GIL mode",
-                    suggestion="Verify thread safety of third-party extensions",
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="no_gil_mode",
+                        status="warning",
+                        message="Python is running in experimental No-GIL mode",
+                        suggestion="Verify thread safety of third-party extensions",
+                    )
+                )
         return results
 
     def diagnose_exception(

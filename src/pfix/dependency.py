@@ -96,7 +96,7 @@ def _install_single_package(pkg: str, config, dry_run: bool) -> bool:
         if result.returncode == 0:
             console.print(f"[green]  ✓ Installed {pkg}[/]")
             return True
-        
+
         console.print(f"[red]  ✗ Failed: {result.stderr.strip()[:200]}[/]")
         return False
 
@@ -135,6 +135,7 @@ def scan_project_deps(project_dir: Optional[Path] = None) -> dict:
 
     try:
         from pipreqs import pipreqs
+
         all_imports = list(pipreqs.get_all_imports(str(project_dir)))
         result["all_imports"] = all_imports
         _categorize_imports(all_imports, result)
@@ -151,7 +152,7 @@ def _categorize_imports(all_imports: list[str], result: dict):
         top = imp.split(".")[0]
         if top in stdlib or top in sys.builtin_module_names:
             continue
-        
+
         if is_module_available(top):
             result["installed"].append(top)
         else:
@@ -168,7 +169,7 @@ def update_requirements_file(
 
     existing = _get_existing_requirements(requirements_path)
     new = [p for p in packages if re.split(r"[=<>~!]", p)[0].lower() not in existing]
-    
+
     if not new:
         return False
 

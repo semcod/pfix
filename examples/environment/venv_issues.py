@@ -31,6 +31,7 @@ def test_sys_path_issue():
 
     # Check if site-packages is accessible
     import site
+
     sp = site.getsitepackages()
     if not sp:
         raise EnvironmentError("No site-packages found — broken venv?")
@@ -40,7 +41,8 @@ def test_sys_path_issue():
 
 @pfix(hint="Running without venv — packages installed globally")
 def check_venv_active() -> dict:
-    import sys, os
+    import sys
+    import os
 
     in_venv = sys.prefix != sys.base_prefix
     venv_path = os.environ.get("VIRTUAL_ENV", None)
@@ -63,6 +65,7 @@ def check_venv_active() -> dict:
 @pfix(hint="Wrong Python version for type syntax")
 def test_version_features() -> dict:
     import sys
+
     v = sys.version_info
 
     features = {}

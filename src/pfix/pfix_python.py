@@ -12,18 +12,18 @@ enables pfix for all scripts without needing 'import pfix' in code.
 import sys
 import os
 import subprocess
-from pathlib import Path
+
 
 def main():
     # Ensure pfix auto-activation is enabled
-    os.environ['PFIX_AUTO_APPLY'] = os.getenv('PFIX_AUTO_APPLY', 'true')
-    
+    os.environ["PFIX_AUTO_APPLY"] = os.getenv("PFIX_AUTO_APPLY", "true")
+
     # Get the real python executable
     python_exe = sys.executable
-    
+
     # Pass through all arguments
     args = sys.argv[1:]
-    
+
     # Run with pfix enabled via .pth file
     # The .pth file in site-packages will auto-activate pfix
     try:
@@ -34,6 +34,7 @@ def main():
     except Exception as e:
         print(f"pfix-python error: {e}", file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

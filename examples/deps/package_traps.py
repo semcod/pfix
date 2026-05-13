@@ -9,6 +9,7 @@ def test_wrong_package():
     # 'python-json' is NOT the stdlib json — it's a different PyPI package
     # People sometimes pip install json and get confused
     import json
+
     data = json.loads('{"key": "value"}')
     return data
 
@@ -16,6 +17,7 @@ def test_wrong_package():
 @pfix(hint="Need 'requests[security]' extras for SNI support")
 def fetch_sni_url():
     import requests
+
     # Some older systems need pyOpenSSL for SNI
     return requests.get("https://example.com", verify=True).status_code
 
@@ -34,6 +36,7 @@ def test_namespace_conflict():
     # Both 'google-cloud-storage' and 'google-auth' provide 'google' namespace
     # Installing one without the other can break imports
     from google.cloud import storage  # ImportError: various reasons
+
     return storage
 
 

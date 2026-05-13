@@ -24,6 +24,7 @@ def parse_json_string(data: str) -> dict:
 def get_home_dir():
     os = "not the module"  # shadows import
     import os  # SyntaxWarning in some versions, or uses local 'os'
+
     return os.path.expanduser("~")
 
 

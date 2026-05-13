@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import pytest
 
 from pfix.cli import main
 
 from pathlib import Path
 
-import pfix.config as config_module
-
 
 # ── CLI ─────────────────────────────────────────────────────────────
+
 
 class TestCLI:
     def test_version(self, capsys):

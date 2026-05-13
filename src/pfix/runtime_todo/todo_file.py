@@ -43,6 +43,7 @@ class TodoFile:
 
     def _file_lock(self):
         """Context manager for cross-platform file lock."""
+
         class LockContext:
             def __init__(ctx_self, lock_path: Path):
                 ctx_self.lock_path = lock_path
@@ -50,10 +51,7 @@ class TodoFile:
 
             def __enter__(ctx_self):
                 ctx_self.lock_path.parent.mkdir(parents=True, exist_ok=True)
-                ctx_self.fd = os.open(
-                    str(ctx_self.lock_path),
-                    os.O_RDWR | os.O_CREAT
-                )
+                ctx_self.fd = os.open(str(ctx_self.lock_path), os.O_RDWR | os.O_CREAT)
                 try:
                     fcntl.flock(ctx_self.fd, fcntl.LOCK_EX)
                 except (ImportError, AttributeError):
@@ -83,7 +81,7 @@ class TodoFile:
             lines = content.splitlines()
 
             for i, line in enumerate(lines):
-                match = re.search(r'<!-- pfix:fp=([a-f0-9]{16}) count=(\d+)', line)
+                match = re.search(r"<!-- pfix:fp=([a-f0-9]{16}) count=(\d+)", line)
                 if match:
                     fp = match.group(1)
                     count = int(match.group(2))
@@ -102,18 +100,10 @@ class TodoFile:
             if 0 <= line_num < len(lines):
                 line = lines[line_num]
                 # Update count
-                new_line = re.sub(
-                    r'count=\d+',
-                    f'count={current_count + 1}',
-                    line
-                )
+                new_line = re.sub(r"count=\d+", f"count={current_count + 1}", line)
                 # Update last_seen timestamp if present
                 now = datetime.now(timezone.utc).isoformat()
-                new_line = re.sub(
-                    r'last=[^\s]+',
-                    f'last={now}',
-                    new_line
-                )
+                new_line = re.sub(r"last=[^\s]+", f"last={now}", new_line)
                 lines[line_num] = new_line
                 self.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         except Exception:
@@ -168,7 +158,7 @@ class TodoFile:
             return ""
 
         content = self.path.read_text(encoding="utf-8")
-        match = re.search(r'## Runtime Errors.*?\n\n(.*?)(?=\n## |\Z)', content, re.DOTALL)
+        match = re.search(r"## Runtime Errors.*?\n\n(.*?)(?=\n## |\Z)", content, re.DOTALL)
         if match:
             return match.group(1).strip()
         return ""

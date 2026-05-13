@@ -24,11 +24,8 @@ Usage (Flask):
 
 from __future__ import annotations
 
-import sys
-import traceback
 from typing import Any, Callable, Optional
 
-from pfix.analyzer import analyze_exception
 from pfix.production import PfixMonitor
 
 

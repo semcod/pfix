@@ -23,6 +23,7 @@ def test_missing_super():
 def test_slots_error():
     class Point:
         __slots__ = ("x", "y")
+
         def __init__(self, x, y):
             self.x = x
             self.y = y
@@ -50,20 +51,29 @@ def test_dataclass_mutable():
 @pfix(hint="Diamond inheritance MRO conflict")
 def test_mro_conflict():
     class A:
-        def method(self): return "A"
+        def method(self):
+            return "A"
+
     class B(A):
-        def method(self): return "B"
+        def method(self):
+            return "B"
+
     class C(A):
-        def method(self): return "C"
+        def method(self):
+            return "C"
 
     # This works, but confusing MRO:
-    class D(B, C): pass
+    class D(B, C):
+        pass
+
     d = D()
     result = d.method()  # Returns "B" (MRO: D → B → C → A)
 
     # This fails with TypeError: inconsistent MRO
     try:
-        class E(A, B): pass  # TypeError: Cannot create a consistent MRO
+
+        class E(A, B):
+            pass  # TypeError: Cannot create a consistent MRO
     except TypeError as e:
         raise TypeError(f"MRO conflict: {e}")
     return result

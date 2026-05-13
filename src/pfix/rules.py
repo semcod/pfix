@@ -3,24 +3,23 @@ pfix.rules — Load and apply custom project rules from .pfix/rules.md
 
 Example .pfix/rules.md:
     # Project Rules
-    
+
     ## Python Style
     - Always use `from __future__ import annotations`
     - Prefer `pathlib.Path` over `os.path`
-    
-    ## Dependencies  
+
+    ## Dependencies
     - Use `httpx` instead of `requests`
-    
+
     ## Database
     - Database connections must use context managers
-    
+
     ## Types
     - All functions must have type hints
 """
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Optional
 

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
 
 from pfix.analyzer import ErrorContext, analyze_exception, classify_error, _extract_imports
 
 
 # ── Analyzer ────────────────────────────────────────────────────────
+
 
 class TestAnalyzer:
     def test_analyze_name_error(self):

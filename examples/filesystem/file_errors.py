@@ -7,6 +7,7 @@ from pfix import pfix
 @pfix(hint="File path is relative but CWD is different from expected")
 def load_config() -> dict:
     import json
+
     with open("config.json") as f:  # FileNotFoundError: config.json doesn't exist
         return json.load(f)
 
@@ -14,6 +15,7 @@ def load_config() -> dict:
 @pfix(hint="Typo in extension: .ymal instead of .yaml")
 def load_settings() -> dict:
     import json
+
     with open("settings.ymal") as f:  # typo: .ymal → .yaml
         return json.load(f)
 

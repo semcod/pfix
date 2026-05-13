@@ -22,8 +22,8 @@ CONSTANT_1234 = 1234
 CONSTANT_1500 = 1500
 
 
-
 # ── Audit Tests ──────────────────────────────────────────────────────
+
 
 class TestAudit:
     def test_audit_entry_creation(self):
@@ -50,7 +50,7 @@ class TestAudit:
         # Use temp directory for audit
         audit_file = tmp_path / ".pfix" / "audit.jsonl"
         audit_file.parent.mkdir(parents=True)
-        
+
         # Create entry
         entry = AuditEntry(
             timestamp=datetime.now().isoformat(),
@@ -68,11 +68,11 @@ class TestAudit:
             file_hash_before="abc123",
             file_hash_after="def456",
         )
-        
+
         # Write to file
         with open(audit_file, "w") as f:
             f.write(json.dumps(entry.__dict__) + "\n")
-        
+
         # Read back
         with open(audit_file) as f:
             line = f.readline()
@@ -82,24 +82,25 @@ class TestAudit:
 
 # ── Permissions Tests ─────────────────────────────────────────────────
 
+
 class TestPermissions:
     def test_get_environment(self, monkeypatch):
         # Test with ENV variable
         monkeypatch.setenv("ENV", "production")
         assert get_environment() == "production"
-        
+
         # Test with ENVIRONMENT variable
         monkeypatch.setenv("ENVIRONMENT", "staging")
         monkeypatch.delenv("ENV", raising=False)
         assert get_environment() == "staging"
-    
+
     def test_check_blocked_path(self):
         # Test blocked patterns
         blocked = Path("/project/migrations/001_add_users.py")
         allowed, reason = check_blocked_path(blocked)
         assert not allowed
         assert "migrations" in reason
-        
+
         # Test allowed path
         allowed_path = Path("/project/src/main.py")
         allowed, reason = check_blocked_path(allowed_path)
@@ -108,11 +109,12 @@ class TestPermissions:
 
 # ── Telemetry Tests ───────────────────────────────────────────────────
 
+
 class TestTelemetry:
     def test_telemetry_disabled_by_default(self, monkeypatch):
         monkeypatch.delenv("PFIX_TELEMETRY_ENABLED", raising=False)
         assert not is_telemetry_enabled()
-    
+
     def test_telemetry_event_creation(self):
         event = TelemetryEvent(
             timestamp=datetime.now().isoformat(),
@@ -129,12 +131,13 @@ class TestTelemetry:
 
 # ── Rollback Tests ────────────────────────────────────────────────────
 
+
 class TestRollback:
     def test_find_backup_dir(self, tmp_path):
         source = tmp_path / "src" / "main.py"
         backup_dir = find_backup_dir(source)
         assert backup_dir == tmp_path / "src" / ".pfix_backups"
-    
+
     def test_list_backups_empty(self, tmp_path):
         backups = list_backups(tmp_path / "nonexistent.py")
         assert backups == []
@@ -142,11 +145,12 @@ class TestRollback:
 
 # ── Rules Tests ───────────────────────────────────────────────────────
 
+
 class TestRules:
     def test_load_nonexistent_rules(self, tmp_path):
         rules = ProjectRules(tmp_path / ".pfix" / "rules.md")
         assert not rules.has_rules()
-    
+
     def test_load_rules(self, tmp_path):
         rules_file = tmp_path / ".pfix" / "rules.md"
         rules_file.parent.mkdir(parents=True)
@@ -160,7 +164,7 @@ class TestRules:
 ## Dependencies
 - Use httpx instead of requests
 """)
-        
+
         rules = ProjectRules(rules_file)
         assert rules.has_rules()
         assert len(rules.rules) == 3
@@ -168,6 +172,7 @@ class TestRules:
 
 
 # ── Cache Tests ───────────────────────────────────────────────────────
+
 
 class TestCache:
     def test_cache_initialization(self, tmp_path):
@@ -186,6 +191,7 @@ from pfix.types import ErrorContext
 
 # ── Hardware Diagnostic Tests ───────────────────────────────────────
 
+
 class TestHardwareDiagnostic:
     def test_initialization(self):
         diag = HardwareDiagnostic()
@@ -198,6 +204,7 @@ class TestHardwareDiagnostic:
         assert isinstance(results, list)
         # If single CPU, should warn
         import multiprocessing
+
         if multiprocessing.cpu_count() == 1:
             assert len(results) == 1
             assert results[0].check_name == "single_cpu"
@@ -231,6 +238,7 @@ class TestHardwareDiagnostic:
 
 
 # ── Concurrency Diagnostic Tests ────────────────────────────────────
+
 
 class TestConcurrencyDiagnostic:
     def test_initialization(self):
@@ -278,6 +286,7 @@ class TestConcurrencyDiagnostic:
 
 
 # ── Serialization Diagnostic Tests ──────────────────────────────────
+
 
 class TestSerializationDiagnostic:
     def test_initialization(self):
@@ -348,13 +357,16 @@ class TestSerializationDiagnostic:
 
 # ── Integration Tests ───────────────────────────────────────────────
 
+
 class TestEnvDiagnosticsImports:
     def test_import_env_diagnostics(self):
         from pfix.env_diagnostics import EnvDiagnostics
+
         assert EnvDiagnostics is not None
 
     def test_import_base_diagnostic(self):
         from pfix.env_diagnostics.base import BaseDiagnostic
+
         assert BaseDiagnostic is not None
 
     def test_import_specific_diagnostics(self):
@@ -368,6 +380,7 @@ class TestEnvDiagnosticsImports:
 
 
 # ── Runtime TODO Tests ────────────────────────────────────────────────
+
 
 class TestRuntimeTodo:
     def test_error_fingerprint_normalization(self):
@@ -388,7 +401,7 @@ class TestRuntimeTodo:
 
     def test_error_fingerprint_consistency(self):
         from pfix.runtime_todo import ErrorFingerprint
-        from pfix.types import RuntimeIssue, TraceFrame
+        from pfix.types import RuntimeIssue
 
         # Same error should produce same fingerprint
         issue1 = RuntimeIssue(
@@ -451,7 +464,12 @@ class TestRuntimeTodo:
             exception_type="RuntimeError",
             exception_message="test error",
             traceback_frames=[
-                TraceFrame(filepath=str(tmp_path / "app.py"), line_number=42, function_name="main", code_line="raise RuntimeError()")
+                TraceFrame(
+                    filepath=str(tmp_path / "app.py"),
+                    line_number=42,
+                    function_name="main",
+                    code_line="raise RuntimeError()",
+                )
             ],
             timestamp=datetime.now(timezone.utc),
             python_version="3.12.0",
@@ -466,6 +484,7 @@ class TestRuntimeTodo:
 
         # First append should succeed (new entry)
         from pfix.runtime_todo import ErrorFingerprint
+
         issue.fingerprint = ErrorFingerprint.compute(issue)
         result1 = todo.append_issue(issue)
         assert result1 is True
@@ -496,6 +515,7 @@ class TestRuntimeTodo:
         # High severity should be captured
         class MockConnError(ConnectionError):
             pass
+
         assert collector._should_capture(MockConnError("high"))
 
     def test_runtime_collector_classification(self):
@@ -512,6 +532,7 @@ class TestRuntimeTodo:
 
 
 # ── EnvDiagnostics Functionality Tests ───────────────────────────────
+
 
 class TestEnvDiagnostics:
     def test_env_diagnostics_initialization(self):
@@ -538,7 +559,6 @@ class TestEnvDiagnostics:
 
     def test_import_shadow_stdlib_check(self, tmp_path):
         from pfix.env_diagnostics.imports import ImportDiagnostic
-        from pathlib import Path
 
         # Create a file that shadows stdlib
         json_file = tmp_path / "json.py"
@@ -600,10 +620,7 @@ class TestEnvDiagnostics:
             line_number=10,
         )
 
-        result = diag.diagnose_exception(
-            ModuleNotFoundError("No module named 'pandas'"),
-            ctx
-        )
+        result = diag.diagnose_exception(ModuleNotFoundError("No module named 'pandas'"), ctx)
 
         assert result is not None
         assert result.category == "import_dependency"
@@ -646,10 +663,7 @@ class TestEnvDiagnostics:
 
         # Test rate limit detection
         ctx = ErrorContext(source_file="/app/main.py", line_number=10)
-        result = diag.diagnose_exception(
-            Exception("Rate limit exceeded: 429 Too Many Requests"),
-            ctx
-        )
+        result = diag.diagnose_exception(Exception("Rate limit exceeded: 429 Too Many Requests"), ctx)
         assert result is not None
         assert result.check_name == "rate_limit"
 
@@ -682,7 +696,6 @@ class TestEnvDiagnostics:
 
     def test_version_conflict_check(self, tmp_path, monkeypatch):
         from pfix.env_diagnostics.imports import ImportDiagnostic
-        from pfix.types import DiagnosticResult
 
         diag = ImportDiagnostic()
         # This test may or may not find conflicts depending on env
@@ -695,6 +708,7 @@ class TestEnvDiagnostics:
 
 
 # ── Auto-fix Tests ──────────────────────────────────────────────────
+
 
 class TestAutoFix:
     def test_auto_fix_registry(self):

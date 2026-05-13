@@ -1,5 +1,5 @@
-import pytest
 from pfix.cache import FixCache
+
 
 class TestCache:
     def test_cache_initialization(self, tmp_path):

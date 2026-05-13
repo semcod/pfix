@@ -1,4 +1,3 @@
-
 CONSTANT_3 = 3
 CONSTANT_20 = 20
 CONSTANT_30 = 30
@@ -14,5 +13,3 @@ CONSTANT_1234 = 1234
 CONSTANT_1500 = 1500
 
 "Tests for pfix new modules (audit, rollback, permissions, telemetry, env_diagnostics)."
-
-

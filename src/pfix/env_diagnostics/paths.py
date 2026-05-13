@@ -41,17 +41,19 @@ class PathDiagnostic(BaseDiagnostic):
 
         # Check for empty string in sys.path (current dir injection)
         if "" in sys.path:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="empty_sys_path",
-                status="warning",
-                message="Empty string in sys.path (current directory injection)",
-                details={"sys_path": sys.path},
-                suggestion="Remove '' from sys.path to avoid import confusion",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="empty_sys_path",
+                    status="warning",
+                    message="Empty string in sys.path (current directory injection)",
+                    details={"sys_path": sys.path},
+                    suggestion="Remove '' from sys.path to avoid import confusion",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
 
         # Check for duplicate entries
         seen = set()
@@ -62,17 +64,19 @@ class PathDiagnostic(BaseDiagnostic):
             seen.add(p)
 
         if duplicates:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="duplicate_sys_path",
-                status="warning",
-                message=f"Duplicate entries in sys.path: {duplicates}",
-                details={"duplicates": duplicates},
-                suggestion="Clean up sys.path initialization",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="duplicate_sys_path",
+                    status="warning",
+                    message=f"Duplicate entries in sys.path: {duplicates}",
+                    details={"duplicates": duplicates},
+                    suggestion="Clean up sys.path initialization",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
 
         return results
 
@@ -84,17 +88,19 @@ class PathDiagnostic(BaseDiagnostic):
         pythonpath = os.environ.get("PYTHONPATH", "")
 
         if pythonpath:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="pythonpath_set",
-                status="warning",
-                message=f"PYTHONPATH is set: {pythonpath[:100]}...",
-                details={"pythonpath": pythonpath},
-                suggestion="PYTHONPATH can cause import confusion - verify it's needed",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="pythonpath_set",
+                    status="warning",
+                    message=f"PYTHONPATH is set: {pythonpath[:100]}...",
+                    details={"pythonpath": pythonpath},
+                    suggestion="PYTHONPATH can cause import confusion - verify it's needed",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
 
         return results
 
@@ -106,17 +112,19 @@ class PathDiagnostic(BaseDiagnostic):
         cwd = os.getcwd()
 
         if " " in cwd:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="cwd_has_spaces",
-                status="warning",
-                message=f"Current directory contains spaces: {cwd}",
-                details={"cwd": cwd},
-                suggestion="Some tools have issues with spaces in paths",
-                auto_fixable=False,
-                abs_path=cwd,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="cwd_has_spaces",
+                    status="warning",
+                    message=f"Current directory contains spaces: {cwd}",
+                    details={"cwd": cwd},
+                    suggestion="Some tools have issues with spaces in paths",
+                    auto_fixable=False,
+                    abs_path=cwd,
+                    line_number=None,
+                )
+            )
 
         return results
 
@@ -132,81 +140,96 @@ class PathDiagnostic(BaseDiagnostic):
 
         for item in project_root.rglob("*"):
             if len(str(item)) > 200:
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="long_path",
-                    status="warning",
-                    message=f"Very long path ({len(str(item))} chars): {item.name}",
-                    details={"path": str(item), "length": len(str(item))},
-                    suggestion="Move project to shorter path or enable Windows long paths",
-                    auto_fixable=False,
-                    abs_path=str(item),
-                    line_number=None,
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="long_path",
+                        status="warning",
+                        message=f"Very long path ({len(str(item))} chars): {item.name}",
+                        details={"path": str(item), "length": len(str(item))},
+                        suggestion="Move project to shorter path or enable Windows long paths",
+                        auto_fixable=False,
+                        abs_path=str(item),
+                        line_number=None,
+                    )
+                )
 
         return results
 
     def _check_cwd_deleted(self) -> list["DiagnosticResult"]:
         """Check if current working directory has been deleted."""
         from ..types import DiagnosticResult
+
         results = []
         try:
             cwd = os.getcwd()
             if not os.path.exists(cwd):
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="cwd_deleted",
-                    status="error",
-                    message=f"Current working directory has been deleted: {cwd}",
-                    suggestion="Change directory to an existing one",
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="cwd_deleted",
+                        status="error",
+                        message=f"Current working directory has been deleted: {cwd}",
+                        suggestion="Change directory to an existing one",
+                    )
+                )
         except OSError as e:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="cwd_error",
-                status="error",
-                message=f"Error accessing current working directory: {e}",
-                suggestion="Check directory permissions or parent existence",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="cwd_error",
+                    status="error",
+                    message=f"Error accessing current working directory: {e}",
+                    suggestion="Check directory permissions or parent existence",
+                )
+            )
         return results
 
     def _check_root_permissions(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check project root readability and writability."""
         from ..types import DiagnosticResult
+
         results = []
         if not os.access(project_root, os.R_OK):
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="root_not_readable",
-                status="error",
-                message=f"Project root is not readable: {project_root}",
-                suggestion="Check directory permissions",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="root_not_readable",
+                    status="error",
+                    message=f"Project root is not readable: {project_root}",
+                    suggestion="Check directory permissions",
+                )
+            )
         if not os.access(project_root, os.W_OK):
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="root_not_writable",
-                status="warning",
-                message=f"Project root is not writable: {project_root}",
-                suggestion="Pfix might not be able to save logs or TODO.md",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="root_not_writable",
+                    status="warning",
+                    message=f"Project root is not writable: {project_root}",
+                    suggestion="Pfix might not be able to save logs or TODO.md",
+                )
+            )
         return results
 
     def _check_tmp_writable(self) -> list["DiagnosticResult"]:
         """Check if system temporary directory is writable."""
         from ..types import DiagnosticResult
         import tempfile
+
         results = []
         try:
             tmpdir = tempfile.gettempdir()
             if not os.access(tmpdir, os.W_OK):
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="tmp_not_writable",
-                    status="error",
-                    message=f"Temporary directory is not writable: {tmpdir}",
-                    suggestion="Check permissions of /tmp or set TMPDIR",
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="tmp_not_writable",
+                        status="error",
+                        message=f"Temporary directory is not writable: {tmpdir}",
+                        suggestion="Check permissions of /tmp or set TMPDIR",
+                    )
+                )
         except Exception:
             pass
         return results
@@ -214,6 +237,7 @@ class PathDiagnostic(BaseDiagnostic):
     def _check_symlink_cycles(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for cyclic symlinks that could cause infinite loops."""
         from ..types import DiagnosticResult
+
         results = []
         for item in project_root.rglob("*"):
             if item.is_symlink():
@@ -221,24 +245,28 @@ class PathDiagnostic(BaseDiagnostic):
                     # Try to resolve to see if it loops or is broken
                     target = item.resolve()
                     if target == item or item in target.parents:
-                        results.append(DiagnosticResult(
-                            category=self.category,
-                            check_name="symlink_cycle",
-                            status="error",
-                            message=f"Symlink cycle detected: {item}",
-                            suggestion="Remove or fix the cyclic symlink",
-                            abs_path=str(item),
-                        ))
+                        results.append(
+                            DiagnosticResult(
+                                category=self.category,
+                                check_name="symlink_cycle",
+                                status="error",
+                                message=f"Symlink cycle detected: {item}",
+                                suggestion="Remove or fix the cyclic symlink",
+                                abs_path=str(item),
+                            )
+                        )
                 except (OSError, RuntimeError):
                     # resolve() can raise RuntimeError on recursive symlinks
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name="symlink_broken_recursive",
-                        status="error",
-                        message=f"Broken or recursive symlink: {item}",
-                        suggestion="Check symlink target",
-                        abs_path=str(item),
-                    ))
+                    results.append(
+                        DiagnosticResult(
+                            category=self.category,
+                            check_name="symlink_broken_recursive",
+                            status="error",
+                            message=f"Broken or recursive symlink: {item}",
+                            suggestion="Check symlink target",
+                            abs_path=str(item),
+                        )
+                    )
         return results
 
     def diagnose_exception(

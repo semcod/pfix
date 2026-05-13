@@ -22,6 +22,7 @@ def parse_user_age(age_str: str) -> int:
 @pfix(hint="JSON with trailing comma — invalid JSON")
 def parse_json_response(raw: str) -> dict:
     import json
+
     return json.loads(raw)  # json.JSONDecodeError
 
 
@@ -34,11 +35,13 @@ def parse_csv_data(csv_text: str) -> list[dict]:
     rows = []
     for row in reader:
         # Force access to column that might not exist in all rows
-        rows.append({
-            "name": row["name"],
-            "score": int(row["score"]),  # ValueError if empty or missing
-            "grade": row["grade"],       # KeyError if column missing in some rows
-        })
+        rows.append(
+            {
+                "name": row["name"],
+                "score": int(row["score"]),  # ValueError if empty or missing
+                "grade": row["grade"],  # KeyError if column missing in some rows
+            }
+        )
     return rows
 
 
@@ -50,23 +53,12 @@ def parse_coordinate(coord_str: str) -> tuple:
 
 if __name__ == "__main__":
     tests = [
-        ("1. KeyError: missing dict key",
-         lambda: extract_email({"name": "Alice", "age": 30})),
-
-        ("2. IndexError: list too short",
-         lambda: get_third_element([10, 20])),
-
-        ("3. ValueError: non-numeric string",
-         lambda: parse_user_age("twenty-five")),
-
-        ("4. JSONDecodeError: trailing comma",
-         lambda: parse_json_response('{"name": "Bob", "age": 25,}')),
-
-        ("5. CSV: missing column",
-         lambda: parse_csv_data("name,score\nAlice,95\nBob,")),
-
-        ("6. ValueError: wrong unpack count",
-         lambda: parse_coordinate("1.0,2.0")),
+        ("1. KeyError: missing dict key", lambda: extract_email({"name": "Alice", "age": 30})),
+        ("2. IndexError: list too short", lambda: get_third_element([10, 20])),
+        ("3. ValueError: non-numeric string", lambda: parse_user_age("twenty-five")),
+        ("4. JSONDecodeError: trailing comma", lambda: parse_json_response('{"name": "Bob", "age": 25,}')),
+        ("5. CSV: missing column", lambda: parse_csv_data("name,score\nAlice,95\nBob,")),
+        ("6. ValueError: wrong unpack count", lambda: parse_coordinate("1.0,2.0")),
     ]
     for label, fn in tests:
         print(f"{label}:")

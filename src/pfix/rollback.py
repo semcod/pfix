@@ -18,7 +18,7 @@ from typing import Optional
 from rich.console import Console
 from rich.table import Table
 
-from .audit import DEFAULT_AUDIT_FILE, read_audit_log
+from .audit import read_audit_log
 
 console = Console()
 
@@ -105,13 +105,10 @@ def rollback_file(filepath: str, before: Optional[str] = None) -> int:
     # Filter by date if specified
     if before:
         before_dt = datetime.fromisoformat(before)
-        backups = [
-            b for b in backups
-            if datetime.fromtimestamp(b.stat().st_mtime) < before_dt
-        ]
+        backups = [b for b in backups if datetime.fromtimestamp(b.stat().st_mtime) < before_dt]
 
     if not backups:
-        console.print(f"[yellow]No backups matching criteria[/]")
+        console.print("[yellow]No backups matching criteria[/]")
         return 0
 
     # Rollback to oldest backup in range

@@ -7,7 +7,7 @@ from pfix.types import ErrorContext
 class TestHardwareDiagnostic:
     def test_initialization(self) -> None:
         diag = HardwareDiagnostic()
-        assert diag.category == 'hardware'
+        assert diag.category == "hardware"
 
     def test_cpu_count_check(self, tmp_path) -> None:
         diag = HardwareDiagnostic()
@@ -15,12 +15,12 @@ class TestHardwareDiagnostic:
         assert isinstance(results, list)
         if multiprocessing.cpu_count() == 1:
             assert len(results) == 1
-            assert results[0].check_name == 'single_cpu'
-            assert results[0].status == 'warning'
+            assert results[0].check_name == "single_cpu"
+            assert results[0].status == "warning"
 
     def test_gpu_check_no_cuda(self, tmp_path, monkeypatch) -> None:
         diag = HardwareDiagnostic()
-        monkeypatch.delenv('CUDA_VISIBLE_DEVICES', raising=False)
+        monkeypatch.delenv("CUDA_VISIBLE_DEVICES", raising=False)
         results = diag._check_gpu_availability()
         assert isinstance(results, list)
 
@@ -31,6 +31,11 @@ class TestHardwareDiagnostic:
 
     def test_diagnose_exception_cuda_error(self) -> None:
         diag = HardwareDiagnostic()
-        ctx = ErrorContext(source_file='/test/file.py', line_number=10, exception_type='RuntimeError', exception_message='CUDA out of memory')
-        result = diag.diagnose_exception(RuntimeError('CUDA error'), ctx)
+        ctx = ErrorContext(
+            source_file="/test/file.py",
+            line_number=10,
+            exception_type="RuntimeError",
+            exception_message="CUDA out of memory",
+        )
+        result = diag.diagnose_exception(RuntimeError("CUDA error"), ctx)
         assert result is None

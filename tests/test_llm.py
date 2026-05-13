@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
 
 from pfix.llm import FixProposal, _parse_response
 
 
 # ── LLM Parsing ────────────────────────────────────────────────────
+
 
 class TestLLMParsing:
     def test_parse_valid_json(self):

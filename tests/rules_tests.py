@@ -1,11 +1,11 @@
-import pytest
 from pfix.rules import ProjectRules
+
 
 class TestRules:
     def test_load_nonexistent_rules(self, tmp_path):
         rules = ProjectRules(tmp_path / ".pfix" / "rules.md")
         assert not rules.has_rules()
-    
+
     def test_load_rules(self, tmp_path):
         rules_file = tmp_path / ".pfix" / "rules.md"
         rules_file.parent.mkdir(parents=True)

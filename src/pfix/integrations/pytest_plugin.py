@@ -11,8 +11,6 @@ pytest_plugins = ["pfix.integrations.pytest_plugin"]
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -131,7 +129,7 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     for report in failures:
         if hasattr(report, "_pfix_diagnosis"):
             pfix_count += 1
-            lines.append(f"")
+            lines.append("")
             lines.append(f"Test: {report.nodeid}")
             lines.append(f"Confidence: {report._pfix_confidence:.0%}")
             lines.append(f"Diagnosis: {report._pfix_diagnosis}")

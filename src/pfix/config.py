@@ -29,7 +29,7 @@ class PfixConfig:
     # Behavior
     auto_apply: bool = False
     auto_install_deps: bool = True
-    auto_restart: bool = False          # os.execv restart after fix
+    auto_restart: bool = False  # os.execv restart after fix
     max_retries: int = 3
     enabled: bool = True
     dry_run: bool = False
@@ -40,7 +40,7 @@ class PfixConfig:
     # MCP
     mcp_enabled: bool = False
     mcp_server_url: str = "http://localhost:3001"
-    mcp_transport: str = "stdio"        # "stdio" | "http"
+    mcp_transport: str = "stdio"  # "stdio" | "http"
 
     # Git integration
     git_auto_commit: bool = False
@@ -121,7 +121,7 @@ def _merge_pyproject_config(cfg: "PfixConfig"):
     """Merge tool.pfix settings from pyproject.toml."""
     pyproject_full = PfixConfig._read_pyproject_full(cfg.project_root / "pyproject.toml")
     cfg._pyproject_data = pyproject_full
-    
+
     pyproject = pyproject_full.get("tool", {}).get("pfix", {})
     for key, val in pyproject.items():
         # Only set if not already overridden by PFIX_* env var

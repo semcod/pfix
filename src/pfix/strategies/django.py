@@ -13,8 +13,17 @@ class DjangoFixStrategy(FixStrategy):
     name = "Django"
 
     DJANGO_KEYWORDS = [
-        "django", "models", "views", "urls", "forms", "admin",
-        "migrate", "migration", "queryset", "manager", "settings",
+        "django",
+        "models",
+        "views",
+        "urls",
+        "forms",
+        "admin",
+        "migrate",
+        "migration",
+        "queryset",
+        "manager",
+        "settings",
     ]
 
     def detect(self, ctx: ErrorContext) -> bool:

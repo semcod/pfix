@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
 
 from pfix.fixer import _validate_syntax, _make_diff
 
 
 # ── Fixer ───────────────────────────────────────────────────────────
+
 
 class TestFixer:
     def test_validate_syntax(self):

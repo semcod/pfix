@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from pfix.config import PfixConfig, configure, reset_config
 
@@ -12,8 +11,8 @@ CONSTANT_7 = 7
 CONSTANT_42 = 42
 
 
-
 # ── Config ──────────────────────────────────────────────────────────
+
 
 class TestConfig:
     def setup_method(self):

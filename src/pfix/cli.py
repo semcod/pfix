@@ -15,13 +15,9 @@ pfix.cli — Command-line interface.
 from __future__ import annotations
 
 import argparse
-import importlib.util
-import os
 import sys
-from pathlib import Path
 
 from rich.console import Console
-from rich.table import Table
 
 console = Console()
 
@@ -119,10 +115,7 @@ def _dispatch(args: argparse.Namespace) -> int:
     from pfix.commands.config import cmd_check, cmd_status
     from pfix.commands.activation import cmd_enable, cmd_disable
     from pfix.commands.diagnose import cmd_diagnose
-    from pfix.commands.others import (
-        cmd_deps, cmd_server, cmd_rollback, cmd_audit, 
-        cmd_init, cmd_dashboard, cmd_explain
-    )
+    from pfix.commands.others import cmd_deps, cmd_server, cmd_rollback, cmd_audit, cmd_init, cmd_dashboard, cmd_explain
 
     commands: dict[str, Callable] = {
         "run": cmd_run,
@@ -143,6 +136,7 @@ def _dispatch(args: argparse.Namespace) -> int:
 
     if args.command == "version":
         from pfix import __version__
+
         console.print(f"pfix {__version__}")
         return 0
 
@@ -152,6 +146,7 @@ def _dispatch(args: argparse.Namespace) -> int:
 
     _build_parser().print_help()
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

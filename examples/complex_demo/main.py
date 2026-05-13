@@ -5,7 +5,6 @@ Zero-config example: just `import pfix`, configuration is in pyproject.toml
 """
 
 
-
 def load_and_process_data(filepath: str) -> dict:
     """Load CSV, process it, return statistics."""
     import pandas as pd  # Will auto-install if missing
@@ -29,7 +28,6 @@ def load_and_process_data(filepath: str) -> dict:
 
 def analyze_users(users: list[dict]) -> dict:
     """Analyze user data with multiple bugs."""
-    import json
 
     # Bug 4: TypeError - can't add int to str
     total_score = 0

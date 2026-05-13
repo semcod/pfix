@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
 
@@ -18,6 +17,7 @@ console = Console(stderr=True)
 
 class DiffParseError(Exception):
     """Raised when diff parsing fails."""
+
     pass
 
 
@@ -46,7 +46,7 @@ def _parse_file_header(lines: list[str], i: int) -> tuple[str, str, int]:
     """Parse --- and +++ lines."""
     old_line = lines[i]
     old_path = old_line[4:].split("\t")[0].strip()
-    
+
     i += 1
     if i >= len(lines):
         raise DiffParseError("Unexpected end of diff after ---")
@@ -54,7 +54,7 @@ def _parse_file_header(lines: list[str], i: int) -> tuple[str, str, int]:
     new_line = lines[i]
     if not new_line.startswith("+++ "):
         raise DiffParseError(f"Expected +++ after ---, got: {new_line[:20]}")
-    
+
     new_path = new_line[4:].split("\t")[0].strip()
     return old_path, new_path, i + 1
 
@@ -66,7 +66,7 @@ def _collect_hunk_lines(lines: list[str], i: int) -> tuple[list[str], int]:
         line = lines[i]
         if line.startswith("--- "):
             break
-        
+
         if any(line.startswith(p) for p in ("@@", "+", "-", " ")) or line == "":
             hunk_lines.append(line)
             i += 1
@@ -110,20 +110,21 @@ def apply_hunk(
 
     _, old_count, _, _ = parse_hunk_header(header)
     start_idx = old_start - 1
-    
+
     processed_lines, lines_consumed = _process_hunk_body(hunk_lines[1:], old_lines[start_idx:])
-    
-    return old_lines[:start_idx] + processed_lines + old_lines[start_idx + old_count:]
+
+    return old_lines[:start_idx] + processed_lines + old_lines[start_idx + old_count :]
 
 
 def _process_hunk_body(hunk_lines: list[str], old_lines_from_start: list[str]) -> tuple[list[str], int]:
     """Process lines within a hunk body and return new lines and count of old lines consumed."""
     new_lines = []
     old_ptr = 0
-    
+
     for line in hunk_lines:
-        if not line: continue
-        
+        if not line:
+            continue
+
         if line.startswith("-"):
             old_ptr += 1
         elif line.startswith("+"):
@@ -132,7 +133,7 @@ def _process_hunk_body(hunk_lines: list[str], old_lines_from_start: list[str]) -
             if old_ptr < len(old_lines_from_start):
                 new_lines.append(old_lines_from_start[old_ptr])
             old_ptr += 1
-            
+
     return new_lines, old_ptr
 
 
@@ -195,6 +196,7 @@ def apply_diff_to_file(
 
         # Validate syntax
         import ast
+
         try:
             ast.parse(new_content)
         except SyntaxError as e:
@@ -228,9 +230,11 @@ def create_unified_diff(
     old_lines = old_content.splitlines(keepends=True)
     new_lines = new_content.splitlines(keepends=True)
 
-    return "".join(difflib.unified_diff(
-        old_lines,
-        new_lines,
-        fromfile=old_path,
-        tofile=new_path,
-    ))
+    return "".join(
+        difflib.unified_diff(
+            old_lines,
+            new_lines,
+            fromfile=old_path,
+            tofile=new_path,
+        )
+    )

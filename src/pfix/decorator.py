@@ -42,9 +42,10 @@ def _capture_runtime_error(exc: BaseException, func: Any = None, hints: Optional
     """Capture exception to runtime TODO.md if enabled."""
     try:
         from .runtime_todo import get_collector
+
         collector = get_collector()
         if collector:
-            context = {"function": getattr(func, '__name__', None)}
+            context = {"function": getattr(func, "__name__", None)}
             if hints:
                 context.update(hints)
             collector.capture(exc, context)
@@ -55,6 +56,7 @@ def _capture_runtime_error(exc: BaseException, func: Any = None, hints: Optional
 
 @overload
 def pfix(func: F) -> F: ...
+
 
 @overload
 def pfix(
@@ -91,6 +93,7 @@ def pfix(
         on_error: Custom error handler, called before LLM analysis.
         enabled: Override global enabled flag.
     """
+
     def decorator(fn: F) -> F:
         @functools.wraps(fn)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -118,8 +121,7 @@ def pfix(
                 except BaseException as exc:
                     last_exc = exc
                     if _handle_decorator_exception(
-                        fn, exc, attempt, max_retries, hint, args, kwargs,
-                        config, should_auto, should_restart, on_error
+                        fn, exc, attempt, max_retries, hint, args, kwargs, config, should_auto, should_restart, on_error
                     ):
                         continue
                     break
@@ -139,8 +141,10 @@ def pfix(
 
 # ── Async variant ───────────────────────────────────────────────────
 
+
 def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
     """Async version of @pfix. CC≤5."""
+
     def decorator(fn: F) -> F:
         @functools.wraps(fn)
         async def wrapper(*args: Any, **kw: Any) -> Any:
@@ -156,9 +160,17 @@ def apfix(func: Optional[F] = None, **kwargs: Any) -> Any:
                 except BaseException as exc:
                     last_exc = exc
                     if _handle_decorator_exception(
-                        fn, exc, attempt, max_retries, kwargs.get("hint", ""),
-                        args, kw, config, kwargs.get("auto_apply"), 
-                        kwargs.get("restart"), kwargs.get("on_error")
+                        fn,
+                        exc,
+                        attempt,
+                        max_retries,
+                        kwargs.get("hint", ""),
+                        args,
+                        kw,
+                        config,
+                        kwargs.get("auto_apply"),
+                        kwargs.get("restart"),
+                        kwargs.get("on_error"),
                     ):
                         continue
                     break
@@ -183,13 +195,14 @@ def _handle_decorator_exception(
         return False
 
     console.print(
-        f"\n[red]💥 pfix caught: {type(exc).__name__}: {exc}[/]"
-        f"  [dim](attempt {attempt + 1}/{max_retries})[/]"
+        f"\n[red]💥 pfix caught: {type(exc).__name__}: {exc}[/]  [dim](attempt {attempt + 1}/{max_retries})[/]"
     )
 
     if on_error:
-        try: on_error(exc)
-        except Exception: pass
+        try:
+            on_error(exc)
+        except Exception:
+            pass
 
     if _try_quick_dep_fix(exc):
         console.print("[green]  ↻ Dependency installed, retrying...[/]")
@@ -210,7 +223,7 @@ def _handle_decorator_exception(
     fixed = _apply_decorator_fix(ctx, proposal, config, should_auto)
     if fixed:
         return _after_fix_action(fn, should_restart)
-    
+
     console.print("[yellow]  Fix not applied[/]")
     return False
 
@@ -231,11 +244,11 @@ def _after_fix_action(fn, should_restart) -> bool:
     if should_restart:
         console.print("[green]  🔄 Restarting process...[/]")
         os.execv(sys.executable, [sys.executable] + sys.argv)
-    
+
     if _try_reload_module(fn):
         console.print("[green]  ↻ Module reloaded, retrying...[/]")
         return True
-    
+
     console.print("[yellow]  ⚠ Reload failed — restart needed[/]")
     return False
 

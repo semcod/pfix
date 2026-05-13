@@ -102,6 +102,7 @@ class FixCache:
         # Try diskcache first (faster), fall back to SQLite
         try:
             import diskcache
+
             self._diskcache = diskcache.Cache(str(self.cache_dir / "diskcache"))
         except ImportError:
             _init_sqlite_db(self.db_path)
@@ -120,8 +121,7 @@ class FixCache:
         # Use SQLite
         conn = sqlite3.connect(str(self.db_path))
         cursor = conn.execute(
-            "SELECT fix_proposal_json FROM fix_cache WHERE cache_key = ? AND expires_at > ?",
-            (key, datetime.now())
+            "SELECT fix_proposal_json FROM fix_cache WHERE cache_key = ? AND expires_at > ?", (key, datetime.now())
         )
         row = cursor.fetchone()
         conn.close()
@@ -157,7 +157,7 @@ class FixCache:
                 hashlib.sha256(ctx.function_source.encode()).hexdigest()[:16] if ctx.function_source else "",
                 json_data,
                 expires_at,
-            )
+            ),
         )
         conn.commit()
         conn.close()

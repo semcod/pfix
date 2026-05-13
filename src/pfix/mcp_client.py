@@ -8,7 +8,7 @@ in the developer's actual environment.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from .config import get_config
@@ -34,6 +34,7 @@ class MCPClient:
     async def connect(self) -> bool:
         try:
             import httpx
+
             self._session = httpx.AsyncClient(base_url=self.server_url, timeout=30.0)
             return True
         except Exception as e:
@@ -49,12 +50,15 @@ class MCPClient:
         if not self._session:
             return MCPResult(success=False, error="Not connected")
         try:
-            resp = await self._session.post("/mcp/v1/tools/call", json={
-                "jsonrpc": "2.0",
-                "method": "tools/call",
-                "params": {"name": tool_name, "arguments": arguments},
-                "id": 1,
-            })
+            resp = await self._session.post(
+                "/mcp/v1/tools/call",
+                json={
+                    "jsonrpc": "2.0",
+                    "method": "tools/call",
+                    "params": {"name": tool_name, "arguments": arguments},
+                    "id": 1,
+                },
+            )
             data = resp.json()
             if "error" in data:
                 return MCPResult(success=False, error=str(data["error"]))

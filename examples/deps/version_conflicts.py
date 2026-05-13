@@ -7,6 +7,7 @@ from pfix import pfix
 @pfix(hint="Using removed API from old version of a package")
 def use_deprecated_api():
     import collections
+
     # collections.MutableMapping removed in Python 3.10+
     # should use collections.abc.MutableMapping
     class MyDict(collections.MutableMapping):  # AttributeError in 3.10+
@@ -16,18 +17,21 @@ def use_deprecated_api():
 @pfix(hint="pkg_resources is deprecated in favor of importlib.metadata")
 def get_package_version(name: str) -> str:
     import pkg_resources  # DeprecationWarning, removed in some envs
+
     return pkg_resources.get_distribution(name).version
 
 
 @pfix(hint="Using function that was renamed in newer version")
 def legacy_json_parse(data: str) -> dict:
     import json
+
     return json.read(data)  # AttributeError: json.read → json.loads
 
 
 @pfix(hint="Missing optional dependency for feature — needs pfix[mcp]")
 def start_mcp_server():
     from mcp.server.fastmcp import FastMCP  # ImportError if mcp not installed
+
     server = FastMCP("test")
     return server
 

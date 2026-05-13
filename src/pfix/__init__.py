@@ -23,24 +23,37 @@ from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
 __version__ = "0.1.73"
-__all__ = ["pfix", "apfix", "auto_pfix", "pfix_session", "pfix_guard", "configure", "get_config", "PfixConfig", "reset_config"]
+__all__ = [
+    "pfix",
+    "apfix",
+    "auto_pfix",
+    "pfix_session",
+    "pfix_guard",
+    "configure",
+    "get_config",
+    "PfixConfig",
+    "reset_config",
+]
 
 # ── Auto-activation on import ─────────────────────────────────────
 # If PFIX_AUTO_APPLY=true in .env, automatically install global exception hook
 # This allows: `import pfix` to just work with zero code changes
 
+
 def _auto_activate():
     """Check .env and auto-enable pfix if context allows."""
     import os
+
     _load_env()
-    
+
     # Check if explicitly disabled
     if os.getenv("PFIX_AUTO_ACTIVATE", "true").lower() in ("false", "0", "no"):
         return
-    
+
     # Check for auto_apply
     if os.getenv("PFIX_AUTO_APPLY", "false").lower() in ("true", "1", "yes"):
         from .session import install_pfix_hook
+
         caller_file = _get_caller_file()
         install_pfix_hook(caller_file, auto_apply=True)
 
@@ -52,6 +65,7 @@ def _load_env():
     """Load .env file from current or parent directories."""
     from pathlib import Path
     from dotenv import load_dotenv
+
     for parent in [Path.cwd(), *Path.cwd().parents]:
         env_file = parent / ".env"
         if env_file.exists():
@@ -62,6 +76,7 @@ def _load_env():
 def _get_caller_file() -> str | None:
     """Get the file path of the script that imported pfix."""
     import inspect
+
     frame = inspect.currentframe()
     if frame and frame.f_back and frame.f_back.f_back:
         # Walk back: _auto_activate -> <module> -> caller
@@ -74,17 +89,19 @@ def _setup_runtime_todo():
     """Configure and install runtime_todo excepthook if enabled."""
     import os
     from .config import get_config
+
     config = get_config()
     pyproject = getattr(config, "_pyproject_data", {})
     rt_config = pyproject.get("tool", {}).get("pfix", {}).get("runtime_todo", {})
-    
+
     rt_enabled = os.getenv("PFIX_RUNTIME_TODO", str(rt_config.get("enabled", "false"))).lower() in ("true", "1", "yes")
     if rt_enabled:
         try:
             from .runtime_todo import RuntimeCollector, TodoFile
+
             todo_path = os.getenv("PFIX_TODO_FILE", rt_config.get("todo_file", "TODO.md"))
             collector = RuntimeCollector(
-                TodoFile(todo_path), 
+                TodoFile(todo_path),
                 enabled=True,
                 min_severity=rt_config.get("min_severity", "low"),
                 deduplicate=rt_config.get("deduplicate", True),
@@ -93,13 +110,16 @@ def _setup_runtime_todo():
         except Exception:
             pass
 
+
 # Run auto-activation
 try:
     _auto_activate()
 except Exception as e:
     # Never break user code if auto-activation fails
     import sys
+
     print(f"[pfix-debug] Auto-activation failed: {e}", file=sys.stderr)
     import traceback
+
     traceback.print_exc()
     pass

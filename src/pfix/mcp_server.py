@@ -33,9 +33,7 @@ def create_mcp_server():
     try:
         from mcp.server.fastmcp import FastMCP
     except ImportError:
-        raise ImportError(
-            "MCP server requires the mcp package. Install with: pip install pfix[mcp]"
-        )
+        raise ImportError("MCP server requires the mcp package. Install with: pip install pfix[mcp]")
 
     mcp = FastMCP(
         "pfix",
@@ -53,6 +51,7 @@ def create_mcp_server():
 
 def _register_analyze_tool(mcp):
     """Register pfix_analyze tool."""
+
     @mcp.tool()
     def pfix_analyze(
         exception_type: str,
@@ -64,27 +63,35 @@ def _register_analyze_tool(mcp):
         hint: str = "",
     ) -> str:
         """Analyze a Python error and return diagnosis + fix proposal (no changes applied)."""
-        from .types import ErrorContext
         from .llm import request_fix
 
         ctx = _build_ctx(
-            exception_type, exception_message, source_file,
-            traceback, function_name, line_number, hint,
+            exception_type,
+            exception_message,
+            source_file,
+            traceback,
+            function_name,
+            line_number,
+            hint,
         )
         proposal = request_fix(ctx)
 
-        return json.dumps({
-            "diagnosis": proposal.diagnosis,
-            "error_category": proposal.error_category,
-            "fix_description": proposal.fix_description,
-            "confidence": proposal.confidence,
-            "dependencies": proposal.dependencies,
-            "has_code_fix": proposal.has_code_fix,
-        }, indent=2)
+        return json.dumps(
+            {
+                "diagnosis": proposal.diagnosis,
+                "error_category": proposal.error_category,
+                "fix_description": proposal.fix_description,
+                "confidence": proposal.confidence,
+                "dependencies": proposal.dependencies,
+                "has_code_fix": proposal.has_code_fix,
+            },
+            indent=2,
+        )
 
 
 def _register_fix_tool(mcp):
     """Register pfix_fix tool."""
+
     @mcp.tool()
     def pfix_fix(
         exception_type: str,
@@ -102,8 +109,13 @@ def _register_fix_tool(mcp):
         from .llm import request_fix
 
         ctx = _build_ctx(
-            exception_type, exception_message, source_file,
-            traceback, function_name, line_number, hint,
+            exception_type,
+            exception_message,
+            source_file,
+            traceback,
+            function_name,
+            line_number,
+            hint,
         )
 
         if auto_apply:
@@ -112,12 +124,15 @@ def _register_fix_tool(mcp):
         proposal = request_fix(ctx)
 
         if proposal.confidence < 0.1:
-            return json.dumps({
-                "applied": False,
-                "reason": "Confidence too low",
-                "confidence": proposal.confidence,
-                "diagnosis": proposal.diagnosis,
-            }, indent=2)
+            return json.dumps(
+                {
+                    "applied": False,
+                    "reason": "Confidence too low",
+                    "confidence": proposal.confidence,
+                    "diagnosis": proposal.diagnosis,
+                },
+                indent=2,
+            )
 
         # Compute diff
         diff = ""
@@ -128,18 +143,22 @@ def _register_fix_tool(mcp):
 
         applied = apply_fix(ctx, proposal, confirm=False)
 
-        return json.dumps({
-            "applied": applied,
-            "diagnosis": proposal.diagnosis,
-            "fix_description": proposal.fix_description,
-            "confidence": proposal.confidence,
-            "diff": diff[:3000],  # truncate for MCP response
-            "dependencies_installed": proposal.dependencies if applied else [],
-        }, indent=2)
+        return json.dumps(
+            {
+                "applied": applied,
+                "diagnosis": proposal.diagnosis,
+                "fix_description": proposal.fix_description,
+                "confidence": proposal.confidence,
+                "diff": diff[:3000],  # truncate for MCP response
+                "dependencies_installed": proposal.dependencies if applied else [],
+            },
+            indent=2,
+        )
 
 
 def _register_deps_tools(mcp):
     """Register dependency-related tools."""
+
     @mcp.tool()
     def pfix_deps_scan(path: str) -> str:
         """Scan Python files for missing third-party dependencies."""
@@ -158,10 +177,13 @@ def _register_deps_tools(mcp):
         from .dependency import install_packages
 
         results = install_packages([package])
-        return json.dumps({
-            "package": package,
-            "installed": results.get(package, False),
-        }, indent=2)
+        return json.dumps(
+            {
+                "package": package,
+                "installed": results.get(package, False),
+            },
+            indent=2,
+        )
 
     @mcp.tool()
     def pfix_deps_generate(project_dir: str = ".") -> str:
@@ -171,15 +193,19 @@ def _register_deps_tools(mcp):
         output = generate_requirements(Path(project_dir))
         if output.exists():
             content = output.read_text()
-            return json.dumps({
-                "path": str(output),
-                "content": content,
-            }, indent=2)
+            return json.dumps(
+                {
+                    "path": str(output),
+                    "content": content,
+                },
+                indent=2,
+            )
         return json.dumps({"error": "Failed to generate requirements.txt"})
 
 
 def _register_diagnose_tool(mcp):
     """Register pfix_diagnose tool."""
+
     @mcp.tool()
     def pfix_diagnose(
         project_path: str = ".",
@@ -212,32 +238,36 @@ def _register_diagnose_tool(mcp):
         errors = sum(1 for r in results if r.status == "error")
         warnings = sum(1 for r in results if r.status == "warning")
 
-        return json.dumps({
-            "project": str(target),
-            "categories_checked": cat_list or "all",
-            "total_issues": len(results),
-            "critical": critical,
-            "errors": errors,
-            "warnings": warnings,
-            "issues": [
-                {
-                    "category": r.category,
-                    "check": r.check_name,
-                    "status": r.status,
-                    "message": r.message,
-                    "suggestion": r.suggestion,
-                    "auto_fixable": r.auto_fixable,
-                    "path": r.abs_path,
-                    "line": r.line_number,
-                }
-                for r in results
-                if r.status != "ok"
-            ],
-        }, indent=2)
+        return json.dumps(
+            {
+                "project": str(target),
+                "categories_checked": cat_list or "all",
+                "total_issues": len(results),
+                "critical": critical,
+                "errors": errors,
+                "warnings": warnings,
+                "issues": [
+                    {
+                        "category": r.category,
+                        "check": r.check_name,
+                        "status": r.status,
+                        "message": r.message,
+                        "suggestion": r.suggestion,
+                        "auto_fixable": r.auto_fixable,
+                        "path": r.abs_path,
+                        "line": r.line_number,
+                    }
+                    for r in results
+                    if r.status != "ok"
+                ],
+            },
+            indent=2,
+        )
 
 
 def _register_edit_tool(mcp):
     """Register pfix_edit_file tool."""
+
     @mcp.tool()
     def pfix_edit_file(path: str, content: str) -> str:
         """Write content to a file (used by LLM to apply fixes)."""
@@ -249,8 +279,13 @@ def _register_edit_tool(mcp):
 
 
 def _build_ctx(
-    exception_type, exception_message, source_file,
-    traceback_text, function_name, line_number, hint,
+    exception_type,
+    exception_message,
+    source_file,
+    traceback_text,
+    function_name,
+    line_number,
+    hint,
 ):
     """Build ErrorContext from MCP tool arguments."""
     from .types import ErrorContext

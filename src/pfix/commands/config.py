@@ -102,6 +102,7 @@ def _check_package_status(table: Table):
 def _check_activation_status(table: Table) -> Path | None:
     """Check auto-activation .pth file status."""
     import site
+
     site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
     if not site_packages:
         site_packages = Path(site.getusersitepackages()) if site.getusersitepackages() else None

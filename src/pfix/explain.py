@@ -17,8 +17,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.markdown import Markdown
 
-from .config import get_config
-from .llm import SYSTEM_PROMPT
 
 console = Console()
 
@@ -223,9 +221,9 @@ def _generate_explanation(exc_type: str, exc_msg: str, diagnosis: str) -> str:
 
     # The error
     parts.append("## The Error")
-    parts.append(f"```")
+    parts.append("```")
     parts.append(f"{exc_type}: {exc_msg}")
-    parts.append(f"```")
+    parts.append("```")
     parts.append("")
 
     # Diagnosis if available

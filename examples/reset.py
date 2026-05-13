@@ -90,6 +90,7 @@ def main():
     original_cwd = Path.cwd()
     try:
         import os
+
         os.chdir(repo_root)
 
         # Run git checkout

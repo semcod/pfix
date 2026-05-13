@@ -14,10 +14,11 @@ def get_collector(config: Optional[Any] = None) -> Optional[RuntimeCollector]:
     """Get or create RuntimeCollector from config."""
     if config is None:
         from ..config import get_config
+
         config = get_config()
 
     # Check if runtime_todo enabled in pyproject.toml
-    pyproject = getattr(config, '_pyproject_data', {})
+    pyproject = getattr(config, "_pyproject_data", {})
     rt_config = pyproject.get("tool", {}).get("pfix", {}).get("runtime_todo", {})
 
     if not rt_config.get("enabled", False):
@@ -42,7 +43,7 @@ def capture_exception(exc: BaseException, context: Optional[dict] = None):
     from ..config import get_config
 
     config = get_config()
-    pyproject = getattr(config, '_pyproject_data', {})
+    pyproject = getattr(config, "_pyproject_data", {})
     rt_config = pyproject.get("tool", {}).get("pfix", {}).get("runtime_todo", {})
 
     if not rt_config.get("enabled", False):

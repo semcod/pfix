@@ -12,11 +12,13 @@ def handle_request(request: dict) -> dict:
     result = query_database(user, payload)
     return serialize_response(result)
 
+
 def authenticate(request: dict) -> dict:
     token = request["headers"]["Authorization"]  # KeyError if no headers
     if not token.startswith("Bearer "):
         raise PermissionError("Invalid token format")
     return {"id": 1, "role": "user"}
+
 
 def validate_payload(request: dict) -> dict:
     body = request["body"]
@@ -25,6 +27,7 @@ def validate_payload(request: dict) -> dict:
     limit = int(body.get("limit", "10"))  # ValueError if non-numeric
     return {"query": body["query"], "limit": limit}
 
+
 def query_database(user: dict, payload: dict) -> list:
     # Simulated DB results — some rows have missing fields
     return [
@@ -32,6 +35,7 @@ def query_database(user: dict, payload: dict) -> list:
         {"id": 2, "name": "Item B"},  # Missing 'price'
         {"id": 3, "name": "Item C", "price": None},  # price is None
     ]
+
 
 def serialize_response(results: list) -> dict:
     total = sum(r["price"] for r in results)  # KeyError + TypeError (None)
@@ -45,12 +49,14 @@ def run_etl_pipeline():
     transformed = transform_records(raw_data)
     return load_to_output(transformed)
 
+
 def extract_from_api() -> list[dict]:
     # Upstream API changed: 'user_name' → 'username'
     return [
         {"username": "alice", "email": "alice@example.com", "score": 95},
         {"username": "bob", "email": "bob@example.com", "score": 87},
     ]
+
 
 def transform_records(records: list[dict]) -> list[dict]:
     return [
@@ -62,15 +68,18 @@ def transform_records(records: list[dict]) -> list[dict]:
         for r in records
     ]
 
+
 def load_to_output(records: list[dict]) -> str:
     import json
+
     return json.dumps(records, indent=2)
 
 
 # --- 3. Config bootstrapping with env fallback chain ---
 @pfix(hint="Config loaded from file → env → defaults. Multiple failure points.")
 def bootstrap_config() -> dict:
-    import json, os
+    import json
+    import os
 
     # Try file first
     config_path = os.getenv("APP_CONFIG", "/etc/myapp/config.json")
@@ -90,26 +99,27 @@ def bootstrap_config() -> dict:
 
 if __name__ == "__main__":
     tests = [
-        ("1. API handler — missing headers",
-         lambda: handle_request({"body": {"query": "test"}})),
-
-        ("1b. API handler — bad limit",
-         lambda: handle_request({
-             "headers": {"Authorization": "Bearer xyz"},
-             "body": {"query": "test", "limit": "abc"},
-         })),
-
-        ("1c. API handler — None price in serialization",
-         lambda: handle_request({
-             "headers": {"Authorization": "Bearer xyz"},
-             "body": {"query": "test"},
-         })),
-
-        ("2. ETL — schema changed (user_name → username)",
-         lambda: run_etl_pipeline()),
-
-        ("3. Config bootstrap — bad port default",
-         lambda: bootstrap_config()),
+        ("1. API handler — missing headers", lambda: handle_request({"body": {"query": "test"}})),
+        (
+            "1b. API handler — bad limit",
+            lambda: handle_request(
+                {
+                    "headers": {"Authorization": "Bearer xyz"},
+                    "body": {"query": "test", "limit": "abc"},
+                }
+            ),
+        ),
+        (
+            "1c. API handler — None price in serialization",
+            lambda: handle_request(
+                {
+                    "headers": {"Authorization": "Bearer xyz"},
+                    "body": {"query": "test"},
+                }
+            ),
+        ),
+        ("2. ETL — schema changed (user_name → username)", lambda: run_etl_pipeline()),
+        ("3. Config bootstrap — bad port default", lambda: bootstrap_config()),
     ]
     for label, fn in tests:
         print(f"{label}:")

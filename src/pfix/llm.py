@@ -7,7 +7,6 @@ from __future__ import annotations
 import json
 import re
 import time
-from typing import Optional
 
 import litellm
 
@@ -81,7 +80,9 @@ def _request_with_chain(error_ctx: ErrorContext, chain: list[str]) -> FixProposa
 
             # Success with good confidence - use this
             if proposal.confidence >= 0.5 and not proposal.diagnosis.startswith("LLM request failed"):
-                proposal.raw_response = f"[Model {i+1}/{len(chain)}: {model}, {duration_ms}ms]\n{proposal.raw_response}"
+                proposal.raw_response = (
+                    f"[Model {i + 1}/{len(chain)}: {model}, {duration_ms}ms]\n{proposal.raw_response}"
+                )
                 return proposal
 
             # Low confidence - try next model
@@ -134,6 +135,7 @@ def _request_single_model(error_ctx: ErrorContext, model: str) -> FixProposal:
         return _parse_response(raw)
     except Exception as e:
         import traceback
+
         error_msg = f"{e}\n{traceback.format_exc()}"
         return FixProposal(
             diagnosis=f"LLM request failed: {error_msg}",

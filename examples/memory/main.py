@@ -12,7 +12,7 @@ def count_lines_in_large_file(path: str) -> int:
 
 @pfix(hint="Creating huge list when generator would suffice")
 def squares_up_to(n: int) -> int:
-    all_squares = [i ** 2 for i in range(n)]  # Allocates entire list
+    all_squares = [i**2 for i in range(n)]  # Allocates entire list
     return sum(all_squares)
 
 
@@ -37,7 +37,7 @@ def create_circular_ref():
 
     root = Node("root")
     child = Node("child")
-    child.parent = root      # child → root
+    child.parent = root  # child → root
     root.children.append(child)  # root → child (circular)
 
     # With __del__ defined, GC can't collect these
@@ -47,7 +47,9 @@ def create_circular_ref():
 
 
 if __name__ == "__main__":
-    import tempfile, os
+    import tempfile
+    import os
+
     tmp = tempfile.mktemp()
     with open(tmp, "w") as f:
         for i in range(100):

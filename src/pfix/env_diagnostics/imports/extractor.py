@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...types import DiagnosticResult
+    pass
 
 
 def extract_imports(source: str) -> set[str]:
@@ -42,7 +42,7 @@ def get_module_name(pyfile: Path, project_root: Path) -> str:
 def resolve_relative_import(node: ast.ImportFrom, module_name: str) -> str:
     """Convert a relative import to an absolute module name."""
     parts = module_name.split(".")
-    base = parts[:-node.level] if node.level <= len(parts) else []
+    base = parts[: -node.level] if node.level <= len(parts) else []
     if node.module:
         return ".".join(base + [node.module])
     return ".".join(base)
@@ -60,7 +60,7 @@ def extract_module_name(msg: str) -> str:
     if match:
         # Filter out common words that aren't modules
         word = match.group(1)
-        if word.lower() not in ('no', 'named', 'module', 'the', 'a', 'an'):
+        if word.lower() not in ("no", "named", "module", "the", "a", "an"):
             return word
     return "unknown"
 
@@ -68,9 +68,6 @@ def extract_module_name(msg: str) -> str:
 def get_installed_packages() -> set[str]:
     """Get lowercase names of currently installed packages."""
     try:
-        return {
-            pkg.metadata["Name"].lower()
-            for pkg in __import__("importlib.metadata").metadata.distributions()
-        }
+        return {pkg.metadata["Name"].lower() for pkg in __import__("importlib.metadata").metadata.distributions()}
     except Exception:
         return set()

@@ -7,6 +7,7 @@ from pfix import pfix
 @pfix(hint="Connection refused — service not running on this port")
 def connect_to_database():
     import socket
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(2)
     sock.connect(("127.0.0.1", 54321))  # ConnectionRefusedError
@@ -16,6 +17,7 @@ def connect_to_database():
 @pfix(hint="DNS resolution fails — misspelled hostname")
 def fetch_from_typo_domain():
     import urllib.request
+
     url = "https://api.exmaple.com/data"  # typo: exmaple → example
     return urllib.request.urlopen(url, timeout=3).read()
 
@@ -23,13 +25,16 @@ def fetch_from_typo_domain():
 @pfix(hint="Timeout on slow endpoint — should increase timeout or retry")
 def call_slow_api():
     import urllib.request
+
     url = "https://httpbin.org/delay/30"
     return urllib.request.urlopen(url, timeout=1).read()  # TimeoutError
 
 
 @pfix(hint="HTTP error 404 not handled — should check status code")
 def download_missing_file():
-    import urllib.request, urllib.error
+    import urllib.request
+    import urllib.error
+
     url = "https://httpbin.org/status/404"
     return urllib.request.urlopen(url).read()  # HTTPError 404
 

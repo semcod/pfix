@@ -2,6 +2,7 @@
 
 from pfix.llm import FixProposal, _parse_response
 
+
 class TestLLMParsing:
     def test_parse_valid_json(self):
         raw = '{"diagnosis": "Missing import", "confidence": 0.9, "dependencies": ["numpy"]}'

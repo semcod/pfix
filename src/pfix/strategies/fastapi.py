@@ -13,8 +13,15 @@ class FastAPIFixStrategy(FixStrategy):
     name = "FastAPI"
 
     FASTAPI_KEYWORDS = [
-        "fastapi", "starlette", "pydantic", "uvicorn", "app.get",
-        "app.post", "app.put", "app.delete", "APIRouter",
+        "fastapi",
+        "starlette",
+        "pydantic",
+        "uvicorn",
+        "app.get",
+        "app.post",
+        "app.put",
+        "app.delete",
+        "APIRouter",
     ]
 
     def detect(self, ctx: ErrorContext) -> bool:

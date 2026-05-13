@@ -83,37 +83,39 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
             if value:
                 # Check if placeholder or dummy value
                 if value.lower() in ("your_key_here", "placeholder", "xxx", "test"):
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name="api_key_placeholder",
-                        status="warning",
-                        message=f"{var} appears to be a placeholder value",
-                        details={"variable": var, "value_preview": value[:10] + "..."},
-                        suggestion=f"Replace {var} with a real API key",
-                        auto_fixable=False,
-                        abs_path=None,
-                        line_number=None,
-                    ))
+                    results.append(
+                        DiagnosticResult(
+                            category=self.category,
+                            check_name="api_key_placeholder",
+                            status="warning",
+                            message=f"{var} appears to be a placeholder value",
+                            details={"variable": var, "value_preview": value[:10] + "..."},
+                            suggestion=f"Replace {var} with a real API key",
+                            auto_fixable=False,
+                            abs_path=None,
+                            line_number=None,
+                        )
+                    )
 
                 # Check if key format looks suspicious
                 if len(value) < 10:
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name="api_key_suspicious",
-                        status="warning",
-                        message=f"{var} has suspicious format (too short)",
-                        details={"variable": var, "length": len(value)},
-                        suggestion=f"Verify {var} is correct",
-                        auto_fixable=False,
-                        abs_path=None,
-                        line_number=None,
-                    ))
+                    results.append(
+                        DiagnosticResult(
+                            category=self.category,
+                            check_name="api_key_suspicious",
+                            status="warning",
+                            message=f"{var} has suspicious format (too short)",
+                            details={"variable": var, "length": len(value)},
+                            suggestion=f"Verify {var} is correct",
+                            auto_fixable=False,
+                            abs_path=None,
+                            line_number=None,
+                        )
+                    )
 
         return results
 
-    def _check_hardcoded_key(
-        self, node: ast.Constant, pyfile: Path
-    ) -> "DiagnosticResult" | None:
+    def _check_hardcoded_key(self, node: ast.Constant, pyfile: Path) -> "DiagnosticResult" | None:
         """Check if a string constant contains a hardcoded API key.
 
         Returns:
@@ -136,16 +138,14 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
             check_name="hardcoded_api_key",
             status="critical",
             message=f"Possible hardcoded API key in {pyfile.name}",
-            details={"file": str(pyfile), "line": getattr(node, 'lineno', None)},
+            details={"file": str(pyfile), "line": getattr(node, "lineno", None)},
             suggestion="Move API keys to environment variables",
             auto_fixable=False,
             abs_path=str(pyfile),
-            line_number=getattr(node, 'lineno', None),
+            line_number=getattr(node, "lineno", None),
         )
 
-    def _check_missing_timeout(
-        self, node: ast.Call, pyfile: Path
-    ) -> "DiagnosticResult" | None:
+    def _check_missing_timeout(self, node: ast.Call, pyfile: Path) -> "DiagnosticResult" | None:
         """Check if an HTTP request call is missing timeout parameter.
 
         Returns:
@@ -163,9 +163,7 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
             return None
 
         # Check if timeout is in keywords
-        has_timeout = any(
-            kw.arg == "timeout" for kw in node.keywords if isinstance(kw.arg, str)
-        )
+        has_timeout = any(kw.arg == "timeout" for kw in node.keywords if isinstance(kw.arg, str))
         if has_timeout:
             return None
 
@@ -174,11 +172,11 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
             check_name="missing_timeout",
             status="warning",
             message=f"HTTP request without timeout in {pyfile.name}",
-            details={"file": str(pyfile), "line": getattr(node, 'lineno', None)},
+            details={"file": str(pyfile), "line": getattr(node, "lineno", None)},
             suggestion="Add timeout parameter to prevent hanging",
             auto_fixable=False,
             abs_path=str(pyfile),
-            line_number=getattr(node, 'lineno', None),
+            line_number=getattr(node, "lineno", None),
         )
 
     def _check_api_client_configs(self, project_root: Path) -> list["DiagnosticResult"]:

@@ -7,14 +7,13 @@ For errors spanning multiple files (imports, inheritance, cross-file dependencie
 from __future__ import annotations
 
 import ast
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 from rich.console import Console
 
 from .analyzer import ErrorContext
-from .types import FixProposal
 
 console = Console(stderr=True)
 
@@ -85,16 +84,16 @@ def _resolve_import_path(module_name: str, current_file: Path, project_root: Pat
 
     parts = module_name.split(".")
     candidate = base / "/".join(parts)
-    
+
     # Try .py and /__init__.py
     py_file = candidate.with_suffix(".py")
     if py_file.exists():
         return py_file
-    
+
     init_file = candidate / "__init__.py"
     if init_file.exists():
         return init_file
-        
+
     return None
 
 
@@ -146,15 +145,15 @@ def build_multi_file_context(
         "",
         "### Multi-File Fix Instructions",
         "Return JSON with 'files' object mapping file paths to new content:",
-        '{',
+        "{",
         '  "files": {',
         f'    "{error_ctx.source_file}": "new content here",',
         '    "other/file.py": "other content"',
-        '  },',
+        "  },",
         '  "dependencies": ["package>=1.0"],',
         '  "diagnosis": "explanation",',
         '  "confidence": 0.85',
-        '}',
+        "}",
     ]
 
     return "\n".join(parts)

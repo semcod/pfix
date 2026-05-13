@@ -36,12 +36,7 @@ def _build_syntax_error_context(exc: SyntaxError) -> "ErrorContext":
     return ctx
 
 
-def _apply_syntax_fix(
-    ctx: "ErrorContext",
-    proposal: "FixProposal",
-    auto_apply: bool,
-    config
-) -> bool:
+def _apply_syntax_fix(ctx: "ErrorContext", proposal: "FixProposal", auto_apply: bool, config) -> bool:
     """Apply a fix proposal for a syntax error. Returns True if successful."""
     from pfix.fixer import apply_fix
     from pfix.session import _clear_pycache
@@ -66,6 +61,7 @@ def _apply_syntax_fix(
         _clear_pycache(Path(ctx.source_file))
         console.print("[green]🔄 Restarting process...[/]")
         import os
+
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
     return True

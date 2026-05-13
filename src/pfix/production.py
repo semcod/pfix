@@ -28,6 +28,7 @@ from .types import FixProposal
 @dataclass
 class CircuitBreaker:
     """Circuit breaker pattern for LLM calls."""
+
     threshold: int = 5
     reset_timeout: int = 300  # 5 minutes
 
@@ -67,6 +68,7 @@ class CircuitBreaker:
 @dataclass
 class RateLimiter:
     """Rate limiter for LLM calls (token bucket algorithm)."""
+
     max_calls: int = 10  # per minute
     window: int = 60  # seconds
 
@@ -93,6 +95,7 @@ class RateLimiter:
 @dataclass
 class ProductionConfig:
     """Configuration for production mode."""
+
     mode: str = "monitor"  # "monitor" | "disabled"
     webhook_url: Optional[str] = None
     rate_limit_per_minute: int = 10
@@ -153,6 +156,7 @@ class PfixMonitor:
 
     def watch(self, func: Callable) -> Callable:
         """Decorator to monitor a function for errors."""
+
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
@@ -280,10 +284,13 @@ class PfixMonitor:
             import urllib.request
             import urllib.error
 
-            payload = json.dumps({
-                "text": f"🐛 pfix detected error: {result['exception_type']}",
-                "error": result,
-            }, ensure_ascii=False).encode()
+            payload = json.dumps(
+                {
+                    "text": f"🐛 pfix detected error: {result['exception_type']}",
+                    "error": result,
+                },
+                ensure_ascii=False,
+            ).encode()
 
             req = urllib.request.Request(
                 self.config.webhook_url,

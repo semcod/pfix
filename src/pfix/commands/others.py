@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import sys
-from pathlib import Path
 
 from rich.console import Console
 from rich.table import Table
@@ -54,6 +52,7 @@ def cmd_server(args) -> int:
 
 def cmd_rollback(args) -> int:
     from pfix.rollback import rollback_command, show_history
+
     if args.history:
         show_history()
         return 0
@@ -67,6 +66,7 @@ def cmd_rollback(args) -> int:
 
 def cmd_audit(args) -> int:
     from pfix.audit import print_audit_report, read_audit_log
+
     if args.report:
         print_audit_report(days=args.days)
     else:
@@ -83,17 +83,20 @@ def cmd_audit(args) -> int:
 
 def cmd_init(args=None) -> int:
     from pfix.init_wizard import init_wizard
+
     init_wizard()
     return 0
 
 
 def cmd_dashboard(args=None) -> int:
     from pfix.dashboard import run_dashboard
+
     run_dashboard()
     return 0
 
 
 def cmd_explain(args) -> int:
     from pfix.explain import explain
+
     explain(what=args.what, file=args.file)
     return 0

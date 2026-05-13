@@ -17,13 +17,14 @@ def cmd_enable(args=None) -> int:
 
     # Install .pth file
     import pfix
+
     pfix_pkg = Path(pfix.__file__).parent
     _install_pth_file(pfix_pkg, site_packages)
-    
+
     # Configure pyproject.toml
     pyproject_path = Path.cwd() / "pyproject.toml"
     config_added = _ensure_project_config(pyproject_path)
-    
+
     _print_enable_summary(config_added)
     return 0
 
@@ -31,6 +32,7 @@ def cmd_enable(args=None) -> int:
 def _find_site_packages() -> Optional[Path]:
     """Locate the active site-packages directory."""
     import site
+
     packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
     if not packages or not packages.exists():
         packages = Path(site.getusersitepackages())
@@ -48,7 +50,7 @@ def _install_pth_file(pfix_pkg: Path, site_packages: Path):
 
     try:
         shutil.copy2(source, dest)
-        console.print(f"[green]✓ pfix auto-activation enabled[/]")
+        console.print("[green]✓ pfix auto-activation enabled[/]")
         console.print(f"[dim]  Installed: {dest}[/]")
     except Exception as e:
         console.print(f"[red]✗ Failed to install .pth file: {e}[/]")
@@ -127,7 +129,7 @@ def cmd_disable(args=None) -> int:
     if dest_file.exists():
         try:
             dest_file.unlink()
-            console.print(f"[green]✓ pfix auto-activation disabled[/]")
+            console.print("[green]✓ pfix auto-activation disabled[/]")
             console.print(f"[dim]  Removed: {dest_file}[/]")
             console.print()
             console.print("[dim]pfix will no longer auto-activate.[/]")

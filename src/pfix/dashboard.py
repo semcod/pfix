@@ -18,7 +18,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.layout import Layout
-from rich.live import Live
 
 console = Console()
 
@@ -27,6 +26,7 @@ try:
     from textual.app import App, ComposeResult
     from textual.widgets import DataTable, Static, Header, Footer, Label
     from textual.containers import Vertical, Horizontal
+
     TEXTUAL_AVAILABLE = True
 except ImportError:
     TEXTUAL_AVAILABLE = False
@@ -47,7 +47,7 @@ def get_log_stats(log_dir: Path = Path(".pfix_logs")) -> dict[str, Any]:
         log_file = log_dir / f"pfix_{date}.jsonl"
         if not log_file.exists():
             continue
-        
+
         _process_log_file(log_file, stats, confidences, recent_errors)
 
     return {
@@ -83,19 +83,21 @@ def _update_stats_from_entry(entry: dict, stats: dict, confidences: list, recent
     stats["total"] += 1
     if entry.get("fix_applied"):
         stats["fixes"] += 1
-    
+
     conf = entry.get("confidence", 0)
     if conf:
         confidences.append(conf)
 
     # Collect recent errors (limited to 10)
     if len(recent_errors) < 10:
-        recent_errors.append({
-            "time": entry.get("timestamp", "?")[11:19] if entry.get("timestamp") else "?",
-            "type": entry.get("exception_type", "Unknown"),
-            "file": entry.get("source_file", "?").split("/")[-1],
-            "confidence": conf,
-        })
+        recent_errors.append(
+            {
+                "time": entry.get("timestamp", "?")[11:19] if entry.get("timestamp") else "?",
+                "type": entry.get("exception_type", "Unknown"),
+                "file": entry.get("source_file", "?").split("/")[-1],
+                "confidence": conf,
+            }
+        )
 
 
 def get_cache_stats(cache_dir: Path = Path(".pfix_cache")) -> dict[str, Any]:
@@ -106,6 +108,7 @@ def get_cache_stats(cache_dir: Path = Path(".pfix_cache")) -> dict[str, Any]:
 
     try:
         import sqlite3
+
         conn = sqlite3.connect(str(db_file))
         cursor = conn.execute("SELECT COUNT(*) FROM fix_cache")
         total = cursor.fetchone()[0]
@@ -182,6 +185,7 @@ def run_console_dashboard() -> None:
 
 # Textual App (if available)
 if TEXTUAL_AVAILABLE:
+
     class PfixDashboardApp(App):
         """Textual TUI Dashboard."""
 

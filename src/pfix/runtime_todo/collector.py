@@ -109,7 +109,7 @@ class RuntimeCollector:
             exception_message=str(exc),
             traceback_frames=frames,
             **self._get_system_info(),  # Grouped system fields
-            **self._get_timestamps(),   # Grouped timestamp fields
+            **self._get_timestamps(),  # Grouped timestamp fields
             category=self._classify(exc),
             severity=self._severity(exc),
             fingerprint="",  # computed below
@@ -171,21 +171,24 @@ class RuntimeCollector:
             except Exception:
                 pass
 
-            frames.append(TraceFrame(
-                filepath=filepath,
-                line_number=tb.tb_lineno,
-                function_name=frame.f_code.co_name,
-                code_line=code_line,
-                local_vars=None,  # too expensive by default
-            ))
+            frames.append(
+                TraceFrame(
+                    filepath=filepath,
+                    line_number=tb.tb_lineno,
+                    function_name=frame.f_code.co_name,
+                    code_line=code_line,
+                    local_vars=None,  # too expensive by default
+                )
+            )
             tb = tb.tb_next
 
         frames.reverse()  # most recent first
-        return frames[:self.include_traceback_depth]
+        return frames[: self.include_traceback_depth]
 
     def _should_exclude_path(self, filepath: str) -> bool:
         """Check if path matches exclusion patterns."""
         import fnmatch
+
         for pattern in self.exclude_paths:
             if fnmatch.fnmatch(filepath, pattern):
                 return True
@@ -222,7 +225,6 @@ class RuntimeCollector:
     def _classify(self, exc: BaseException) -> str:
         """Classify error into category."""
         # Order matters: check most specific exceptions first
-        import socket
         mapping = {
             # Import errors (most specific first)
             ModuleNotFoundError: "import_error",
@@ -265,10 +267,8 @@ class RuntimeCollector:
     def _severity(self, exc: BaseException) -> str:
         """Determine severity from exception type."""
         critical = (MemoryError, SystemError, RecursionError)
-        high = (ConnectionError, FileNotFoundError, PermissionError,
-                ModuleNotFoundError, OSError)
-        medium = (TypeError, ValueError, KeyError, IndexError,
-                  AttributeError, UnicodeError)
+        high = (ConnectionError, FileNotFoundError, PermissionError, ModuleNotFoundError, OSError)
+        medium = (TypeError, ValueError, KeyError, IndexError, AttributeError, UnicodeError)
         low = (NameError, SyntaxError, NotImplementedError)
 
         if isinstance(exc, critical):

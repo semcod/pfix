@@ -1,6 +1,6 @@
 from pathlib import Path
-import pytest
-from pfix.permissions import check_auto_apply_allowed, check_blocked_path, get_environment
+from pfix.permissions import check_blocked_path, get_environment
+
 
 class TestPermissions:
     def test_get_environment(self, monkeypatch):
@@ -9,7 +9,7 @@ class TestPermissions:
         monkeypatch.setenv("ENVIRONMENT", "staging")
         monkeypatch.delenv("ENV", raising=False)
         assert get_environment() == "staging"
-    
+
     def test_check_blocked_path(self):
         blocked = Path("/project/migrations/001_add_users.py")
         allowed, reason = check_blocked_path(blocked)

@@ -60,6 +60,7 @@ def test_bad_context_manager():
     @contextmanager
     def timer():
         import time
+
         start = time.time()
         # Missing yield! — RuntimeError: generator didn't yield
         elapsed = time.time() - start

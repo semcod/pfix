@@ -11,6 +11,7 @@ from pfix import pfix
 def fetch_json(url: str) -> dict:
     """Fetch JSON from URL — dependencies auto-installed on first run."""
     import requests
+
     return requests.get(url).json()
 
 
@@ -18,7 +19,7 @@ def fetch_json(url: str) -> dict:
 def average(numbers: list[float]) -> float:
     """Calculate average — ZeroDivisionError will be auto-fixed."""
     if len(numbers) == 0:
-        return float('nan')
+        return float("nan")
     return sum(numbers) / len(numbers)
 
 

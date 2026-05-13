@@ -7,8 +7,6 @@ Set PFIX_AUTO_APPLY=true in .env and run:
 That's it. No decorators, no configure(), just import pfix.
 """
 
-import pfix  # Auto-activates if PFIX_AUTO_APPLY=true in .env
-
 from shared import fetch_json, average, greet
 
 
@@ -16,7 +14,7 @@ def main():
     print("=== pfix Demo (zero config) ===\n")
 
     print("1. fetch_json:")
-    result = fetch_json('https://httpbin.org/json')
+    result = fetch_json("https://httpbin.org/json")
     print(f"   ✓ {type(result).__name__}")
 
     print("\n2. average([]):")
@@ -24,7 +22,7 @@ def main():
     print(f"   ✓ {result}")
 
     print("\n3. greet('Alice', 30):")
-    result = greet('Alice', 30)
+    result = greet("Alice", 30)
     print(f"   ✓ {result}")
 
 

@@ -13,8 +13,14 @@ class FlaskFixStrategy(FixStrategy):
     name = "Flask"
 
     FLASK_KEYWORDS = [
-        "flask", "werkzeug", "jinja2", "render_template",
-        "@app.route", "Blueprint", "request", "session",
+        "flask",
+        "werkzeug",
+        "jinja2",
+        "render_template",
+        "@app.route",
+        "Blueprint",
+        "request",
+        "session",
     ]
 
     def detect(self, ctx: ErrorContext) -> bool:

@@ -1,6 +1,6 @@
-import pytest
 from pfix.env_diagnostics.hardware import HardwareDiagnostic
 from pfix.types import ErrorContext
+
 
 class TestHardwareDiagnostic:
     def test_initialization(self):
@@ -12,6 +12,7 @@ class TestHardwareDiagnostic:
         results = diag._check_cpu_count()
         assert isinstance(results, list)
         import multiprocessing
+
         if multiprocessing.cpu_count() == 1:
             assert len(results) == 1
             assert results[0].check_name == "single_cpu"

@@ -39,20 +39,22 @@ class SerializationDiagnostic(BaseDiagnostic):
         highest_protocol = pickle.HIGHEST_PROTOCOL
 
         if highest_protocol > default_protocol:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="pickle_protocol",
-                status="warning",
-                message=f"Pickle highest protocol ({highest_protocol}) > default ({default_protocol})",
-                details={
-                    "default_protocol": default_protocol,
-                    "highest_protocol": highest_protocol,
-                },
-                suggestion="Pickle files created with higher protocol may not load on older Python",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="pickle_protocol",
+                    status="warning",
+                    message=f"Pickle highest protocol ({highest_protocol}) > default ({default_protocol})",
+                    details={
+                        "default_protocol": default_protocol,
+                        "highest_protocol": highest_protocol,
+                    },
+                    suggestion="Pickle files created with higher protocol may not load on older Python",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
 
         return results
 
@@ -68,24 +70,26 @@ class SerializationDiagnostic(BaseDiagnostic):
                 # Try to list - if it fails, might be corrupt
                 list(cache_dir.iterdir())
             except (OSError, PermissionError) as e:
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="corrupt_pycache",
-                    status="warning",
-                    message=f"Cannot read __pycache__ directory: {e}",
-                    details={"cache_dir": str(cache_dir)},
-                    suggestion="Clear __pycache__ directories",
-                    auto_fixable=True,
-                    abs_path=str(cache_dir),
-                    line_number=None,
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="corrupt_pycache",
+                        status="warning",
+                        message=f"Cannot read __pycache__ directory: {e}",
+                        details={"cache_dir": str(cache_dir)},
+                        suggestion="Clear __pycache__ directories",
+                        auto_fixable=True,
+                        abs_path=str(cache_dir),
+                        line_number=None,
+                    )
+                )
 
         return results
 
     def _check_yaml_safety(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for unsafe YAML loading."""
         from ..types import DiagnosticResult
-        import re
+
         results = []
         for pyfile in project_root.rglob("*.py"):
             if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
@@ -94,14 +98,16 @@ class SerializationDiagnostic(BaseDiagnostic):
                 content = pyfile.read_text()
                 # Search for yaml.load( without SafeLoader
                 if "yaml.load(" in content and "SafeLoader" not in content and "Loader=" not in content:
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name="unsafe_yaml_load",
-                        status="critical",
-                        message=f"Unsafe yaml.load() detected in {pyfile.name}",
-                        suggestion="Use yaml.safe_load() or specify SafeLoader",
-                        abs_path=str(pyfile),
-                    ))
+                    results.append(
+                        DiagnosticResult(
+                            category=self.category,
+                            check_name="unsafe_yaml_load",
+                            status="critical",
+                            message=f"Unsafe yaml.load() detected in {pyfile.name}",
+                            suggestion="Use yaml.safe_load() or specify SafeLoader",
+                            abs_path=str(pyfile),
+                        )
+                    )
             except Exception:
                 pass
         return results
@@ -110,6 +116,7 @@ class SerializationDiagnostic(BaseDiagnostic):
         """Check validity of common JSON manifest files."""
         from ..types import DiagnosticResult
         import json
+
         results = []
         manifests = ["package.json", "composer.json", "manifest.json"]
         for m in manifests:
@@ -119,14 +126,16 @@ class SerializationDiagnostic(BaseDiagnostic):
                     with open(p, "r") as f:
                         json.load(f)
                 except Exception as e:
-                    results.append(DiagnosticResult(
-                        category=self.category,
-                        check_name=f"invalid_{m.replace('.', '_')}",
-                        status="error",
-                        message=f"JSON syntax error in {m}: {e}",
-                        suggestion=f"Fix syntax in {m}",
-                        abs_path=str(p),
-                    ))
+                    results.append(
+                        DiagnosticResult(
+                            category=self.category,
+                            check_name=f"invalid_{m.replace('.', '_')}",
+                            status="error",
+                            message=f"JSON syntax error in {m}: {e}",
+                            suggestion=f"Fix syntax in {m}",
+                            abs_path=str(p),
+                        )
+                    )
         return results
 
     def diagnose_exception(

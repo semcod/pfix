@@ -37,17 +37,19 @@ class ConcurrencyDiagnostic(BaseDiagnostic):
         thread_count = threading.active_count()
 
         if thread_count > 100:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="high_thread_count",
-                status="warning",
-                message=f"High number of active threads: {thread_count}",
-                details={"thread_count": thread_count},
-                suggestion="Review thread pool usage, consider async/threading balance",
-                auto_fixable=False,
-                abs_path=None,
-                line_number=None,
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="high_thread_count",
+                    status="warning",
+                    message=f"High number of active threads: {thread_count}",
+                    details={"thread_count": thread_count},
+                    suggestion="Review thread pool usage, consider async/threading balance",
+                    auto_fixable=False,
+                    abs_path=None,
+                    line_number=None,
+                )
+            )
 
         return results
 
@@ -62,17 +64,19 @@ class ConcurrencyDiagnostic(BaseDiagnostic):
 
             try:
                 loop = asyncio.get_running_loop()
-                results.append(DiagnosticResult(
-                    category=self.category,
-                    check_name="asyncio_loop_running",
-                    status="ok",
-                    message="Asyncio event loop is running",
-                    details={"loop": str(loop)},
-                    suggestion="",
-                    auto_fixable=False,
-                    abs_path=None,
-                    line_number=None,
-                ))
+                results.append(
+                    DiagnosticResult(
+                        category=self.category,
+                        check_name="asyncio_loop_running",
+                        status="ok",
+                        message="Asyncio event loop is running",
+                        details={"loop": str(loop)},
+                        suggestion="",
+                        auto_fixable=False,
+                        abs_path=None,
+                        line_number=None,
+                    )
+                )
             except RuntimeError:
                 # No loop running - normal for sync code
                 pass
@@ -85,32 +89,36 @@ class ConcurrencyDiagnostic(BaseDiagnostic):
     def _check_thread_hangs(self) -> list["DiagnosticResult"]:
         """Check for potential thread hangs/stuck threads."""
         from ..types import DiagnosticResult
+
         results = []
         # We can't know for sure if a thread is hung without a heartbeat,
         # but we can check for unusually high number of non-daemon threads.
         non_daemon = [t for t in threading.enumerate() if not t.daemon]
         if len(non_daemon) > 50:
-            results.append(DiagnosticResult(
-                category=self.category,
-                check_name="too_many_non_daemon_threads",
-                status="warning",
-                message=f"Large number of non-daemon threads: {len(non_daemon)}",
-                suggestion="Daemonize background threads to avoid hanging on exit",
-            ))
+            results.append(
+                DiagnosticResult(
+                    category=self.category,
+                    check_name="too_many_non_daemon_threads",
+                    status="warning",
+                    message=f"Large number of non-daemon threads: {len(non_daemon)}",
+                    suggestion="Daemonize background threads to avoid hanging on exit",
+                )
+            )
         return results
 
     def _check_async_lag(self) -> list["DiagnosticResult"]:
         """Measure asyncio event loop lag if running."""
-        from ..types import DiagnosticResult
         import time
+
         results = []
         try:
             import asyncio
+
             try:
                 loop = asyncio.get_running_loop()
                 # Use a small task to measure lag
                 start = time.time()
-                # In a real environment, we'd schedule this, 
+                # In a real environment, we'd schedule this,
                 # but during a diagnostic check, we might be blocking anyway.
                 # Here we just report if we are IN the loop.
             except RuntimeError:

@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 from .extractor import get_module_name, resolve_relative_import
 
 
-def build_import_graph(
-    project_root: Path
-) -> tuple[dict[str, set[str]], dict[str, Path]]:
+def build_import_graph(project_root: Path) -> tuple[dict[str, set[str]], dict[str, Path]]:
     """Build import dependency graph from project files."""
     module_imports: dict[str, set[str]] = {}
     module_paths: dict[str, Path] = {}
@@ -47,10 +45,7 @@ def build_import_graph(
 
 
 def find_cycle_dfs(
-    start: str,
-    visited: set[str],
-    path: list[str],
-    module_imports: dict[str, set[str]]
+    start: str, visited: set[str], path: list[str], module_imports: dict[str, set[str]]
 ) -> list[str] | None:
     """Find a cycle starting from a module using DFS.
 
@@ -64,7 +59,7 @@ def find_cycle_dfs(
         Cycle path if found, None otherwise
     """
     if start in path:
-        return path[path.index(start):] + [start]
+        return path[path.index(start) :] + [start]
     if start in visited:
         return None
     visited.add(start)

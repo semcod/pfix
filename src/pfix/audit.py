@@ -186,11 +186,11 @@ def print_audit_report(days: int = 7) -> None:
     console.print(f"Auto-approved: {summary['auto_approved']}")
     console.print(f"User-approved: {summary['user_approved']}")
 
-    if summary['by_model']:
+    if summary["by_model"]:
         table = Table(title="Fixes by Model")
         table.add_column("Model", style="cyan")
         table.add_column("Count", style="green")
-        for model, count in sorted(summary['by_model'].items(), key=lambda x: -x[1]):
+        for model, count in sorted(summary["by_model"].items(), key=lambda x: -x[1]):
             table.add_row(model, str(count))
         console.print(table)
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 from rich.console import Console
@@ -39,20 +38,24 @@ def _format_diagnostic_results(results, diag, json_output: bool) -> str:
     """Format diagnostic results for output (JSON or text)."""
     if json_output:
         import json
-        return json.dumps([
-            {
-                "category": r.category,
-                "check_name": r.check_name,
-                "status": r.status,
-                "message": r.message,
-                "details": r.details,
-                "suggestion": r.suggestion,
-                "auto_fixable": r.auto_fixable,
-                "abs_path": r.abs_path,
-                "line_number": r.line_number,
-            }
-            for r in results
-        ], indent=2)
+
+        return json.dumps(
+            [
+                {
+                    "category": r.category,
+                    "check_name": r.check_name,
+                    "status": r.status,
+                    "message": r.message,
+                    "details": r.details,
+                    "suggestion": r.suggestion,
+                    "auto_fixable": r.auto_fixable,
+                    "abs_path": r.abs_path,
+                    "line_number": r.line_number,
+                }
+                for r in results
+            ],
+            indent=2,
+        )
     else:
         return diag.generate_report(results)
 

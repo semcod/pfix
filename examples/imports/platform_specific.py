@@ -43,6 +43,7 @@ def test_optional_extra():
 
 if __name__ == "__main__":
     import sys
+
     print(f"Python {sys.version}\n")
 
     tests = [

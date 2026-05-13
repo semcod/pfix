@@ -167,7 +167,7 @@ class SQLiteLogger:
                 event.llm_tokens_used,
                 json.dumps(event.dependencies_installed),
                 event.cost_usd,
-            )
+            ),
         )
         conn.commit()
         conn.close()
@@ -202,22 +202,24 @@ class SQLiteLogger:
 
         events = []
         for row in rows:
-            events.append(FixEvent(
-                timestamp=row[1],
-                exception_type=row[2],
-                exception_message=row[CONSTANT_3],
-                source_file=row[CONSTANT_4],
-                function_name=row[CONSTANT_5],
-                error_category=row[CONSTANT_6],
-                diagnosis=row[CONSTANT_7],
-                fix_applied=bool(row[CONSTANT_8]),
-                confidence=row[CONSTANT_9],
-                duration_ms=row[10],
-                llm_model=row[CONSTANT_11],
-                llm_tokens_used=row[CONSTANT_12],
-                dependencies_installed=json.loads(row[CONSTANT_13]) if row[CONSTANT_13] else [],
-                cost_usd=row[CONSTANT_14],
-            ))
+            events.append(
+                FixEvent(
+                    timestamp=row[1],
+                    exception_type=row[2],
+                    exception_message=row[CONSTANT_3],
+                    source_file=row[CONSTANT_4],
+                    function_name=row[CONSTANT_5],
+                    error_category=row[CONSTANT_6],
+                    diagnosis=row[CONSTANT_7],
+                    fix_applied=bool(row[CONSTANT_8]),
+                    confidence=row[CONSTANT_9],
+                    duration_ms=row[10],
+                    llm_model=row[CONSTANT_11],
+                    llm_tokens_used=row[CONSTANT_12],
+                    dependencies_installed=json.loads(row[CONSTANT_13]) if row[CONSTANT_13] else [],
+                    cost_usd=row[CONSTANT_14],
+                )
+            )
         return events
 
     def get_stats(self) -> dict:
@@ -225,15 +227,9 @@ class SQLiteLogger:
         conn = sqlite3.connect(str(self.db_path))
 
         total = conn.execute("SELECT COUNT(*) FROM fix_events").fetchone()[0]
-        applied = conn.execute(
-            "SELECT COUNT(*) FROM fix_events WHERE fix_applied = 1"
-        ).fetchone()[0]
-        avg_confidence = conn.execute(
-            "SELECT AVG(confidence) FROM fix_events"
-        ).fetchone()[0] or 0.0
-        total_cost = conn.execute(
-            "SELECT SUM(cost_usd) FROM fix_events"
-        ).fetchone()[0] or 0.0
+        applied = conn.execute("SELECT COUNT(*) FROM fix_events WHERE fix_applied = 1").fetchone()[0]
+        avg_confidence = conn.execute("SELECT AVG(confidence) FROM fix_events").fetchone()[0] or 0.0
+        total_cost = conn.execute("SELECT SUM(cost_usd) FROM fix_events").fetchone()[0] or 0.0
 
         conn.close()
 
@@ -256,6 +252,7 @@ class SentryIntegration:
         if dsn:
             try:
                 import sentry_sdk
+
                 self._sentry = sentry_sdk
                 sentry_sdk.init(dsn=dsn)
             except ImportError:
@@ -272,9 +269,7 @@ class SentryIntegration:
             scope.set_extra("pfix_confidence", proposal.confidence)
             scope.set_extra("pfix_dependencies", proposal.dependencies)
 
-            event_id = self._sentry.capture_exception(
-                __import__("builtins").Exception(ctx.exception_message)
-            )
+            event_id = self._sentry.capture_exception(__import__("builtins").Exception(ctx.exception_message))
             return event_id
 
 
