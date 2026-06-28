@@ -29,3 +29,9 @@
       ↳ seen: 2026-03-29T17:06:30Z (1x)
       ↳ env: py3.13.7 | nvidia | venv:system
       <!-- pfix:fp=da6fad5d393d83ae count=1 first=2026-03-29T17:06:30Z last=2026-03-29T17:06:30Z -->
+- [ ] /usr/lib/python3.13/contextlib.py:221 - ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+      ↳ function: __aexit__()
+      ↳ trace: contextlib.py:221 → base_events.py:725 → runners.py:118 → pfix:8
+      ↳ seen: 2026-06-10T14:03:24Z (1x)
+      ↳ env: py3.13.7 | nvidia | venv:system
+      <!-- pfix:fp=d644d9c16f8a36a1 count=5 first=2026-06-10T14:03:24Z last=2026-06-25T11:36:59.423763+00:00 -->
