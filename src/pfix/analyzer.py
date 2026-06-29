@@ -14,7 +14,10 @@ import traceback
 from pathlib import Path
 from typing import Any, Optional
 
+from .classifiers import classify_error
 from .types import ErrorContext
+
+__all__ = ["analyze_exception", "classify_error", "scan_missing_deps"]
 
 
 def analyze_exception(
