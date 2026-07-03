@@ -8,6 +8,7 @@ import ast
 import difflib
 import shutil
 from datetime import datetime
+import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -208,6 +209,10 @@ def _confirm_fix(auto_apply: bool, confirm: bool) -> bool:
         return True
     if not confirm:
         return True
+    if not sys.stdin.isatty():
+        # Headless run without auto_apply: input() would block forever.
+        console.print("[yellow]  Non-interactive session and auto_apply off — fix not applied[/]")
+        return False
 
     try:
         answer = input("\n  Apply this fix? [y/N] ").strip().lower()

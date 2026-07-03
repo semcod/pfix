@@ -18,12 +18,17 @@ def cmd_run(args) -> int:
         console.print(f"[red]✗ Not found: {script}[/]")
         return 1
 
-    configure(
-        auto_apply=args.auto,
-        dry_run=args.dry_run,
-        auto_restart=args.restart,
-        project_root=script.parent,
-    )
+    overrides = {
+        "dry_run": args.dry_run,
+        "auto_restart": args.restart,
+        "project_root": script.parent,
+    }
+    # --auto opts IN; its absence must not override auto_apply=true from
+    # pyproject/[tool.pfix] or the env — otherwise configured projects hang
+    # on the interactive confirm prompt in headless runs.
+    if args.auto:
+        overrides["auto_apply"] = True
+    configure(**overrides)
     _install_excepthook()
 
     sys.argv = [str(script)] + (args.args or [])
@@ -45,7 +50,10 @@ def cmd_run(args) -> int:
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
     except Exception as e:
-        console.print(f"[red]💥 Unhandled: {type(e).__name__}: {e}[/]")
+        # Route through the pfix excepthook: a caught exception never reaches
+        # sys.excepthook on its own, so without this the self-heal pipeline
+        # (analyze -> request_fix -> apply_fix) never ran for script errors.
+        sys.excepthook(type(e), e, e.__traceback__)
         return 1
     return 0
 
@@ -93,7 +101,10 @@ def cmd_dev(args) -> int:
     except SystemExit as e:
         return e.code if isinstance(e.code, int) else 0
     except Exception as e:
-        console.print(f"[red]💥 Unhandled: {type(e).__name__}: {e}[/]")
+        # Route through the pfix excepthook: a caught exception never reaches
+        # sys.excepthook on its own, so without this the self-heal pipeline
+        # (analyze -> request_fix -> apply_fix) never ran for script errors.
+        sys.excepthook(type(e), e, e.__traceback__)
         return 1
     return 0
 
