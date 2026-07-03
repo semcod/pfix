@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.1.76] - 2026-07-03
+
+### Docs
+- Update README.md
+
 ## [0.1.75] - 2026-07-03
 
 ### Docs
