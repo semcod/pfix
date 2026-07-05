@@ -3,6 +3,34 @@
 ## [Unreleased]
 
 ### Fixed
+- `_fix_stale_bytecode` (`--fix` for the `stale_bytecode` finding) and
+  `rollback.list_backups()` still walked the entire project tree unpruned
+  (`rglob("*.pyc")`, `rglob("__pycache__")`, `rglob(".pfix_backups")`) —
+  same populated-venv hang risk as the read-only diagnostics, but in code
+  paths that also *mutate*/*read* the filesystem, so the fix has to keep
+  finding `__pycache__`/`.pfix_backups` inside the user's own project while
+  skipping `venv`/`site-packages` (added `prune_dependency_dirs`, a variant
+  of `prune_walk_dirs` that excludes `__pycache__` from the skip set, so a
+  `__pycache__` inside the user's own tree is still discovered and removed —
+  only the walk *into vendored dependencies looking for it* is skipped).
+  Verified with a synthetic project (real `__pycache__`/`.pfix_backups` in
+  both project source and a `venv/.../site-packages` subtree): both now
+  find/act on the project-source copy only, leaving the venv copy untouched.
+  Full test suite (180 tests) passes.
+
+## [0.1.79] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+## [0.1.78] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Fixed
 - Three more `env_diagnostics` checks were missed by the venv-pruning fix in 0.1.77
   and still walked the *entire* project tree (including a populated `venv`/`site-packages`)
   before filtering, each only skipping `__pycache__` by substring match:
@@ -13,12 +41,6 @@
   shared `walk_py_files`/`walk_paths` helpers from `skip_dirs.py`.
   Verified: `pfix diagnose` on that same project (repo + populated venv) now completes in
   ~4.4s (previously timed out past 60s). Full test suite (180 tests) passes.
-
-## [0.1.78] - 2026-07-05
-
-### Docs
-- Update CHANGELOG.md
-- Update README.md
 
 ## [0.1.77] - 2026-07-05
 

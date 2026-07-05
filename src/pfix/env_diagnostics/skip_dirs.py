@@ -53,6 +53,20 @@ def prune_walk_dirs(dirs: list[str]) -> None:
     dirs[:] = [d for d in dirs if d not in SKIP_DIR_NAMES]
 
 
+DEPENDENCY_DIR_NAMES = SKIP_DIR_NAMES - {"__pycache__"}
+
+
+def prune_dependency_dirs(dirs: list[str]) -> None:
+    """Like ``prune_walk_dirs``, but keeps ``__pycache__`` walkable.
+
+    For checks that need to find (and e.g. remove) ``__pycache__`` dirs
+    within the user's own project — pruning venv/site-packages/VCS so the
+    walk doesn't descend into vendored dependencies, without also hiding
+    the very ``__pycache__`` entries the caller is looking for.
+    """
+    dirs[:] = [d for d in dirs if d not in DEPENDENCY_DIR_NAMES]
+
+
 def has_skippable_component(path: Path | str) -> bool:
     """True if any path *component* (not substring of the full path) is a
     venv/VCS/cache directory name."""

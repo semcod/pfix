@@ -10,6 +10,7 @@ Usage:
 
 from __future__ import annotations
 
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -19,6 +20,7 @@ from rich.console import Console
 from rich.table import Table
 
 from .audit import read_audit_log
+from .env_diagnostics.skip_dirs import prune_walk_dirs
 
 console = Console()
 
@@ -39,9 +41,16 @@ def list_backups(filepath: Optional[Path] = None) -> list[Path]:
             pattern = f"{filepath.name}.*.bak"
             backups.extend(backup_dir.glob(pattern))
     else:
-        # All backups in project
-        for backup_dir in Path.cwd().rglob(".pfix_backups"):
-            backups.extend(backup_dir.glob("*.bak"))
+        # All backups in project — prune venv/site-packages/VCS during the
+        # walk rather than filtering an unbounded rglob() afterward, since a
+        # populated venv makes a full unfiltered walk slow (and .pfix_backups
+        # is never created inside one anyway).
+        cwd = Path.cwd()
+        for dirpath, dirs, _files in os.walk(cwd):
+            prune_walk_dirs(dirs)
+            if ".pfix_backups" in dirs:
+                backup_dir = Path(dirpath) / ".pfix_backups"
+                backups.extend(backup_dir.glob("*.bak"))
 
     return sorted(backups, key=lambda p: p.stat().st_mtime, reverse=True)
 

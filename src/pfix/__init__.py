@@ -22,7 +22,7 @@ from .config import PfixConfig, configure, get_config, reset_config
 from .decorator import apfix, pfix
 from .session import auto_pfix, pfix_guard, pfix_session
 
-__version__ = "0.1.78"
+__version__ = "0.1.79"
 __all__ = [
     "pfix",
     "apfix",

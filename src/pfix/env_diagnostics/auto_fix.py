@@ -6,6 +6,7 @@ Provides automatic fixes for issues marked as auto_fixable=True.
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -38,19 +39,32 @@ def apply_auto_fix(result: "DiagnosticResult", project_root: Path) -> tuple[bool
 
 
 def _fix_stale_bytecode(result: "DiagnosticResult", project_root: Path) -> tuple[bool, str]:
-    """Remove stale .pyc files."""
-    removed = 0
-    for pyc in project_root.rglob("*.pyc"):
-        py = pyc.with_suffix(".py")
-        if py.exists() and pyc.stat().st_mtime > py.stat().st_mtime:
-            pyc.unlink()
-            removed += 1
+    """Remove stale .pyc files and __pycache__ dirs in the user's own project.
 
-    # Also clear __pycache__
-    for pycache in project_root.rglob("__pycache__"):
-        if pycache.is_dir():
-            shutil.rmtree(pycache, ignore_errors=True)
+    Prunes venv/site-packages/VCS dirs during the walk (both for speed on a
+    populated venv, and because vendored dependency bytecode isn't this
+    project's concern to clean up) while still descending far enough to
+    find __pycache__ dirs anywhere in the user's own source tree.
+    """
+    from .skip_dirs import prune_dependency_dirs
+
+    removed = 0
+    for dirpath, dirs, files in os.walk(project_root):
+        prune_dependency_dirs(dirs)
+
+        if "__pycache__" in dirs:
+            shutil.rmtree(Path(dirpath) / "__pycache__", ignore_errors=True)
             removed += 1
+            dirs.remove("__pycache__")
+
+        for name in files:
+            if not name.endswith(".pyc"):
+                continue
+            pyc = Path(dirpath) / name
+            py = pyc.with_suffix(".py")
+            if py.exists() and pyc.stat().st_mtime > py.stat().st_mtime:
+                pyc.unlink()
+                removed += 1
 
     return True, f"Removed {removed} stale bytecode items"
 
