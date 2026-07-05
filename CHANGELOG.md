@@ -2,6 +2,51 @@
 
 ## [Unreleased]
 
+### Fixed
+- Added `env_diagnostics/skip_dirs.py` with shared, correct venv/VCS/cache exclusion
+  (`prune_walk_dirs`, `walk_paths`, `walk_py_files`) and fixed two recurring bugs across
+  every diagnostic that walks a project tree:
+  - `os.walk`-based checks (`imports/checks.py: check_missing_inits`,
+    `filesystem.py: _check_case_conflicts/_check_hidden_pollution`) used
+    `if ".venv" in root: continue` without pruning `dirs`, so the walk still fully
+    recursed into every subdirectory of a populated virtualenv before each entry got
+    discarded — on any project with a populated venv, `pfix diagnose` performed at
+    least seven separate full unfiltered tree walks (`imports/checks.py` x2,
+    `filesystem.py` x5, `paths.py` x2) before this fix.
+  - Several `rglob("*")`/`rglob("*.py")`-based checks matched the skip name as a
+    *substring of the full path string* (e.g. `".venv" in str(pyfile)`), which both
+    over-matches (a project checked out under `~/.venvs/myproject/...` had every file
+    wrongly excluded) and fully misses pruning during the walk. Fixed in
+    `filesystem.py` (`_check_symlinks`, `_check_large_files`, `_check_filename_encoding`),
+    `paths.py` (`_check_long_paths`, `_check_symlink_cycles`), `python_version.py`
+    (`_check_version_features`), `import_diagnostic.py` (`_get_all_project_imports`),
+    `serialization.py` (`_check_yaml_safety`), and `imports/graph_builder.py`
+    (`build_import_graph`).
+  Verified: a synthetic project with a 3000-file populated venv completes
+  `check_deprecated_apis` correctly and quickly (finds only the real source file); a
+  project checked out under a path containing the substring `.venvs` (but not as an
+  actual venv directory) no longer has its files wrongly excluded. Full test suite
+  (180 tests) passes.
+
+## [0.1.77] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Other
+- Update examples/complex_demo/local.dev.txt
+- Update examples/concurrency/local.dev.txt
+- Update examples/data/local.dev.txt
+- Update examples/deps/local.dev.txt
+- Update examples/edge_cases/local.dev.txt
+- Update examples/encoding/local.dev.txt
+- Update examples/environment/local.dev.txt
+- Update examples/filesystem/local.dev.txt
+- Update examples/getting_started/local.dev.txt
+- Update examples/imports/local.dev.txt
+- ... and 5 more files
+
 ## [0.1.76] - 2026-07-03
 
 ### Docs

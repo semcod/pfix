@@ -131,6 +131,7 @@ class PathDiagnostic(BaseDiagnostic):
     def _check_long_paths(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for paths that might be too long on Windows."""
         from ..types import DiagnosticResult
+        from .skip_dirs import walk_paths
 
         results = []
 
@@ -138,7 +139,7 @@ class PathDiagnostic(BaseDiagnostic):
         if sys.platform != "win32":
             return results
 
-        for item in project_root.rglob("*"):
+        for item in walk_paths(project_root):
             if len(str(item)) > 200:
                 results.append(
                     DiagnosticResult(
@@ -237,9 +238,10 @@ class PathDiagnostic(BaseDiagnostic):
     def _check_symlink_cycles(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for cyclic symlinks that could cause infinite loops."""
         from ..types import DiagnosticResult
+        from .skip_dirs import walk_paths
 
         results = []
-        for item in project_root.rglob("*"):
+        for item in walk_paths(project_root):
             if item.is_symlink():
                 try:
                     # Try to resolve to see if it loops or is broken

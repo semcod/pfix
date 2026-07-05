@@ -77,10 +77,10 @@ class ImportDiagnostic(BaseDiagnostic):
 
     def _get_all_project_imports(self, project_root: Path) -> set[str]:
         """Collect all imports from Python files in the project."""
+        from .skip_dirs import walk_py_files
+
         all_imports = set()
-        for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
-                continue
+        for pyfile in walk_py_files(project_root):
             try:
                 imports = extract_imports(pyfile.read_text())
                 all_imports.update(imports)

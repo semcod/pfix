@@ -84,9 +84,10 @@ class FilesystemDiagnostic(BaseDiagnostic):
     def _check_symlinks(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for broken symlinks."""
         from ..types import DiagnosticResult
+        from .skip_dirs import walk_paths
 
         results = []
-        for item in project_root.rglob("*"):
+        for item in walk_paths(project_root):
             if item.is_symlink():
                 if not item.exists():
                     results.append(
@@ -107,9 +108,10 @@ class FilesystemDiagnostic(BaseDiagnostic):
     def _check_large_files(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for unexpectedly large files."""
         from ..types import DiagnosticResult
+        from .skip_dirs import walk_paths
 
         results = []
-        for item in project_root.rglob("*"):
+        for item in walk_paths(project_root, files_only=True):
             if item.is_file():
                 size = item.stat().st_size
                 if item.suffix == ".py" and size > 1_000_000:  # 1MB
@@ -215,9 +217,10 @@ class FilesystemDiagnostic(BaseDiagnostic):
     def _check_filename_encoding(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for filenames that might cause issues due to encoding."""
         from ..types import DiagnosticResult
+        from .skip_dirs import walk_paths
 
         results = []
-        for item in project_root.rglob("*"):
+        for item in walk_paths(project_root):
             try:
                 item.name.encode("ascii")
             except UnicodeEncodeError:
@@ -237,11 +240,11 @@ class FilesystemDiagnostic(BaseDiagnostic):
     def _check_case_conflicts(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for multiple files with same name but different cases."""
         from ..types import DiagnosticResult
+        from .skip_dirs import prune_walk_dirs
 
         results = []
         for root, dirs, files in os.walk(project_root):
-            if ".git" in root or "__pycache__" in root:
-                continue
+            prune_walk_dirs(dirs)
             lower_to_orig = {}
             for name in files + dirs:
                 lower = name.lower()
@@ -269,7 +272,10 @@ class FilesystemDiagnostic(BaseDiagnostic):
         POLLUTANTS = [".DS_Store", "Thumbs.db", ".directory", "*.swp", "*~"]
         import fnmatch
 
+        from .skip_dirs import prune_walk_dirs
+
         for root, dirs, files in os.walk(project_root):
+            prune_walk_dirs(dirs)
             for name in files:
                 for pattern in POLLUTANTS:
                     if fnmatch.fnmatch(name, pattern):

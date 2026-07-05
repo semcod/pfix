@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from ...types import DiagnosticResult
 
 from .extractor import get_module_name, resolve_relative_import
+from ..skip_dirs import walk_py_files
 
 
 def build_import_graph(project_root: Path) -> tuple[dict[str, set[str]], dict[str, Path]]:
@@ -19,10 +20,7 @@ def build_import_graph(project_root: Path) -> tuple[dict[str, set[str]], dict[st
     module_imports: dict[str, set[str]] = {}
     module_paths: dict[str, Path] = {}
 
-    for pyfile in project_root.rglob("*.py"):
-        if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
-            continue
-
+    for pyfile in walk_py_files(project_root):
         module_name = get_module_name(pyfile, project_root)
         module_paths[module_name] = pyfile
 

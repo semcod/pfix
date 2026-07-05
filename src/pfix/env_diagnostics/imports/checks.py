@@ -162,10 +162,11 @@ def check_missing_inits(project_root: Path, category: str) -> list["DiagnosticRe
     """Find directories containing .py files but no __init__.py."""
     from ...types import DiagnosticResult
 
+    from ..skip_dirs import prune_walk_dirs
+
     results = []
     for root, dirs, files in os.walk(project_root):
-        if "__pycache__" in root or ".git" in root or ".venv" in root:
-            continue
+        prune_walk_dirs(dirs)
 
         if any(f.endswith(".py") for f in files) and "__init__.py" not in files:
             rel_path = Path(root).relative_to(project_root)
@@ -201,31 +202,38 @@ DEPRECATED_MODULES = {
 def check_deprecated_apis(project_root: Path, category: str) -> list["DiagnosticResult"]:
     """Check for use of deprecated standard library or third-party APIs."""
     from ...types import DiagnosticResult
+    from ..skip_dirs import prune_walk_dirs
 
     results = []
 
-    for pyfile in project_root.rglob("*.py"):
-        if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
-            continue
-        try:
-            content = pyfile.read_text()
-            imports = extract_imports(content)
-            for imp in imports:
-                if imp in DEPRECATED_MODULES:
-                    results.append(
-                        DiagnosticResult(
-                            category=category,
-                            check_name="deprecated_api",
-                            status="warning",
-                            message=f"Use of deprecated module '{imp}' in {pyfile.name}",
-                            details={"module": imp, "alternative": DEPRECATED_MODULES[imp]},
-                            suggestion=DEPRECATED_MODULES[imp],
-                            auto_fixable=False,
-                            abs_path=str(pyfile),
+    for root, dirs, files in os.walk(project_root):
+        prune_walk_dirs(dirs)
+        for filename in files:
+            if not filename.endswith(".py"):
+                continue
+            pyfile = Path(root) / filename
+            try:
+                content = pyfile.read_text()
+                imports = extract_imports(content)
+                for imp in imports:
+                    if imp in DEPRECATED_MODULES:
+                        results.append(
+                            DiagnosticResult(
+                                category=category,
+                                check_name="deprecated_api",
+                                status="warning",
+                                message=f"Use of deprecated module '{imp}' in {pyfile.name}",
+                                details={
+                                    "module": imp,
+                                    "alternative": DEPRECATED_MODULES[imp],
+                                },
+                                suggestion=DEPRECATED_MODULES[imp],
+                                auto_fixable=False,
+                                abs_path=str(pyfile),
+                            )
                         )
-                    )
-        except Exception:
-            pass
+            except Exception:
+                pass
     return results
 
 

@@ -140,13 +140,12 @@ class PythonVersionDiagnostic(BaseDiagnostic):
 
     def _check_version_features(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for version-specific features in code."""
+        from .skip_dirs import walk_py_files
+
         results = []
         current = sys.version_info[:2]
 
-        for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
-                continue
-
+        for pyfile in walk_py_files(project_root):
             try:
                 source = pyfile.read_text()
                 tree = ast.parse(source)

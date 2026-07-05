@@ -89,11 +89,10 @@ class SerializationDiagnostic(BaseDiagnostic):
     def _check_yaml_safety(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for unsafe YAML loading."""
         from ..types import DiagnosticResult
+        from .skip_dirs import walk_py_files
 
         results = []
-        for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile) or ".venv" in str(pyfile):
-                continue
+        for pyfile in walk_py_files(project_root):
             try:
                 content = pyfile.read_text()
                 # Search for yaml.load( without SafeLoader

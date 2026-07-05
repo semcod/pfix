@@ -1,0 +1,10 @@
+# local.dev.txt — locally developed dependencies of this project (generated 2026-07-04)
+# by ~/github/local.dev.sh — DO NOT EDIT; see ~/github/local.dev.md
+# project: pfix 0.1.76 (python) at /home/tom/github/semcod/pfix
+# deps declared: 22 | with local source: 2
+
+## LOCAL DEPS  (dep | required | local source (version) | installed | status)
+costs | >=0.1.20 | /home/tom/github/semcod/costs (0.1.53) | 0.1.35 non-editable | STALE-INSTALL (local 0.1.53) -> fix: pip install -e /home/tom/github/semcod/costs  [pyproject.toml[dev]]
+goal | >=2.1.0 | /home/tom/github/semcod/goal (2.1.266) | 2.1.165 non-editable | STALE-INSTALL (local 2.1.266) -> fix: pip install -e /home/tom/github/semcod/goal  [pyproject.toml[dev]]
+
+## EXTERNAL DEPS (no local source, 19): diskcache, gitpython, httpx, litellm, mcp, pathspec, pipreqs, psutil, pytest, pytest-cov, python-dotenv, rich, ruff, sentry-sdk, structlog, tenacity, textual, uvicorn, watchdog
