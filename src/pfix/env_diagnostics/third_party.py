@@ -183,13 +183,12 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
         """Check API client configurations in code."""
         import ast
 
+        from .skip_dirs import walk_py_files
+
         results = []
 
         # Look for hardcoded API keys or missing timeout configs
-        for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile):
-                continue
-
+        for pyfile in walk_py_files(project_root):
             try:
                 source = pyfile.read_text()
                 tree = ast.parse(source)

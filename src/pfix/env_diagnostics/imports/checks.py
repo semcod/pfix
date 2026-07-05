@@ -65,7 +65,9 @@ def check_shadow_stdlib(project_root: Path, category: str) -> list["DiagnosticRe
         else {"json", "sys", "os", "re", "collections", "typing", "pathlib"}
     )
 
-    for pyfile in project_root.rglob("*.py"):
+    from ..skip_dirs import walk_py_files
+
+    for pyfile in walk_py_files(project_root):
         name = pyfile.stem
         if name in stdlib_names and pyfile.parent == project_root:
             results.append(
@@ -88,9 +90,12 @@ def check_shadow_stdlib(project_root: Path, category: str) -> list["DiagnosticRe
 def check_stale_bytecode(project_root: Path, category: str) -> list["DiagnosticResult"]:
     """Check for stale .pyc files."""
     from ...types import DiagnosticResult
+    from ..skip_dirs import walk_paths
 
     results = []
-    for pyc in project_root.rglob("*.pyc"):
+    for pyc in walk_paths(project_root, files_only=True):
+        if pyc.suffix != ".pyc":
+            continue
         py = pyc.with_suffix(".py")
         if py.exists():
             if pyc.stat().st_mtime > py.stat().st_mtime:

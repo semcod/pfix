@@ -75,12 +75,11 @@ class EncodingDiagnostic(BaseDiagnostic):
         """Check Python files for encoding issues."""
         from ..types import DiagnosticResult
 
+        from .skip_dirs import walk_py_files
+
         results = []
 
-        for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile):
-                continue
-
+        for pyfile in walk_py_files(project_root):
             try:
                 with open(pyfile, "rb") as f:
                     content = f.read()
@@ -128,12 +127,11 @@ class EncodingDiagnostic(BaseDiagnostic):
         """Check for mixed line endings."""
         from ..types import DiagnosticResult
 
+        from .skip_dirs import walk_py_files
+
         results = []
 
-        for pyfile in project_root.rglob("*.py"):
-            if "__pycache__" in str(pyfile):
-                continue
-
+        for pyfile in walk_py_files(project_root):
             try:
                 content = pyfile.read_bytes()
 

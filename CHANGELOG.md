@@ -3,6 +3,41 @@
 ## [Unreleased]
 
 ### Fixed
+- Three more `env_diagnostics` checks were missed by the venv-pruning fix in 0.1.77
+  and still walked the *entire* project tree (including a populated `venv`/`site-packages`)
+  before filtering, each only skipping `__pycache__` by substring match:
+  `third_party.py: _check_api_client_configs`, `encoding.py: _check_file_encoding` and
+  `_check_line_endings`, and `imports/checks.py`'s stdlib-shadow and stale-bytecode checks.
+  Found by re-running `pfix diagnose` against a real project (`redup`) whose venv still
+  had the pre-0.1.77 `pfix` installed: `diagnose` hung past 60s. Switched all four to the
+  shared `walk_py_files`/`walk_paths` helpers from `skip_dirs.py`.
+  Verified: `pfix diagnose` on that same project (repo + populated venv) now completes in
+  ~4.4s (previously timed out past 60s). Full test suite (180 tests) passes.
+
+## [0.1.78] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+## [0.1.77] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Other
+- Update examples/complex_demo/local.dev.txt
+- Update examples/concurrency/local.dev.txt
+- Update examples/data/local.dev.txt
+- Update examples/deps/local.dev.txt
+- Update examples/edge_cases/local.dev.txt
+- Update examples/encoding/local.dev.txt
+- Update examples/environment/local.dev.txt
+- Update examples/filesystem/local.dev.txt
+- Update examples/getting_started/local.dev.txt
+
+### Fixed
 - Added `env_diagnostics/skip_dirs.py` with shared, correct venv/VCS/cache exclusion
   (`prune_walk_dirs`, `walk_paths`, `walk_py_files`) and fixed two recurring bugs across
   every diagnostic that walks a project tree:
@@ -27,25 +62,6 @@
   project checked out under a path containing the substring `.venvs` (but not as an
   actual venv directory) no longer has its files wrongly excluded. Full test suite
   (180 tests) passes.
-
-## [0.1.77] - 2026-07-05
-
-### Docs
-- Update CHANGELOG.md
-- Update README.md
-
-### Other
-- Update examples/complex_demo/local.dev.txt
-- Update examples/concurrency/local.dev.txt
-- Update examples/data/local.dev.txt
-- Update examples/deps/local.dev.txt
-- Update examples/edge_cases/local.dev.txt
-- Update examples/encoding/local.dev.txt
-- Update examples/environment/local.dev.txt
-- Update examples/filesystem/local.dev.txt
-- Update examples/getting_started/local.dev.txt
-- Update examples/imports/local.dev.txt
-- ... and 5 more files
 
 ## [0.1.76] - 2026-07-03
 
