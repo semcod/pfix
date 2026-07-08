@@ -217,3 +217,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+.code2llm_cache/
+.github/
+.pyqual/
+.redsl/
+.taskill/
