@@ -307,6 +307,11 @@ pfix server --http 3001         # Start MCP server (HTTP)
 
 pfix exposes tools via FastMCP for IDE integration:
 
+Write-capable MCP tools are disabled unless the server is started with
+`PFIX_MCP_ALLOW_WRITE=1`. A live mutation additionally requires an `actor` and
+the exact `approval_hash` returned for that proposal; analysis remains available
+without the flag.
+
 | Tool | Description |
 |---|---|
 | `pfix_analyze` | Analyze error → diagnosis + fix proposal |

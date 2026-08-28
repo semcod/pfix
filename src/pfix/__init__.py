@@ -18,9 +18,8 @@ Auto-activation via .env:
     without any code changes (just import pfix).
 """
 
-from .config import PfixConfig, configure, get_config, reset_config
-from .decorator import apfix, pfix
-from .session import auto_pfix, pfix_guard, pfix_session
+from importlib import import_module
+from typing import Any
 
 __version__ = "0.1.79"
 __all__ = [
@@ -35,6 +34,29 @@ __all__ = [
     "reset_config",
 ]
 
+_LAZY_EXPORTS = {
+    "pfix": ("pfix.decorator", "pfix"),
+    "apfix": ("pfix.decorator", "apfix"),
+    "auto_pfix": ("pfix.session", "auto_pfix"),
+    "pfix_session": ("pfix.session", "pfix_session"),
+    "pfix_guard": ("pfix.session", "pfix_guard"),
+    "configure": ("pfix.config", "configure"),
+    "get_config": ("pfix.config", "get_config"),
+    "PfixConfig": ("pfix.config", "PfixConfig"),
+    "reset_config": ("pfix.config", "reset_config"),
+}
+
+
+def __getattr__(name: str) -> Any:
+    """Load public runtime integrations only when they are requested."""
+    target = _LAZY_EXPORTS.get(name)
+    if target is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module_name, attribute = target
+    value = getattr(import_module(module_name), attribute)
+    globals()[name] = value
+    return value
+
 # ── Auto-activation on import ─────────────────────────────────────
 # If PFIX_AUTO_APPLY=true in .env, automatically install global exception hook
 # This allows: `import pfix` to just work with zero code changes
@@ -46,19 +68,22 @@ def _auto_activate():
 
     _load_env()
 
-    # Check if explicitly disabled
-    if os.getenv("PFIX_AUTO_ACTIVATE", "true").lower() in ("false", "0", "no"):
+    activation = os.getenv("PFIX_AUTO_ACTIVATE", "").lower()
+    if activation in ("false", "0", "no"):
         return
 
-    # Check for auto_apply
+    # Preserve the documented PFIX_AUTO_APPLY opt-in while keeping plain
+    # metadata imports free from implicit runtime hooks.
     if os.getenv("PFIX_AUTO_APPLY", "false").lower() in ("true", "1", "yes"):
         from .session import install_pfix_hook
 
         caller_file = _get_caller_file()
         install_pfix_hook(caller_file, auto_apply=True)
 
-    # Setup runtime_todo if enabled
-    _setup_runtime_todo()
+    # Runtime TODO hooks are broader than auto-apply and require an explicit
+    # activation flag even when pyproject.toml enables their configuration.
+    if activation in ("true", "1", "yes"):
+        _setup_runtime_todo()
 
 
 def _load_env():
