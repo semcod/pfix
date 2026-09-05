@@ -779,3 +779,7 @@ _Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:42
 > Introduced a deep code analysis engine and a configuration management system, plus a number of documentation/refactor updates and CLI/config fixes across the project.
 
 <!-- taskill:status:end -->
+
+## Dependency maintenance
+
+See [dependency updates and Python tool groups](docs/dependencies.md) for locked tests, daily updates and freshness checks.
