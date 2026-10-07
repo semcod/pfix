@@ -23,6 +23,11 @@ console = Console()
 
 
 def main(argv: list[str] | None = None) -> int:
+    try:
+        from pfix.autoupdate import check_for_updates
+        check_for_updates("pfix")
+    except Exception:
+        pass
     parser = _build_parser()
     args = parser.parse_args(argv)
     return _dispatch(args)
