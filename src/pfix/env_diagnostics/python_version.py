@@ -138,6 +138,20 @@ class PythonVersionDiagnostic(BaseDiagnostic):
             abs_path=path,
         )
 
+    _AST_CACHE: dict[str, tuple[int, int, ast.AST]] = {}
+
+    @classmethod
+    def _parse_ast_cached(cls, pyfile: Path) -> ast.AST:
+        """Parse Python file AST with mtime/size cache."""
+        st = pyfile.stat()
+        key = str(pyfile)
+        cached = cls._AST_CACHE.get(key)
+        if cached is not None and cached[0] == st.st_mtime_ns and cached[1] == st.st_size:
+            return cached[2]
+        tree = ast.parse(pyfile.read_text())
+        cls._AST_CACHE[key] = (st.st_mtime_ns, st.st_size, tree)
+        return tree
+
     def _check_version_features(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check for version-specific features in code."""
         from .skip_dirs import walk_py_files
@@ -147,8 +161,7 @@ class PythonVersionDiagnostic(BaseDiagnostic):
 
         for pyfile in walk_py_files(project_root):
             try:
-                source = pyfile.read_text()
-                tree = ast.parse(source)
+                tree = self._parse_ast_cached(pyfile)
                 results.extend(self._check_file_features(tree, current, str(pyfile)))
             except (SyntaxError, Exception):
                 pass
@@ -212,8 +225,7 @@ class PythonVersionDiagnostic(BaseDiagnostic):
                 continue
 
             try:
-                source = pyfile.read_text()
-                tree = ast.parse(source)
+                tree = self._parse_ast_cached(pyfile)
 
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):

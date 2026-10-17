@@ -55,7 +55,8 @@ def cmd_status(args=None) -> int:
     from pfix import __version__
     from pfix.config import get_config
 
-    config = get_config()
+    project_root = getattr(args, "project_root", None) if args is not None else None
+    config = get_config(project_root) if project_root else get_config()
     warnings = config.validate()
 
     # Header

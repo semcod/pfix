@@ -179,6 +179,22 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
             line_number=getattr(node, "lineno", None),
         )
 
+    _AST_CACHE: dict[str, tuple[int, int, object]] = {}
+
+    @classmethod
+    def _parse_ast_cached(cls, pyfile: Path):
+        """Parse Python file AST with mtime/size cache."""
+        import ast
+
+        st = pyfile.stat()
+        key = str(pyfile)
+        cached = cls._AST_CACHE.get(key)
+        if cached is not None and cached[0] == st.st_mtime_ns and cached[1] == st.st_size:
+            return cached[2]
+        tree = ast.parse(pyfile.read_text())
+        cls._AST_CACHE[key] = (st.st_mtime_ns, st.st_size, tree)
+        return tree
+
     def _check_api_client_configs(self, project_root: Path) -> list["DiagnosticResult"]:
         """Check API client configurations in code."""
         import ast
@@ -190,8 +206,7 @@ class ThirdPartyDiagnostic(BaseDiagnostic):
         # Look for hardcoded API keys or missing timeout configs
         for pyfile in walk_py_files(project_root):
             try:
-                source = pyfile.read_text()
-                tree = ast.parse(source)
+                tree = self._parse_ast_cached(pyfile)
 
                 for node in ast.walk(tree):
                     # Check for hardcoded API keys

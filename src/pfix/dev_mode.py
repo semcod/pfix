@@ -126,10 +126,10 @@ def install_dev_mode_hook():
     class DevModeFinder:
         """Meta path finder that wraps modules from site-packages."""
 
-        def find_module(self, fullname: str, path=None):
+        def find_module(self, fullname: str, _path=None):
             return None  # We don't find modules, just wrap them
 
-        def find_spec(self, fullname: str, path, target=None):
+        def find_spec(self, fullname: str, path, _target=None):
             return None
 
     class DevModeLoader:
