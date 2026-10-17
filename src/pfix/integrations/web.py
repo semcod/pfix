@@ -201,7 +201,7 @@ def create_error_handler(
     """
     monitor = PfixMonitor(
         webhook_url=notify_url,
-        auto_apply=False,
+        auto_apply=auto_fix,
     )
 
     def handle(exc: Exception) -> None:

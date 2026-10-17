@@ -199,6 +199,20 @@ def parse_multi_file_response(raw: str) -> Optional[MultiFileFixProposal]:
         return None
 
 
+_SYNTAX_CACHE: dict[int, ast.AST] = {}
+
+
+def _validate_python_syntax(content: str) -> ast.AST:
+    """Parse Python source with content-hash memoization."""
+    key = hash(content)
+    cached = _SYNTAX_CACHE.get(key)
+    if cached is not None:
+        return cached
+    tree = ast.parse(content)
+    _SYNTAX_CACHE[key] = tree
+    return tree
+
+
 def apply_multi_file_fix(
     proposal: MultiFileFixProposal,
     project_root: Path,
@@ -228,7 +242,7 @@ def apply_multi_file_fix(
         try:
             # Validate syntax
             try:
-                ast.parse(new_content)
+                _validate_python_syntax(new_content)
             except SyntaxError as e:
                 console.print(f"[red]✗ Syntax error in {relative_path}: {e}[/]")
                 results[relative_path] = False

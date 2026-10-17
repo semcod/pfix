@@ -10,7 +10,8 @@ console = Console()
 
 def cmd_enable(args=None) -> int:
     """Enable pfix auto-activation and add config to pyproject.toml. CC≤5."""
-    site_packages = _find_site_packages()
+    custom_site = getattr(args, "site_packages", None) if args is not None else None
+    site_packages = Path(custom_site) if custom_site else _find_site_packages()
     if not site_packages:
         console.print("[red]✗ Cannot find site-packages directory[/]")
         return 1
@@ -115,7 +116,8 @@ def cmd_disable(args=None) -> int:
     import site
 
     # Find site-packages directory
-    site_packages = Path(site.getsitepackages()[0]) if site.getsitepackages() else None
+    custom_site = getattr(args, "site_packages", None) if args is not None else None
+    site_packages = Path(custom_site) if custom_site else (Path(site.getsitepackages()[0]) if site.getsitepackages() else None)
     if not site_packages:
         site_packages = Path(site.getusersitepackages())
 

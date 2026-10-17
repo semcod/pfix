@@ -112,7 +112,7 @@ def _format_local_vars(local_vars: Optional[dict]) -> dict[str, str]:
     """Anonymize and repr local variables."""
     if not local_vars:
         return {}
-    return {k: _safe_repr(v) for k, v in local_vars.items() if not k.startswith("__")}
+    return {k: _safe_repr(v, max_len=200) for k, v in local_vars.items() if not k.startswith("__")}
 
 
 def _extract_function_source(func: Optional[Any]) -> dict:

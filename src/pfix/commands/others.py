@@ -84,6 +84,8 @@ def cmd_audit(args) -> int:
 def cmd_init(args=None) -> int:
     from pfix.init_wizard import init_wizard
 
+    if getattr(args, "skip", False):
+        return 0
     init_wizard()
     return 0
 
@@ -91,6 +93,8 @@ def cmd_init(args=None) -> int:
 def cmd_dashboard(args=None) -> int:
     from pfix.dashboard import run_dashboard
 
+    if getattr(args, "skip", False):
+        return 0
     run_dashboard()
     return 0
 

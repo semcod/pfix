@@ -15,6 +15,21 @@ from .extractor import get_module_name, resolve_relative_import
 from ..skip_dirs import walk_py_files
 
 
+_AST_CACHE: dict[str, tuple[int, int, ast.AST]] = {}
+
+
+def _parse_ast_cached(pyfile: Path) -> ast.AST:
+    """Parse Python file AST with mtime/size cache."""
+    st = pyfile.stat()
+    key = str(pyfile)
+    cached = _AST_CACHE.get(key)
+    if cached is not None and cached[0] == st.st_mtime_ns and cached[1] == st.st_size:
+        return cached[2]
+    tree = ast.parse(pyfile.read_text())
+    _AST_CACHE[key] = (st.st_mtime_ns, st.st_size, tree)
+    return tree
+
+
 def build_import_graph(project_root: Path) -> tuple[dict[str, set[str]], dict[str, Path]]:
     """Build import dependency graph from project files."""
     module_imports: dict[str, set[str]] = {}
@@ -25,7 +40,7 @@ def build_import_graph(project_root: Path) -> tuple[dict[str, set[str]], dict[st
         module_paths[module_name] = pyfile
 
         try:
-            tree = ast.parse(pyfile.read_text())
+            tree = _parse_ast_cached(pyfile)
             imports = set()
 
             for node in ast.walk(tree):
@@ -36,7 +51,7 @@ def build_import_graph(project_root: Path) -> tuple[dict[str, set[str]], dict[st
                         imports.add(node.module.split(".")[0])
 
             module_imports[module_name] = imports
-        except (SyntaxError, UnicodeDecodeError):
+        except (SyntaxError, UnicodeDecodeError, OSError):
             pass
 
     return module_imports, module_paths

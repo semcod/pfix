@@ -59,14 +59,29 @@ def get_log_stats(log_dir: Path = Path(".pfix_logs")) -> dict[str, Any]:
     }
 
 
+def _read_bounded_log_lines(path: Path, max_bytes: int = 262_144) -> list[str]:
+    """Read up to the last max_bytes of a JSONL file without loading unbounded history."""
+    with path.open("rb") as handle:
+        handle.seek(0, 2)
+        size = handle.tell()
+        offset = max(0, size - max_bytes)
+        handle.seek(offset)
+        raw = handle.read(max_bytes)
+    text = raw.decode("utf-8", errors="replace")
+    lines = text.splitlines()
+    if offset > 0 and lines:
+        lines = lines[1:]
+    return lines
+
+
 def _process_log_file(log_file: Path, stats: dict, confidences: list, recent_errors: list):
     """Process single log file and update stats/history."""
     try:
-        content = log_file.read_text(encoding="utf-8").strip()
-        if not content:
+        lines = _read_bounded_log_lines(log_file, max_bytes=262_144)
+        if not lines:
             return
 
-        for line in content.split("\n"):
+        for line in lines:
             if not line:
                 continue
             try:
