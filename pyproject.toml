@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pfix"
-version = "0.1.79"
+version = "0.1.80"
 description = "Self-healing Python — catches runtime errors, fixes code & dependencies via LLM + MCP"
 readme = "README.md"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 authors = [
     { name = "Tom Sapletta", email = "tom@sapletta.com" },

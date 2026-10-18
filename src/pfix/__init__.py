@@ -21,7 +21,7 @@ Auto-activation via .env:
 from importlib import import_module
 from typing import Any
 
-__version__ = "0.1.79"
+__version__ = "0.1.80"
 __all__ = [
     "pfix",
     "apfix",
