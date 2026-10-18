@@ -226,7 +226,7 @@ strategies:
   python:
     test: python3 -c "import pathlib; assert pathlib.Path('pyproject.toml').exists()"
     build: python -m build
-    publish: twine upload dist/pfix-{version}*
+    publish: twine upload --skip-existing dist/*{version}*
     publish_enabled: true
     dependencies:
       file: requirements.txt
